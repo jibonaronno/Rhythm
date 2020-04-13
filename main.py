@@ -101,11 +101,12 @@ class WorkerThread(QObject):
                         in_waiting = self.s.in_waiting
                         
                     jMessage = ""
-                    while self.s.in_waiting:
-                        #print(self.s.readline().decode('ascii'))
-                        lst = self.s.readlines()
-                        for itm in lst:
-                            jMessage += itm.decode('ascii')
+                    while "ok" not in jMessage:
+                        while self.s.in_waiting:
+                            #print(self.s.readline().decode('ascii'))
+                            lst = self.s.readlines()
+                            for itm in lst:
+                                jMessage += itm.decode('ascii')
                     self.signal.emit(str(line) + " - " + jMessage)
             except serial.SerialException as ex:
                 print("Error In SerialException" + ex.strerror)
@@ -119,7 +120,7 @@ class MainWindow(QMainWindow):
         #self.verticalLayout_2 = QVBoxLayout()
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
-        window_title = "ICU Ventilator Monitoring"
+        window_title = "Rhythm"
         self.json = JsonSettings("settings.json")
         self.settings_dict = self.json.dict
         pprint.pprint(self.settings_dict)
@@ -145,6 +146,7 @@ class MainWindow(QMainWindow):
         self.motion_table.setColumnCount(2)
         self.motion_table.setRowCount(10)
         self.motion_table.setHorizontalHeaderLabels(self.motion_table_headers)
+        #self.motion_table.setSizeAdjustPolicy(QtWidget.QAbstractScrollArea.AdjustToContents)
         self.CalculateSettings()
         self.verticalLayout_2.addWidget(self.motion_table)
 
@@ -165,6 +167,9 @@ class MainWindow(QMainWindow):
 
         self.s = ""
         self.ports = list(port_list.comports())
+
+        self.workerThreadCreated = False
+        self.serialPortOpen = False
     
     def ShowGcodeTable(self):
         codelist = self.generator.gcodestr.splitlines()
@@ -203,6 +208,8 @@ class MainWindow(QMainWindow):
         self.txrxtable.insertRow(rcount)
         self.txrxtable.setItem(rcount,0, QTableWidgetItem(data_stream))
         self.txrxtable.scrollToBottom()
+        self.txrxtable.resizeColumnsToContents()
+        self.txrxtable.resizeRowsToContents()
         if data_stream == "Stopped":
             self.primaryThread.exit()
         elif data_stream == "Loop":
@@ -212,7 +219,8 @@ class MainWindow(QMainWindow):
             self.worker.signal.connect(self.write_info)
             self.worker.moveToThread(self.workerThread)
             self.workerThread.start()
-            print("Starting Thread")
+            self.workerThreadCreated = True
+            print("Starting Worker Thread")
 
         #if data_stream == "Stopped":
         #    self.worker = WorkerThread(self.s)
@@ -241,29 +249,33 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_btninit_clicked(self):
-        self.primary = PrimaryThread(self.s)
-        self.primaryThread = QThread()
-        self.primaryThread.started.connect(self.primary.run)
-        self.primary.signal.connect(self.write_info)
-        self.primary.moveToThread(self.primaryThread)
-        self.primaryThread.start()
-        print("Starting Primary Thread")
+        if not self.workerThreadCreated:
+            self.primary = PrimaryThread(self.s)
+            self.primaryThread = QThread()
+            self.primaryThread.started.connect(self.primary.run)
+            self.primary.signal.connect(self.write_info)
+            self.primary.moveToThread(self.primaryThread)
+            self.primaryThread.start()
+            print("Starting Primary Thread")
 
     @Slot()
     def on_connect_clicked(self):
         try:
-            print("Serial Port Name : " + self.portsList.currentText())
-            self.s = serial.Serial(self.portsList.currentText(), baudrate=115200, timeout=1)
-            #self.s.open()
-            time.sleep(1)
-            #self.s.write("\r\n\r\n") # Hit enter a few times to wake the Printrbot
-            #time.sleep(2)   # Wait for Printrbot to initialize
-            while self.s.in_waiting:
-                self.s.readline()
-                #print(self.s.readline().decode("ascii"))
-            #self.s.flushInput()  # Flush startup text in serial input
+            if not self.serialPortOpen:
+                print("Serial Port Name : " + self.portsList.currentText())
+                self.s = serial.Serial(self.portsList.currentText(), baudrate=115200, timeout=1)
+                #self.s.open()
+                time.sleep(1)
+                self.serialPortOpen = True
+                #self.s.write("\r\n\r\n") # Hit enter a few times to wake the Printrbot
+                #time.sleep(2)   # Wait for Printrbot to initialize
+                while self.s.in_waiting:
+                    self.s.readline()
+                    #print(self.s.readline().decode("ascii"))
+                #self.s.flushInput()  # Flush startup text in serial input
             
         except serial.SerialException as ex:
+            self.serialPortOpen = False
             print(ex.strerror)
             print("Error Opening Serial Port..........................................")
            
@@ -278,7 +290,8 @@ class MainWindow(QMainWindow):
         self.json.dict[r'fio2'] = str(((self.table.item(0,3).text())))
         self.generator = GcodeGenerator(int(self.json.dict[r'vt']), int(self.json.dict[r'rr']), int(self.json.dict[r'ie']), int(self.json.dict[r'fio2']))
         self.generator.Generate()
-        self.worker.updateGcode(self.generator)
+        if self.workerThreadCreated:
+            self.worker.updateGcode(self.generator)
         pprint.pprint(self.generator.gcodestr)
         self.json.dumptojson()
 
@@ -340,7 +353,7 @@ class GcodeGenerator(object):
 
     def Generate(self):
         self.gcodeprimary = "G21\r\nG80\r\nM92 X400 Y400\r\nG90\r\nG28 X0Y0 F500\r\nG01 X" + str(self.Dp) + "Y" + str(self.Dp) + " F500\r\n"
-        self.gcodestr = "G01 X" + str(self.Dt)+"Y"+str(self.Dt)+"F500\r\n"+"G01 X" + str(self.Dp)+"Y"+str(self.Dp)+" F"+str(self.Vi)+"\r\n"+"G01 X"+str(self.Dt)+"Y"+str(self.Dt)+" F"+str(self.Vh)+"\r\n"+"G04 P"+str(self.TDMS)+"\r\n"
+        self.gcodestr = "G01 X" + str(self.Dt)+"Y"+str(self.Dt)+"F500\r\n"+"G01 X" + str(self.Dp)+"Y"+str(self.Dp)+" F"+str(self.Vi)+"\r\n"+"G01 X"+str(self.Dt)+"Y"+str(self.Dt)+" F"+str(self.Vh)+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
         with open('primary.gcode', 'w') as writer:
             writer.write(self.gcodeprimary)
 
