@@ -280,7 +280,13 @@ class MainWindow(QMainWindow):
             print(ex.strerror)
             print("Error Opening Serial Port..........................................")
            
-
+    @Slot()
+    def on_btnCPAP_clicked(self):
+        if self.btnCPAP.isChecked():
+            #self.btnCPAP.toggle()
+            self.btnCPAP.setStyleSheet('QPushButton {background-color: #7F7F7F}')
+        else:
+            self.btnCPAP.setStyleSheet('QPushButton {background-color: #404040}')
 
     def SaveSettings(self):
         self.json = JsonSettings("settings.json")
