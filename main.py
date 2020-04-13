@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import sys
 from os.path import join, dirname, abspath
 import serial
@@ -263,7 +264,7 @@ class MainWindow(QMainWindow):
         try:
             if not self.serialPortOpen:
                 print("Serial Port Name : " + self.portsList.currentText())
-                self.s = serial.Serial(self.portsList.currentText(), baudrate=115200, timeout=1)
+                self.s = serial.Serial(self.portsList.currentText(), baudrate=250000, timeout=1)
                 #self.s.open()
                 time.sleep(1)
                 self.serialPortOpen = True
