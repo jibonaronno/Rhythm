@@ -345,7 +345,7 @@
                <string>#PEEP LEVEL</string>
               </property>
               <property name="textFormat">
-               <enum>Qt::MarkdownText</enum>
+               <enum>Qt::AutoText</enum>
               </property>
               <property name="scaledContents">
                <bool>false</bool>
