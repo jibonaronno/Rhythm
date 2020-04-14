@@ -128,6 +128,37 @@ class WorkerThread(QObject):
 
             # doFunc(self.signal, jMessage)
 
+class SensorThread(QObject):
+    signal = Signal(str)
+    def __init__(self, s, codegen):
+        self.s = s
+        self.flagStop = False
+        super().__init__()
+
+    def Stop(self):
+        self.flagStop = True
+
+    @Slot()
+    def run(self):
+        lst = []
+        while 1:
+            if self.flagStop:
+                break
+            try:
+                in_waiting = self.s.in_waiting
+                while in_waiting == 0:
+                    time.sleep(0.1)
+                    in_waiting = self.s.in_waiting
+                jMessage = ""
+                while "ok" not in jMessage:
+                    while self.s.in_waiting:
+                        #print(self.s.readline().decode('ascii'))
+                        lst = self.s.readlines()
+                        for itm in lst:
+                            jMessage += itm.decode('ascii')
+                self.signal.emit(str(line) + " - " + jMessage)
+            except serial.SerialException as ex:
+                print("Error In SerialException" + ex.strerror)
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -182,12 +213,67 @@ class MainWindow(QMainWindow):
         self.hbox.addWidget(self.txrxtable)
         #self.hbox.addLayout
 
+        self.peepdial.valueChanged.connect(self.peepDialChanged)
+        self.peeplcd.display(self.peepdial.value())
+        self.peakdial.valueChanged.connect(self.peakDialChanged)
+        self.peaklcd.display(self.peakdial.value())
+        self.ipapdial.valueChanged.connect(self.ipapDialChanged)
+        self.ipaplcd.display(self.ipapdial.value())
+        self.vtdial.valueChanged.connect(self.vtDialChanged)
+        self.vtlcd.display(self.vtdial.value())
+        self.iedial.valueChanged.connect(self.ieDialChanged)
+        self.ielcd.display(self.iedial.value())
+        self.rrdial.valueChanged.connect(self.rrDialChanged)
+        self.rrlcd.display(self.rrdial.value())
+        self.fiodial.valueChanged.connect(self.fioDialChanged)
+        self.fiolcd.display(self.fiodial.value())
+
         self.s = ""
         self.ports = list(port_list.comports())
 
         self.primaryThreadCreated = False
         self.workerThreadCreated = False
         self.serialPortOpen = False
+
+    def update_param_table(self):
+        self.table.setItem(0,0, QTableWidgetItem(self.settings_dict[r"vt"]))
+        self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
+        self.table.setItem(0,2, QTableWidgetItem(self.settings_dict[r"rr"]))
+        self.table.setItem(0,3, QTableWidgetItem(self.settings_dict[r"fio2"]))
+
+    def peepDialChanged(self):
+        self.peeplcd.display(self.peepdial.value())
+
+    def peakDialChanged(self):
+        self.peaklcd.display(self.peakdial.value())
+
+    def ipapDialChanged(self):
+        self.ipaplcd.display(self.ipapdial.value())
+
+    def vtDialChanged(self):
+        self.vtlcd.display(self.vtdial.value())
+        self.vt = self.vtdial.value()
+        self.settings_dict[r"vt"] = str(self.vt)
+        self.update_param_table()
+
+    def ieDialChanged(self):
+        self.ielcd.display(self.iedial.value())
+        self.ie = self.iedial.value()
+        self.settings_dict[r"ie"] = str(self.ie)
+        self.update_param_table()
+
+    def rrDialChanged(self):
+        self.rrlcd.display(self.rrdial.value())
+        self.rr = self.rrdial.value()
+        self.settings_dict[r"rr"] = str(self.rr)
+        self.update_param_table()
+
+    def fioDialChanged(self):
+        self.fiolcd.display(self.fiodial.value())
+        self.fio = self.fiodial.value()
+        self.settings_dict[r"fio"] = str(self.fio)
+        self.update_param_table()
+
     
     def ShowGcodeTable(self):
         codelist = self.generator.gcodestr.splitlines()
