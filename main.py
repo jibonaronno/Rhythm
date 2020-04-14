@@ -130,7 +130,7 @@ class WorkerThread(QObject):
 
 class SensorThread(QObject):
     signal = Signal(str)
-    def __init__(self, s, codegen):
+    def __init__(self, s):
         self.s = s
         self.flagStop = False
         super().__init__()
@@ -150,13 +150,13 @@ class SensorThread(QObject):
                     time.sleep(0.1)
                     in_waiting = self.s.in_waiting
                 jMessage = ""
-                while "ok" not in jMessage:
-                    while self.s.in_waiting:
-                        #print(self.s.readline().decode('ascii'))
-                        lst = self.s.readlines()
-                        for itm in lst:
-                            jMessage += itm.decode('ascii')
-                self.signal.emit(str(line) + " - " + jMessage)
+                while self.s.in_waiting:
+                    #print(self.s.readline().decode('ascii'))
+                    lst = self.s.readlines()
+                    for itm in lst:
+                        jMessage += itm.decode('ascii')
+                        print(jMessage)
+                #self.signal.emit(str(line) + " - " + jMessage)
             except serial.SerialException as ex:
                 print("Error In SerialException" + ex.strerror)
 
@@ -229,11 +229,14 @@ class MainWindow(QMainWindow):
         self.fiolcd.display(self.fiodial.value())
 
         self.s = ""
+        self.s2 = ""
         self.ports = list(port_list.comports())
 
         self.primaryThreadCreated = False
         self.workerThreadCreated = False
+        self.sensorThreadCreated = False
         self.serialPortOpen = False
+        self.serialSensorOpen = False
 
     def update_param_table(self):
         self.table.setItem(0,0, QTableWidgetItem(self.settings_dict[r"vt"]))
@@ -312,6 +315,9 @@ class MainWindow(QMainWindow):
         self.motion_table.setItem(6,0, QTableWidgetItem('Vh'))
         self.motion_table.setItem(6,1, QTableWidgetItem(str(self.generator.Vh)))
 
+    def sensorData(self, data_stream):
+        pass
+
     def write_info(self, data_stream):
         rcount = self.txrxtable.rowCount()
         self.txrxtable.insertRow(rcount)
@@ -374,6 +380,16 @@ class MainWindow(QMainWindow):
                 self.primaryThread.start()
                 self.primaryThreadCreated = True
                 print("Starting Primary Thread")
+        if self.serialSensorOpen:
+            if not self.sensorThreadCreated:
+                self.sensor = SensorThread(self.s2)
+                self.sensorThread = QThread()
+                self.sensorThread.started.connect(self.sensor.run)
+                self.sensor.signal.connect(self.sensorData)
+                self.sensor.moveToThread(self.sensorThread)
+                self.sensorThread.start()
+                self.sensorThreadCreated = True
+                print("Starting Sensor Thread ...")
 
     @Slot()
     def on_runloop_clicked(self):
@@ -402,8 +418,14 @@ class MainWindow(QMainWindow):
                 self.primaryThread.wait()
                 self.primaryThreadCreated = False
                 del self.primaryThread
+            if self.sensorThreadCreated:
+                self.sensor.Stop()
+                self.sensorThread.exit()
+                self.sensorThread.wait()
+                self.sensorThreadCreated = False
             self.s.close()
             self.serialPortOpen = False
+            self.serialSensorOpen = False
 
     @Slot()
     def on_connect_clicked(self):
@@ -420,6 +442,10 @@ class MainWindow(QMainWindow):
                     self.s.readline()
                     #print(self.s.readline().decode("ascii"))
                 #self.s.flushInput()  # Flush startup text in serial input
+                #monitoringPort
+            if not self.serialSensorOpen:
+                self.s2 = serial.Serial(self.monitoringPort.currentText(), baudrate=115200, timeout=1)
+                self.serialSensorOpen = True
             
         except serial.SerialException as ex:
             self.serialPortOpen = False
