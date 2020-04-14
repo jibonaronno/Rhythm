@@ -26,10 +26,10 @@ _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 class PrimaryThread(QObject):
     signal = Signal(str)
 
-    def __init__(self, s):
+    def __init__(self, s, codegen):
         self.s = s
-        self.json = JsonSettings("settings.json")
-        self.codegen = GcodeGenerator(int(self.json.dict['vt']), int(self.json.dict['rr']), int(self.json.dict['ie']), int(self.json.dict['fio2']))
+        #self.json = JsonSettings("settings.json")
+        self.codegen = codegen #GcodeGenerator(int(self.json.dict['vt']), int(self.json.dict['rr']), int(self.json.dict['ie']), int(self.json.dict['fio2']))
         self.codegen.Generate()
         self.codelist = self.codegen.gcodeprimary.splitlines()
         self.flagStop = False
@@ -178,7 +178,7 @@ class MainWindow(QMainWindow):
         self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
         self.table.setItem(0,2, QTableWidgetItem(self.settings_dict[r"rr"]))
         self.table.setItem(0,3, QTableWidgetItem(self.settings_dict[r"fio2"]))
-        self.table.itemChanged.connect(self.SaveSettings)
+        #self.table.itemChanged.connect(self.SaveSettings)
         self.vt = int(self.settings_dict[r"vt"])
         self.rr = int(self.settings_dict[r"rr"])
         self.ie = int(self.settings_dict[r"ie"])
@@ -255,24 +255,29 @@ class MainWindow(QMainWindow):
         self.vt = self.vtdial.value()
         self.settings_dict[r"vt"] = str(self.vt)
         self.update_param_table()
+        self.SaveSettings()
 
     def ieDialChanged(self):
+        self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
         self.ielcd.display(self.iedial.value())
         self.ie = self.iedial.value()
         self.settings_dict[r"ie"] = str(self.ie)
         self.update_param_table()
+        self.SaveSettings()
 
     def rrDialChanged(self):
         self.rrlcd.display(self.rrdial.value())
         self.rr = self.rrdial.value()
         self.settings_dict[r"rr"] = str(self.rr)
         self.update_param_table()
+        self.SaveSettings()
 
     def fioDialChanged(self):
         self.fiolcd.display(self.fiodial.value())
-        self.fio = self.fiodial.value()
-        self.settings_dict[r"fio"] = str(self.fio)
+        self.fio2 = self.fiodial.value()
+        self.settings_dict[r"fio2"] = str(self.fio2)
         self.update_param_table()
+        self.SaveSettings()
 
     
     def ShowGcodeTable(self):
@@ -285,12 +290,12 @@ class MainWindow(QMainWindow):
 
     def CalculateSettings(self):
         del self.generator
-        self.json = JsonSettings("settings.json")
-        self.settings_dict = self.json.dict
-        self.vt = int(self.settings_dict[r"vt"])
-        self.rr = int(self.settings_dict[r"rr"])
-        self.ie = int(self.settings_dict[r"ie"])
-        self.fio2 = int(self.settings_dict[r"fio2"])
+        ###self.json = JsonSettings("settings.json")
+        ###self.settings_dict = self.json.dict
+        #self.vt = int(self.settings_dict[r"vt"])
+        #self.rr = int(self.settings_dict[r"rr"])
+        #self.ie = int(self.settings_dict[r"ie"])
+        #self.fio2 = int(self.settings_dict[r"fio2"])
         self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
         self.motion_table.setItem(0,0, QTableWidgetItem('Dp'))
         self.motion_table.setItem(0,1, QTableWidgetItem(str(self.generator.Dp)))
@@ -361,7 +366,7 @@ class MainWindow(QMainWindow):
     def on_btninit_clicked(self):
         if not self.workerThreadCreated:
             if not self.primaryThreadCreated:
-                self.primary = PrimaryThread(self.s)
+                self.primary = PrimaryThread(self.s, self.generator)
                 self.primaryThread = QThread()
                 self.primaryThread.started.connect(self.primary.run)
                 self.primary.signal.connect(self.write_info)
@@ -430,25 +435,25 @@ class MainWindow(QMainWindow):
             self.btnCPAP.setStyleSheet('QPushButton {background-color: #404040}')
 
     def SaveSettings(self):
-        self.json = JsonSettings("settings.json")
-        self.settings_dict = self.json.dict
-        self.json.dict[r'vt'] = str(((self.table.item(0,0).text())))
-        self.json.dict[r'ie'] = str(((self.table.item(0,1).text())))
-        self.json.dict[r'rr'] = str(((self.table.item(0,2).text())))
-        self.json.dict[r'fio2'] = str(((self.table.item(0,3).text())))
-        self.generator = GcodeGenerator(int(self.json.dict[r'vt']), int(self.json.dict[r'rr']), int(self.json.dict[r'ie']), int(self.json.dict[r'fio2']))
+        ###self.json = JsonSettings("settings.json")
+        ###self.settings_dict = self.json.dict
+        self.json.dict[r'vt'] = str(self.vt)
+        self.json.dict[r'ie'] = str(self.ie)
+        self.json.dict[r'rr'] = str(self.rr)
+        self.json.dict[r'fio2'] = str(self.fio2)
+        self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
         self.generator.Generate()
         if self.workerThreadCreated:
             self.worker.updateGcode(self.generator)
         pprint.pprint(self.generator.gcodestr)
-        self.json.dumptojson()
-
-        self.vt = int(self.settings_dict[r"vt"])
-        self.rr = int(self.settings_dict[r"rr"])
-        self.ie = int(self.settings_dict[r"ie"])
-        self.fio2 = int(self.settings_dict[r"fio2"])
+        #self.json.dumptojson()
+        ###self.vt = int(self.settings_dict[r"vt"])
+        ###self.rr = int(self.settings_dict[r"rr"])
+        ###self.ie = int(self.settings_dict[r"ie"])
+        ###self.fio2 = int(self.settings_dict[r"fio2"])
         self.CalculateSettings()
-        pprint.pprint(self.json.dict)
+        ###print(str(self.vt) + ", "+str(self.ie)+", "+str(self.rr)+", "+str(self.fio2)+"\r\n")
+        ###pprint.pprint(self.json.dict)
 
 class JsonSettings(object):
     def __init__(self , location):
