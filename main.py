@@ -133,6 +133,7 @@ class SensorThread(QObject):
     def __init__(self, s):
         self.s = s
         self.flagStop = False
+        self.jMessage = ""
         super().__init__()
 
     def Stop(self):
@@ -145,17 +146,19 @@ class SensorThread(QObject):
             if self.flagStop:
                 break
             try:
-                in_waiting = self.s.in_waiting
-                while in_waiting == 0:
-                    time.sleep(0.1)
-                    in_waiting = self.s.in_waiting
-                jMessage = ""
-                while self.s.in_waiting:
+                jMessage = self.s.readline().decode('ascii')
+                self.signal.emit(jMessage)
+                #in_waiting = self.s.in_waiting
+                #while in_waiting == 0:
+                    #time.sleep(0.1)
+                    #in_waiting = self.s.in_waiting
+                #jMessage = ""
+                #while self.s.in_waiting:
                     #print(self.s.readline().decode('ascii'))
-                    lst = self.s.readlines()
-                    for itm in lst:
-                        jMessage += itm.decode('ascii')
-                        print(jMessage)
+                    #lst = self.s.readlines()
+                    #for itm in lst:
+                        #jMessage += itm.decode('ascii')
+                        #print(jMessage)
                 #self.signal.emit(str(line) + " - " + jMessage)
             except serial.SerialException as ex:
                 print("Error In SerialException" + ex.strerror)
@@ -192,10 +195,20 @@ class MainWindow(QMainWindow):
         self.motion_table.setColumnCount(2)
         self.motion_table.setRowCount(10)
         self.motion_table.setHorizontalHeaderLabels(self.motion_table_headers)
+        self.motion_table.hide()
+
+        self.dat = deque()
+        self.datpeak = deque()
+
+        self.plotter = PlotWidget()
+        self.plotter.showGrid(x=True, y=True, alpha=None)
+        self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
+        self.curve2 = self.plotter.plot(0,0,"peakpressure", 'r')
         
         #self.motion_table.setSizeAdjustPolicy(QtWidget.QAbstractScrollArea.AdjustToContents)
         self.CalculateSettings()
         self.verticalLayout_2.addWidget(self.motion_table)
+        self.verticalLayout_2.addWidget(self.plotter)
         self.motion_table.hide()
 
         self.gcodetable = QTableWidget(self)
@@ -316,7 +329,18 @@ class MainWindow(QMainWindow):
         self.motion_table.setItem(6,1, QTableWidgetItem(str(self.generator.Vh)))
 
     def sensorData(self, data_stream):
-        pass
+        print(data_stream.split(','))
+        lst = data_stream.split(",")
+        self.maxLen = 400  # max number of data points to show on graph
+        if(len(lst) > 1):
+            if len(self.dat) > self.maxLen:
+                self.dat.popleft()  # remove oldest
+            if len(self.datpeak) > self.maxLen:
+                self.datpeak.popleft()
+            self.datpeak.append(float(self.peakdial.value()))
+            self.dat.append(float(lst[1]))
+            self.curve1.setData(self.dat)
+            self.curve2.setData(self.datpeak)
 
     def write_info(self, data_stream):
         rcount = self.txrxtable.rowCount()
@@ -424,6 +448,8 @@ class MainWindow(QMainWindow):
                 self.sensorThread.wait()
                 self.sensorThreadCreated = False
             self.s.close()
+            if self.serialSensorOpen:
+                self.s2.close()
             self.serialPortOpen = False
             self.serialSensorOpen = False
 
