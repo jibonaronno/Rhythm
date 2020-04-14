@@ -32,13 +32,19 @@ class PrimaryThread(QObject):
         self.codegen = GcodeGenerator(int(self.json.dict['vt']), int(self.json.dict['rr']), int(self.json.dict['ie']), int(self.json.dict['fio2']))
         self.codegen.Generate()
         self.codelist = self.codegen.gcodeprimary.splitlines()
+        self.flagStop = False
         super().__init__()
+
+    def Stop(self):
+        self.flagStop = True
 
     @Slot()
     def run(self):
         try:
             lst = []
             for line in self.codelist:
+                if self.flagStop:
+                    break
                 #self.s.reset_input_buffer()
                 self.s.write((str(line) + "\r\n").encode("utf-8"))
                 time.sleep(0.5)
@@ -58,7 +64,7 @@ class PrimaryThread(QObject):
                         time.sleep(1)
                         continue
                 self.signal.emit(str(line) + " - " + jMessage)
-            self.signal.emit("Loop")
+            self.signal.emit("Stopped")
         except serial.SerialException as ex:
             print("Error In SerialException" + ex.strerror)
             self.signal.emit("Stopped")
@@ -81,7 +87,11 @@ class WorkerThread(QObject):
         #for idxx in range(self.linecount):
         #    print(self.codelist[idxx])
         #self.idx = 0
+        self.flagStop = False
         super().__init__()
+
+    def Stop(self):
+        self.flagStop = True
 
     def updateGcode(self, codegen):
         self.codegen = codegen
@@ -92,8 +102,12 @@ class WorkerThread(QObject):
     def run(self):
         lst = []
         while 1:
+            if self.flagStop:
+                break
             try:
                 for line in self.codelist:
+                    if self.flagStop:
+                        break
                     self.s.write((str(line)+"\r\n").encode('utf-8'))
                     time.sleep(0.5)
                     in_waiting = self.s.in_waiting
@@ -169,6 +183,7 @@ class MainWindow(QMainWindow):
         self.s = ""
         self.ports = list(port_list.comports())
 
+        self.primaryThreadCreated = False
         self.workerThreadCreated = False
         self.serialPortOpen = False
     
@@ -212,16 +227,22 @@ class MainWindow(QMainWindow):
         self.txrxtable.resizeColumnsToContents()
         self.txrxtable.resizeRowsToContents()
         if data_stream == "Stopped":
-            self.primaryThread.exit()
-        elif data_stream == "Loop":
-            self.worker = WorkerThread(self.s, self.generator)
-            self.workerThread = QThread()
-            self.workerThread.started.connect(self.worker.run)
-            self.worker.signal.connect(self.write_info)
-            self.worker.moveToThread(self.workerThread)
-            self.workerThread.start()
-            self.workerThreadCreated = True
-            print("Starting Worker Thread")
+            if self.primaryThreadCreated:
+                self.primaryThread.exit()
+                self.primaryThread.wait()
+                self.primaryThreadCreated = False
+                del self.primaryThread
+
+        #elif data_stream == "Loop":
+        #    self.primaryThread.exit() ###
+        #    self.worker = WorkerThread(self.s, self.generator)
+        #    self.workerThread = QThread()
+        #    self.workerThread.started.connect(self.worker.run)
+        #    self.worker.signal.connect(self.write_info)
+        #    self.worker.moveToThread(self.workerThread)
+        #    self.workerThread.start()
+        #    self.workerThreadCreated = True
+        #    print("Starting Worker Thread")
 
         #if data_stream == "Stopped":
         #    self.worker = WorkerThread(self.s)
@@ -251,13 +272,45 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_btninit_clicked(self):
         if not self.workerThreadCreated:
-            self.primary = PrimaryThread(self.s)
-            self.primaryThread = QThread()
-            self.primaryThread.started.connect(self.primary.run)
-            self.primary.signal.connect(self.write_info)
-            self.primary.moveToThread(self.primaryThread)
-            self.primaryThread.start()
-            print("Starting Primary Thread")
+            if not self.primaryThreadCreated:
+                self.primary = PrimaryThread(self.s)
+                self.primaryThread = QThread()
+                self.primaryThread.started.connect(self.primary.run)
+                self.primary.signal.connect(self.write_info)
+                self.primary.moveToThread(self.primaryThread)
+                self.primaryThread.start()
+                self.primaryThreadCreated = True
+                print("Starting Primary Thread")
+
+    @Slot()
+    def on_runloop_clicked(self):
+        if not self.primaryThreadCreated:
+            if not self.workerThreadCreated:
+                self.worker = WorkerThread(self.s, self.generator)
+                self.workerThread = QThread()
+                self.workerThread.started.connect(self.worker.run)
+                self.worker.signal.connect(self.write_info)
+                self.worker.moveToThread(self.workerThread)
+                self.workerThread.start()
+                self.workerThreadCreated = True
+                print("Starting Worker Thread")
+
+    @Slot()
+    def on_disconnect_clicked(self):
+        if self.serialPortOpen:
+            if self.workerThreadCreated:
+                self.worker.Stop()
+                self.workerThread.exit()
+                self.workerThread.wait()
+                self.workerThreadCreated = False
+                del self.workerThread
+            if self.primaryThreadCreated:
+                self.primaryThread.exit()
+                self.primaryThread.wait()
+                self.primaryThreadCreated = False
+                del self.primaryThread
+            self.s.close()
+            self.serialPortOpen = False
 
     @Slot()
     def on_connect_clicked(self):
@@ -359,7 +412,7 @@ class GcodeGenerator(object):
         self.Vh = (self.xav * 60) / self.Th
 
     def Generate(self):
-        self.gcodeprimary = "G21\r\nG80\r\nM92 X400 Y400\r\nG90\r\nG28 X0Y0 F500\r\nG01 X" + str(self.Dp) + "Y" + str(self.Dp) + " F500\r\n"
+        self.gcodeprimary = "G21\r\nG80\r\nM92 X80 Y80\r\nG90\r\nG28 X0Y0 F500\r\nG01 X" + str(self.Dp) + "Y" + str(self.Dp) + " F500\r\n"
         self.gcodestr = "G01 X" + str(self.Dt)+"Y"+str(self.Dt)+"F500\r\n"+"G01 X" + str(self.Dp)+"Y"+str(self.Dp)+" F"+str(self.Vi)+"\r\n"+"G01 X"+str(self.Dt)+"Y"+str(self.Dt)+" F"+str(self.Vh)+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
         with open('primary.gcode', 'w') as writer:
             writer.write(self.gcodeprimary)
