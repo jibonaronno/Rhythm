@@ -161,9 +161,11 @@ class MainWindow(QMainWindow):
         self.motion_table.setColumnCount(2)
         self.motion_table.setRowCount(10)
         self.motion_table.setHorizontalHeaderLabels(self.motion_table_headers)
+        
         #self.motion_table.setSizeAdjustPolicy(QtWidget.QAbstractScrollArea.AdjustToContents)
         self.CalculateSettings()
         self.verticalLayout_2.addWidget(self.motion_table)
+        self.motion_table.hide()
 
         self.gcodetable = QTableWidget(self)
         self.gcodetable.setRowCount(1)
