@@ -20,6 +20,13 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Connection Details</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <layout class="QGridLayout" name="gridLayout_2">
           <property name="leftMargin">
            <number>10</number>
@@ -31,14 +38,15 @@
             </property>
            </widget>
           </item>
+          <item row="5" column="1">
+           <widget class="QPushButton" name="gengcode">
+            <property name="text">
+             <string>Generate Gcode</string>
+            </property>
+           </widget>
+          </item>
           <item row="3" column="1">
            <widget class="QPushButton" name="connect">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
             <property name="text">
              <string>Connect</string>
             </property>
@@ -46,15 +54,6 @@
           </item>
           <item row="6" column="1">
            <widget class="QPushButton" name="btninit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
             <property name="text">
              <string>Run Init</string>
             </property>
@@ -62,15 +61,6 @@
           </item>
           <item row="4" column="1">
            <widget class="QPushButton" name="disconnect">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
             <property name="text">
              <string>Disconnect</string>
             </property>
@@ -78,26 +68,13 @@
           </item>
           <item row="0" column="1">
            <widget class="QPushButton" name="scanPorts">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
             <property name="text">
              <string>Scan Ports</string>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QComboBox" name="monitoringPort">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
-           </widget>
+           <widget class="QComboBox" name="monitoringPort"/>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label">
@@ -107,41 +84,12 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QComboBox" name="portsList">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
-           </widget>
+           <widget class="QComboBox" name="portsList"/>
           </item>
           <item row="7" column="1">
            <widget class="QPushButton" name="runloop">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
             <property name="text">
              <string>Run Loop</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QPushButton" name="gengcode">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Generate Gcode</string>
             </property>
            </widget>
           </item>
@@ -149,6 +97,133 @@
         </item>
         <item>
          <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Vent Settings</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Tidal Volume</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="respirationRate"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Respiration Rate</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="tidalVolume"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>I:E Ratio</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="inhaleExhaleRatio"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ventSetButton">
+          <property name="text">
+           <string>Set</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Patient Vitals</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <property name="leftMargin">
+           <number>10</number>
+          </property>
+          <item row="1" column="1">
+           <widget class="QLCDNumber" name="heartrate">
+            <property name="styleSheet">
+             <string notr="true">QLCDNumber{
+    color: rgb(0, 0, 0);
+	background-color:  rgb(200, 0, 0);
+}</string>
+            </property>
+            <property name="digitCount">
+             <number>2</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Heart Rate</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLCDNumber" name="o2value">
+            <property name="styleSheet">
+             <string notr="true">QLCDNumber{
+    background-color: rgb(0, 57, 191)
+}</string>
+            </property>
+            <property name="digitCount">
+             <number>2</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>FiO2</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>

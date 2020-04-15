@@ -13,6 +13,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox
 
+import math
 import os
 import numpy as np
 import random
@@ -65,7 +66,7 @@ class PrimaryThread(QObject):
                         time.sleep(1)
                         continue
                 self.signal.emit(str(line) + " - " + jMessage)
-            self.signal.emit("Stopped")
+            self.signal.emit("StoppedOK")
         except serial.SerialException as ex:
             print("Error In SerialException" + ex.strerror)
             self.signal.emit("Stopped")
@@ -124,7 +125,7 @@ class WorkerThread(QObject):
                             for itm in lst:
                                 jMessage += itm.decode('ascii')
                     self.signal.emit(str(line) + " - " + jMessage)
-                    time.sleep(self.codegen.Ti+self.codegen.Th)
+                    #time.sleep(self.codegen.Ti+self.codegen.Th)
             except serial.SerialException as ex:
                 print("Error In SerialException" + ex.strerror)
 
@@ -172,10 +173,17 @@ class MainWindow(QMainWindow):
         self.table.setItem(0,2, QTableWidgetItem(self.settings_dict[r"rr"]))
         self.table.setItem(0,3, QTableWidgetItem(self.settings_dict[r"fio2"]))
         #self.table.itemChanged.connect(self.SaveSettings)
-        self.vt = int(self.settings_dict[r"vt"])
-        self.rr = int(self.settings_dict[r"rr"])
-        self.ie = int(self.settings_dict[r"ie"])
-        self.fio2 = int(self.settings_dict[r"fio2"])
+        
+        #self.vt = int(self.settings_dict[r"vt"])
+        #self.rr = int(self.settings_dict[r"rr"])
+        #self.ie = int(self.settings_dict[r"ie"])
+        #self.fio2 = int(self.settings_dict[r"fio2"])
+
+        self.vt = self.vtdial.value()
+        self.ie = self.iedial.value()
+        self.rr = self.rrdial.value()
+        self.fio2 = self.fiodial.value()
+
         self.table.hide()
         self.verticalLayout_2.addWidget(self.table)
 
@@ -347,12 +355,13 @@ class MainWindow(QMainWindow):
         self.txrxtable.scrollToBottom()
         self.txrxtable.resizeColumnsToContents()
         self.txrxtable.resizeRowsToContents()
-        if data_stream == "Stopped":
+        if data_stream == "StoppedOK":
             if self.primaryThreadCreated:
                 self.primaryThread.exit()
                 self.primaryThread.wait()
                 self.primaryThreadCreated = False
                 del self.primaryThread
+                self.runloop.setEnabled(True)
 
         #elif data_stream == "Loop":
         #    self.primaryThread.exit() ###
@@ -378,6 +387,7 @@ class MainWindow(QMainWindow):
     def on_gengcode_clicked(self):
         self.CalculateSettings()
         self.generator.Generate()
+        print(self.generator.gcodeprimary)
         self.ShowGcodeTable()
 
     @Slot()
@@ -450,6 +460,10 @@ class MainWindow(QMainWindow):
                 self.s2.close()
             self.serialPortOpen = False
             self.serialSensorOpen = False
+            self.connect.setEnabled(True)
+            self.disconnect.setEnabled(False)
+            self.btninit.setEnabled(False)
+            self.runloop.setEnabled(False)
 
     @Slot()
     def on_connect_clicked(self):
@@ -457,19 +471,28 @@ class MainWindow(QMainWindow):
             if not self.serialPortOpen:
                 print("Serial Port Name : " + self.portsList.currentText())
                 self.s = serial.Serial(self.portsList.currentText(), baudrate=115200, timeout=1)
+                #self.s.open()
                 time.sleep(1)
                 self.serialPortOpen = True
+                #self.s.write("\r\n\r\n") # Hit enter a few times to wake the Printrbot
+                #time.sleep(2)   # Wait for Printrbot to initialize
                 while self.s.in_waiting:
                     self.s.readline()
+                    #print(self.s.readline().decode("ascii"))
+                #self.s.flushInput()  # Flush startup text in serial input
+                #monitoringPort
             if self.portsList.currentText() != self.monitoringPort.currentText():
                 if not self.serialSensorOpen:
                     self.s2 = serial.Serial(self.monitoringPort.currentText(), baudrate=115200, timeout=1)
                     self.serialSensorOpen = True
-            
         except serial.SerialException as ex:
             self.serialPortOpen = False
             print(ex.strerror)
             print("Error Opening Serial Port..........................................")
+        else:
+            self.btninit.setEnabled(True)
+            self.connect.setEnabled(False)
+            self.disconnect.setEnabled(True)
            
     @Slot()
     def on_btnCPAP_clicked(self):
@@ -492,7 +515,13 @@ class MainWindow(QMainWindow):
             self.worker.updateGcode(self.generator)
         pprint.pprint(self.generator.gcodestr)
         #self.json.dumptojson()
+        ###self.vt = int(self.settings_dict[r"vt"])
+        ###self.rr = int(self.settings_dict[r"rr"])
+        ###self.ie = int(self.settings_dict[r"ie"])
+        ###self.fio2 = int(self.settings_dict[r"fio2"])
         self.CalculateSettings()
+        ###print(str(self.vt) + ", "+str(self.ie)+", "+str(self.rr)+", "+str(self.fio2)+"\r\n")
+        ###pprint.pprint(self.json.dict)
 
 class JsonSettings(object):
     def __init__(self , location):
@@ -525,33 +554,74 @@ class GcodeGenerator(object):
         self.fio2 = fio2
     
     def Compute(self):
-        self.xmax = 60
-        self.xamb = 30
-        self.xrect = 15
+        self.stepspermm = 80
+
+        self.ACC=1000
+        self.xmax = 75
+        self.xamb = 40
+        self.xrect = 25
         self.vtmax = 800
         self.Dt = self.xmax - self.xrect
         self.xav = self.xrect * (self.vt / self.vtmax)
         self.Dp = self.Dt + self.xav
         self.TDMS = 0
 
-        self.Kie = 1 / self.ie
-        self.vmax = 2000
-        self.BCT = 60 / self.rr
+        self.Kie =  1/self.ie
+        self.vmax = 5000
+        self.BCT = 60*(1-0.24) / self.rr
         self.Ti = self.BCT / (1 + (1 / self.Kie))
         self.Th = self.BCT - self.Ti
-
-        self.ACC_inhale = (4 * self.xav) / (self.Ti * self.Ti)
-        self.ACC_exhale = (4 * self.xav) / (self.Th * self.Th)
         
-        self.Vi = self.ACC_inhale * (self.Ti / 2) * 60
-        self.ViAvg = self.ACC_inhale * (self.Ti / 4) * 60
-        self.Vh = self.ACC_exhale * (self.Th / 2) * 60
-        self.VhAvg = self.ACC_exhale * (self.Th / 4) * 60
-    
+        self.midpart_ti=(1-self.ACC*self.Ti*self.Ti)/2
+        self.lastpart_ti=self.xav*self.xav/4
+        self.identifier_ti=math.sqrt(self.midpart_ti*self.midpart_ti-4*self.lastpart_ti)
+        self.sol1_ti=(-1*self.midpart_ti+self.identifier_ti)/2
+        self.sol2_ti=(-1*self.midpart_ti-self.identifier_ti)/2
+
+        if self.sol1_ti>self.xav:
+            if self.sol2_ti>self.xav:
+                self.dsmall_ti=0.1
+            else:
+                self.dsmall_ti=self.sol2_ti
+        else:
+            self.dsmall_ti=self.sol1_ti  
+               
+        #print(self.identifier_ti)
+        self.midpart_th=(1-self.ACC*self.Th*self.Th)/2
+        self.lastpart_th=self.xav*self.xav/4
+        self.identifier_th=math.sqrt(self.midpart_th*self.midpart_th-4*self.lastpart_th)
+        self.sol1_th=(-1*self.midpart_th+self.identifier_th)/2
+        self.sol2_th=(-1*self.midpart_th-self.identifier_th)/2
+
+        if self.sol1_th>self.xav:
+            if self.sol2_th>self.xav:
+                self.dsmall_th=0.1
+            else:
+                self.dsmall_th=self.sol2_th
+        else:
+            self.dsmall_th=self.sol1_th 
+
+     
+        #self.ACC_inhale = (4 * self.xav) / (self.Ti * self.Ti)
+        #self.ACC_exhale = (4 * self.xav) / (self.Th * self.Th)
+        
+       # self.Vi = self.ACC_inhale * (self.Ti / 2) * 60
+       #self.Vh = self.ACC_exhale * (self.Th / 2) * 60
+        self.vimax=math.sqrt(2*self.dsmall_ti*self.ACC)
+        self.vhmax=math.sqrt(2*self.dsmall_th*self.ACC)
+        self.ViAvg = self.vimax * 60
+        #print(self.ViAvg)
+
+        self.Vi = self.ViAvg
+        
+        self.VhAvg = self.vhmax* 60
+        self.Vh = self.VhAvg
+        
     def Generate(self):
         self.Compute()
-        self.gcodeprimary = "G21\r\nG80\r\nM92 X80 Y80\r\nM201 X1000 Y1000\r\nG90\r\nG28 X0Y0 F500\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
-        self.gcodestr = "M201 X" + str(int(self.ACC_inhale)) + " Y" + str(int(self.ACC_exhale)) + " G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.Vi))+"\r\n"+ "M201 X"+ str(int(self.ACC_exhale)) + " Y"+ str(int(self.ACC_exhale)) +" G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.Vh))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
+        self.gcodeprimary = "G21\r\nG80\r\nG90\r\nG28 X0Y0 F500\r\nM92 X"+ str(self.stepspermm) +" Y"+ str(self.stepspermm) +"\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC)+"\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
+        self.gcodestr =  "G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+"\r\n" +"G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
+       # self.gcodestr = "M201 X" + str(int(self.ACC_inhale)) + " Y" + str(int(self.ACC_exhale)) + "\r\n" + " G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.Vi))+"\r\n"+ "M201 X"+ str(int(self.ACC_exhale)) + " Y"+ str(int(self.ACC_exhale)) + "\r\n" +" G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.Vh))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
         with open('primary.gcode', 'w') as writer:
             writer.write(self.gcodeprimary)
 
