@@ -24,10 +24,65 @@
           <property name="leftMargin">
            <number>10</number>
           </property>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_2">
+          <item row="2" column="1">
+           <widget class="QComboBox" name="monitoringPort">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>60</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="scanPorts">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>60</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Monitoring Port</string>
+             <string>Scan Ports</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QPushButton" name="gengcode">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Generate Gcode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="portsList">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>60</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QPushButton" name="runloop">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Run Loop</string>
             </property>
            </widget>
           </item>
@@ -76,51 +131,8 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="scanPorts">
-            <property name="minimumSize">
-             <size>
-              <width>120</width>
-              <height>60</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Scan Ports</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="monitoringPort">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Vent Port</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="portsList">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QPushButton" name="runloop">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
+          <item row="8" column="1">
+           <widget class="QPushButton" name="gcodeshow">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -128,20 +140,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Run Loop</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QPushButton" name="gengcode">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Generate Gcode</string>
+             <string>Show/Hide Gcode</string>
             </property>
            </widget>
           </item>

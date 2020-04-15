@@ -223,8 +223,10 @@ class MainWindow(QMainWindow):
         self.txrxtable = QTableWidget()
         self.txrxtable.setRowCount(1)
         self.txrxtable.setColumnCount(1)
+        self.txrxtablevisible = False
+
         self.gcodetable.hide()
-        #self.txrxtable.hide()
+        self.txrxtable.hide()
         self.hbox.addWidget(self.txrxtable)
         #self.hbox.addLayout
 
@@ -252,6 +254,7 @@ class MainWindow(QMainWindow):
         self.sensorThreadCreated = False
         self.serialPortOpen = False
         self.serialSensorOpen = False
+        self.gengcode.hide()
 
     def update_param_table(self):
         self.table.setItem(0,0, QTableWidgetItem(self.settings_dict[r"vt"]))
@@ -501,6 +504,15 @@ class MainWindow(QMainWindow):
             self.btnCPAP.setStyleSheet('QPushButton {background-color: #7F7F7F}')
         else:
             self.btnCPAP.setStyleSheet('QPushButton {background-color: #404040}')
+
+    @Slot()
+    def on_gcodeshow_clicked(self):
+        if self.txrxtablevisible:
+            self.txrxtable.hide()
+            self.txrxtablevisible = False
+        else:
+            self.txrxtable.show()
+            self.txrxtablevisible = True
 
     def SaveSettings(self):
         ###self.json = JsonSettings("settings.json")
