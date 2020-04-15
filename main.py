@@ -331,7 +331,7 @@ class MainWindow(QMainWindow):
         self.motion_table.setItem(6,1, QTableWidgetItem(str(self.generator.Vh)))
 
     def sensorData(self, data_stream):
-        print(data_stream.split(','))
+        #print(data_stream.split(','))
         lst = data_stream.split(",")
         self.maxLen = 400  # max number of data points to show on graph
         if(len(lst) > 1):
@@ -460,7 +460,7 @@ class MainWindow(QMainWindow):
         try:
             if not self.serialPortOpen:
                 print("Serial Port Name : " + self.portsList.currentText())
-                self.s = serial.Serial(self.portsList.currentText(), baudrate=250000, timeout=1)
+                self.s = serial.Serial(self.portsList.currentText(), baudrate=115200, timeout=1)
                 #self.s.open()
                 time.sleep(1)
                 self.serialPortOpen = True
@@ -557,10 +557,31 @@ class GcodeGenerator(object):
         #self.Vi = (self.xrect * 60) / self.Ti
         self.Vi = (self.xav / self.Ti) * 60
         self.Vh = (self.xav * 60) / self.Th
+    
+    def Compute(self):
+        self.xmax = 64
+        self.xamb = 30
+        self.xrect = 20
+        self.vtmax = 800
+        self.xavmax = self.xmax - self.xrect
+        self.Dt = self.xmax - self.xrect
+        #self.xav = self.xavmax * (self.vt / self.vtmax)
+        self.xav = self.xrect * (self.vt / self.vtmax)
+        self.Dp = self.Dt + self.xav
+        self.Dr = self.xrect
+        #self.Dt = self.Dp - self.Dr
+        self.TDMS = 100
 
+        self.vmax = 200
+        self.Ti = 60 / ((1 + self.ie) * self.rr)
+        self.Th = self.Ti * self.ie
+        #self.Vi = (self.xrect * 60) / self.Ti
+        self.Vi = (self.xav / self.Ti) * 60
+        self.Vh = (self.xav * 60) / self.Th
     def Generate(self):
-        self.gcodeprimary = "G21\r\nG80\r\nM92 X80 Y80\r\nG90\r\nG28 X0Y0 F500\r\nG01 X" + str(self.Dp) + "Y" + str(self.Dp) + " F500\r\n"
-        self.gcodestr = "G01 X" + str(self.Dt)+"Y"+str(self.Dt)+"F500\r\n"+"G01 X" + str(self.Dp)+"Y"+str(self.Dp)+" F"+str(self.Vi)+"\r\n"+"G01 X"+str(self.Dt)+"Y"+str(self.Dt)+" F"+str(self.Vh)+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
+        self.Compute()
+        self.gcodeprimary = "G21\r\nG80\r\nM92 X160 Y160\r\nG90\r\nG28 X0Y0 F500\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
+        self.gcodestr = "G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.Vi))+"\r\n"+"G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.Vh))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
         with open('primary.gcode', 'w') as writer:
             writer.write(self.gcodeprimary)
 

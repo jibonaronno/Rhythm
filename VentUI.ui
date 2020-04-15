@@ -349,17 +349,27 @@
               <property name="maximum">
                <number>800</number>
               </property>
+              <property name="value">
+               <number>500</number>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QLCDNumber" name="vtlcd">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>40</height>
-               </size>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <property name="topMargin">
+               <number>0</number>
               </property>
-             </widget>
+              <item>
+               <widget class="QLCDNumber" name="vtlcd">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <spacer name="verticalSpacer_7">
@@ -402,17 +412,73 @@
               <property name="maximum">
                <number>4</number>
               </property>
+              <property name="value">
+               <number>2</number>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QLCDNumber" name="ielcd">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>40</height>
-               </size>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <property name="topMargin">
+               <number>0</number>
               </property>
-             </widget>
+              <item>
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLCDNumber" name="lcdNumber">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>40</height>
+                 </size>
+                </property>
+                <property name="digitCount">
+                 <number>1</number>
+                </property>
+                <property name="value" stdset="0">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_17">
+                <property name="font">
+                 <font>
+                  <pointsize>20</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLCDNumber" name="ielcd">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>40</height>
+                 </size>
+                </property>
+                <property name="digitCount">
+                 <number>1</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <spacer name="verticalSpacer_9">
@@ -454,6 +520,9 @@
               </property>
               <property name="maximum">
                <number>30</number>
+              </property>
+              <property name="value">
+               <number>14</number>
               </property>
              </widget>
             </item>
@@ -656,6 +725,9 @@
               </property>
               <property name="maximum">
                <number>35</number>
+              </property>
+              <property name="value">
+               <number>25</number>
               </property>
              </widget>
             </item>
