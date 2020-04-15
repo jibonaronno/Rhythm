@@ -7,6 +7,7 @@ from qtpy import uic
 from qtpy.QtCore import Slot, QTimer, QThread, Signal, QObject, Qt
 from qtpy.QtWidgets import QApplication, QMainWindow, QMessageBox, QAction, QDialog, QTableWidgetItem
 from pyqtgraph import PlotWidget
+import pyqtgraph as pg
 from collections import deque
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -200,10 +201,11 @@ class MainWindow(QMainWindow):
         self.dat = deque()
         self.datpeak = deque()
 
+        self.lungpressure_line_pen = pg.mkPen(200, 100, 0)
         self.plotter = PlotWidget()
         self.plotter.showGrid(x=True, y=True, alpha=None)
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
-        self.curve2 = self.plotter.plot(0,0,"peakpressure", 'r')
+        self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
         
         #self.motion_table.setSizeAdjustPolicy(QtWidget.QAbstractScrollArea.AdjustToContents)
         self.CalculateSettings()
