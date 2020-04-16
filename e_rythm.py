@@ -221,12 +221,9 @@ class WaveMapper(QObject):
         buzzer=23 
         GPIO.setup(buzzer,GPIO.OUT)
         #Run forever loop
-        while True:
-            GPIO.output(buzzer,GPIO.HIGH)
-            print ("Beep")
-            sleep(0.5) # Delay in seconds
-            GPIO.output(buzzer,GPIO.LOW)
-            print ("No Beep")
+        GPIO.output(buzzer,GPIO.HIGH)
+        sleep(0.5) # Delay in seconds
+        GPIO.output(buzzer,GPIO.LOW)
 
 class MainWindow(QMainWindow):
     def __init__(self):
