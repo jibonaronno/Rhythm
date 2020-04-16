@@ -27,6 +27,9 @@ from math import pi, sin
 from PyQt5.QtMultimedia import *
 import struct
 
+import RPi.GPIO as GPIO
+from time import sleep
+
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
 class PrimaryThread(QObject):
@@ -208,6 +211,22 @@ class WaveMapper(QObject):
         self.changeFrequency(1000)
         self.changeVolume(1000)
         self.play()
+
+    def Beep(self):
+        #Disable warnings (optional)
+        GPIO.setwarnings(False)
+        #Select GPIO mode
+        GPIO.setmode(GPIO.BCM)
+        #Set buzzer - pin 23 as output
+        buzzer=23 
+        GPIO.setup(buzzer,GPIO.OUT)
+        #Run forever loop
+        while True:
+            GPIO.output(buzzer,GPIO.HIGH)
+            print ("Beep")
+            sleep(0.5) # Delay in seconds
+            GPIO.output(buzzer,GPIO.LOW)
+            print ("No Beep")
 
 class MainWindow(QMainWindow):
     def __init__(self):
