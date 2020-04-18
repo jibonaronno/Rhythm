@@ -22,14 +22,10 @@
 	COLOR_ACCENT   = #3D7848
 */
 
-{
+* {
 	background: #191919;
 	color: #DDDDDD;
 	border: 1px solid #5A5A5A;
-}
-
-QLCDNumber::intValue {
-	color:#191919
 }
 
 QWidget::item:selected {
