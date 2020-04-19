@@ -276,19 +276,30 @@ class MainWindow(QMainWindow):
         self.motion_table.setHorizontalHeaderLabels(self.motion_table_headers)
         self.motion_table.hide()
 
-        self.dat = deque()
-        self.datpeak = deque()
+        self.lungpressuredata = deque()
+        self.lungpressurepeakdata = deque()
 
         self.lungpressure_line_pen = pg.mkPen(200, 100, 0)
         self.plotter = PlotWidget()
         self.plotter.showGrid(x=True, y=True, alpha=None)
+        self.plotter.setTitle("Pressure")
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
         self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
+
+        self.flowplotter = PlotWidget()
+        self.flowplotter.showGrid(x=True, y=True, alpha=None)
+        self.flowplotter.setTitle("Flow")
+
+        self.volplotter = PlotWidget()
+        self.volplotter.showGrid(x=True, y=True, alpha=None)
+        self.volplotter.setTitle("Volume")
         
         #self.motion_table.setSizeAdjustPolicy(QtWidget.QAbstractScrollArea.AdjustToContents)
         self.CalculateSettings()
         self.verticalLayout_2.addWidget(self.motion_table)
         self.verticalLayout_2.addWidget(self.plotter)
+        self.verticalLayout_2.addWidget(self.flowplotter)
+        self.verticalLayout_2.addWidget(self.volplotter)
         self.motion_table.hide()
 
         self.gcodetable = QTableWidget(self)
@@ -323,6 +334,14 @@ class MainWindow(QMainWindow):
         self.rrlcd.display(self.rrdial.value())
         self.fiodial.valueChanged.connect(self.fioDialChanged)
         self.fiolcd.display(self.fiodial.value())
+        self.lowpdial.valueChanged.connect(self.lowpDialChanged)
+        self.lowplcd.display(self.lowpdial.value())
+        self.peeplcd.display(self.peepdial.value())
+        self.himinitdial.valueChanged.connect(self.himinitDialChanged)
+        self.himinitlcd.display(self.himinitdial.value())
+        self.lowminitdial.valueChanged.connect(self.lowminitDialChanged)
+        self.lowminitlcd.display(self.lowminitdial.value())
+
 
         self.s = ""
         self.s2 = ""
@@ -348,6 +367,11 @@ class MainWindow(QMainWindow):
         self.label_17.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.label_14.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.label_16.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.peaklcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.peeplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.lowplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.lowminitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.himinitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 
     def update_param_table(self):
         self.table.setItem(0,0, QTableWidgetItem(self.settings_dict[r"vt"]))
@@ -360,6 +384,15 @@ class MainWindow(QMainWindow):
 
     def peakDialChanged(self):
         self.peaklcd.display(self.peakdial.value())
+
+    def lowpDialChanged(self):
+        self.lowplcd.display(self.lowpdial.value())
+
+    def himinitDialChanged(self):
+        self.himinitlcd.display(self.himinitdial.value())
+
+    def lowminitDialChanged(self):
+        self.lowminitlcd.display(self.lowminitdial.value())
 
     def ipapDialChanged(self):
         self.ipaplcd.display(self.ipapdial.value())
@@ -433,14 +466,14 @@ class MainWindow(QMainWindow):
         self.maxLen = 100  # max number of data points to show on graph
         if(len(lst) > 1):
             try:
-                if len(self.dat) > self.maxLen:
-                    self.dat.popleft()  # remove oldest
-                if len(self.datpeak) > self.maxLen:
-                    self.datpeak.popleft()
-                self.datpeak.append(float(self.peakdial.value()))
-                self.dat.append(float(lst[1]) + float(self.peepdial.value()))
-                self.curve1.setData(self.dat)
-                self.curve2.setData(self.datpeak)
+                if len(self.lungpressuredata) > self.maxLen:
+                    self.lungpressuredata.popleft()  # remove oldest
+                if len(self.lungpressurepeakdata) > self.maxLen:
+                    self.lungpressurepeakdata.popleft()
+                self.lungpressurepeakdata.append(float(self.peakdial.value()))
+                self.lungpressuredata.append(float(lst[1]) + float(self.peepdial.value()))
+                self.curve1.setData(self.lungpressuredata)
+                self.curve2.setData(self.lungpressurepeakdata)
             except:
                 pass
             else:
@@ -564,6 +597,14 @@ class MainWindow(QMainWindow):
             self.disconnect.setEnabled(False)
             self.runloop.setEnabled(False)
             self.btninit.setEnabled(False)
+
+    @Slot()
+    def on_btnalarmpage_clicked(self):
+        #self.stackedWidget = QStackerWidget()
+        if self.btnalarmpage.isChecked():
+            self.stackedWidget.setCurrentIndex(1)
+        else:
+            self.stackedWidget.setCurrentIndex(0)
 
     @Slot()
     def on_connect_clicked(self):
