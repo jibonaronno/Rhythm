@@ -200,7 +200,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page">
              <widget class="QDial" name="vtdial">
@@ -312,7 +312,7 @@
                <number>1</number>
               </property>
               <property name="maximum">
-               <number>4</number>
+               <number>5</number>
               </property>
               <property name="value">
                <number>2</number>
@@ -611,10 +611,10 @@
                </size>
               </property>
               <property name="minimum">
-               <number>5</number>
+               <number>15</number>
               </property>
               <property name="maximum">
-               <number>35</number>
+               <number>50</number>
               </property>
               <property name="value">
                <number>25</number>
@@ -653,8 +653,8 @@
                <rect>
                 <x>4</x>
                 <y>8</y>
-                <width>89</width>
-                <height>14</height>
+                <width>101</width>
+                <height>21</height>
                </rect>
               </property>
               <property name="text">
@@ -683,16 +683,16 @@
                <number>5</number>
               </property>
               <property name="maximum">
-               <number>30</number>
+               <number>25</number>
               </property>
              </widget>
              <widget class="QLabel" name="label_8">
               <property name="geometry">
                <rect>
-                <x>216</x>
+                <x>208</x>
                 <y>8</y>
-                <width>66</width>
-                <height>14</height>
+                <width>81</width>
+                <height>21</height>
                </rect>
               </property>
               <property name="layoutDirection">
@@ -773,8 +773,11 @@
                 <height>100</height>
                </rect>
               </property>
+              <property name="maximum">
+               <number>25</number>
+              </property>
               <property name="value">
-               <number>10</number>
+               <number>5</number>
               </property>
              </widget>
              <widget class="QLCDNumber" name="lowplcd">
@@ -802,10 +805,10 @@
              <widget class="QLabel" name="label_10">
               <property name="geometry">
                <rect>
-                <x>106</x>
+                <x>100</x>
                 <y>8</y>
-                <width>91</width>
-                <height>16</height>
+                <width>101</width>
+                <height>21</height>
                </rect>
               </property>
               <property name="layoutDirection">
@@ -839,10 +842,10 @@
              <widget class="QLabel" name="label_11">
               <property name="geometry">
                <rect>
-                <x>309</x>
+                <x>304</x>
                 <y>8</y>
-                <width>81</width>
-                <height>16</height>
+                <width>91</width>
+                <height>21</height>
                </rect>
               </property>
               <property name="layoutDirection">
@@ -961,10 +964,10 @@
              <widget class="QLabel" name="label_12">
               <property name="geometry">
                <rect>
-                <x>410</x>
+                <x>404</x>
                 <y>8</y>
-                <width>81</width>
-                <height>16</height>
+                <width>91</width>
+                <height>21</height>
                </rect>
               </property>
               <property name="layoutDirection">
