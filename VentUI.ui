@@ -200,7 +200,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page">
              <widget class="QDial" name="vtdial">
@@ -651,9 +651,9 @@
              <widget class="QLabel" name="label_9">
               <property name="geometry">
                <rect>
-                <x>24</x>
+                <x>14</x>
                 <y>8</y>
-                <width>101</width>
+                <width>121</width>
                 <height>21</height>
                </rect>
               </property>
@@ -689,9 +689,9 @@
              <widget class="QLabel" name="label_8">
               <property name="geometry">
                <rect>
-                <x>288</x>
+                <x>278</x>
                 <y>8</y>
-                <width>81</width>
+                <width>101</width>
                 <height>21</height>
                </rect>
               </property>
@@ -805,9 +805,9 @@
              <widget class="QLabel" name="label_10">
               <property name="geometry">
                <rect>
-                <x>150</x>
+                <x>140</x>
                 <y>8</y>
-                <width>101</width>
+                <width>121</width>
                 <height>21</height>
                </rect>
               </property>
@@ -842,9 +842,9 @@
              <widget class="QLabel" name="label_11">
               <property name="geometry">
                <rect>
-                <x>414</x>
+                <x>404</x>
                 <y>8</y>
-                <width>91</width>
+                <width>111</width>
                 <height>21</height>
                </rect>
               </property>
@@ -964,9 +964,9 @@
              <widget class="QLabel" name="label_12">
               <property name="geometry">
                <rect>
-                <x>544</x>
+                <x>534</x>
                 <y>8</y>
-                <width>91</width>
+                <width>111</width>
                 <height>21</height>
                </rect>
               </property>
