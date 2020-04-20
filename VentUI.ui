@@ -163,6 +163,13 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="alarm">
+            <property name="text">
+             <string>alarm</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -283,7 +290,7 @@
                <string notr="true">color:black</string>
               </property>
               <property name="text">
-               <string>#VT</string>
+               <string>VT</string>
               </property>
              </widget>
              <widget class="QDial" name="iedial">
@@ -412,7 +419,7 @@
                <string notr="true">color:black</string>
               </property>
               <property name="text">
-               <string>#IE</string>
+               <string>IE</string>
               </property>
              </widget>
              <widget class="QDial" name="rrdial">
@@ -453,7 +460,7 @@
                <string notr="true">color:black</string>
               </property>
               <property name="text">
-               <string>#RR</string>
+               <string>RR</string>
               </property>
              </widget>
              <widget class="QDial" name="fiodial">
@@ -525,7 +532,7 @@
                <string notr="true">color:black</string>
               </property>
               <property name="text">
-               <string>#FIO2</string>
+               <string>FIO2</string>
               </property>
              </widget>
              <widget class="QLCDNumber" name="rrlcd">
@@ -651,7 +658,7 @@
                </rect>
               </property>
               <property name="text">
-               <string>#PEAK PRESSURE</string>
+               <string>PEAK PRESSURE</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -704,7 +711,7 @@
                <number>8</number>
               </property>
               <property name="text">
-               <string>#PEEP LEVEL</string>
+               <string>PEEP LEVEL</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -817,7 +824,7 @@
                <number>8</number>
               </property>
               <property name="text">
-               <string>#LOW PRESSURE</string>
+               <string>LOW PRESSURE</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -854,7 +861,7 @@
                <number>8</number>
               </property>
               <property name="text">
-               <string>#HIGH MINUTE</string>
+               <string>HIGH MINUTE</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -976,7 +983,7 @@
                <number>8</number>
               </property>
               <property name="text">
-               <string>#LOW MINUTE</string>
+               <string>LOW MINUTE</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
