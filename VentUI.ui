@@ -170,6 +170,13 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="startpush">
+            <property name="text">
+             <string>Start Push</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -200,7 +207,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page">
              <widget class="QDial" name="vtdial">

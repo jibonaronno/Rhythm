@@ -1,6 +1,8 @@
 import sys
 import serial
 import pprint
+import time
+import enum
 from os.path import join, dirname, abspath
 from qtpy.QtCore import Slot, QTimer, QThread, Signal, QObject, Qt
 
@@ -53,14 +55,69 @@ class PrimaryThread(QObject):
             pprint.pprint(e)
             self.signal.emit("Stopped")
 
+class GcodeStates(enum.Enum):
+    WAIT_FOR_TIMEOUT = 1
+    GCODE_SENT = 2
+    READY_TO_SEND = 3
+
+class BipapThread(QObject):
+    signal = Signal(str)
+    def __init__(self, serl, codegen):
+        self.serl = serl
+        self.codegen = codegen
+        self.codegen.GenerateCMV()
+        self.codelist = self.codegen.gcodestr.splitlines()
+        self.linecount = len(self.codelist)
+        self.flagStop = False
+        self.pause = True
+        self.gcode_exec_state = GcodeStates.READY_TO_SEND
+        self.gcode_move_count = 0
+        self.presentPosition = (0,0)
+        self.Tic = 0
+        self.Toc = 0
+        super().__init__()
+
+    def Stop(self):
+        self.flagStop = True
+
+    def updateGcode(self, codegen):
+        self.codegen = codegen
+        self.codegen.GenerateCMV()
+        self.codelist = self.codegen.gcodestr.splitlines()
+
+    def StartMoving(self):
+        self.pause = False
+
+    @Slot()
+    def run(self):
+        lst = []
+        while 1:
+            if self.flagStop:
+                break
+            try:
+                if not self.pause:
+                    if self.gcode_exec_state == GcodeStates.READY_TO_SEND:
+                        #self.serl.write()
+                        self.gcode_move_count += 1
+                        if self.gcode_move_count >= 5:
+                            self.pause = True
+                            self.gcode_move_count = 0
+                        else:
+                            self.gcode_exec_state = GcodeStates.WAIT_FOR_TIMEOUT
+                            self.Tic = time.perf_counter()
+                    if self.gcode_exec_state == GcodeStates.WAIT_FOR_TIMEOUT:
+                        if (time.perf_counter() - self.Tic) >= 1:
+                            print("Gcode Executed\r\n")
+                            self.gcode_exec_state = GcodeStates.READY_TO_SEND
+
+            except serial.SerialException as ex:
+                print("Error In SerialException" + ex.strerror)
 
 class WorkerThread(QObject):
     signal = Signal(str)
-
     def __init__(self, s, codegen):
         self.s = s
-        self.json = JsonSettings("settings.json")
-        self.codegen = codegen #GcodeGenerator(int(self.json.dict['vt']), int(self.json.dict['rr']), int(self.json.dict['ie']), int(self.json.dict['fio2']))
+        self.codegen = codegen
         self.codegen.GenerateCMV()
         self.codelist = self.codegen.gcodestr.splitlines()
         #pprint.pprint(self.codelist)
@@ -107,8 +164,6 @@ class WorkerThread(QObject):
                     #time.sleep(self.codegen.Ti+self.codegen.Th)
             except serial.SerialException as ex:
                 print("Error In SerialException" + ex.strerror)
-
-            # doFunc(self.signal, jMessage)
 
 class SensorThread(QObject):
     signal = Signal(str)

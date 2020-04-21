@@ -24,7 +24,7 @@ import json
 import pprint
 
 from gcodegenerator import GcodeGenerator
-from dispatchers import PrimaryThread, WorkerThread, SensorThread
+from dispatchers import PrimaryThread, WorkerThread, SensorThread, BipapThread
 from wavegenerator import WaveMapper
 from startdialog import StartDialog
 
@@ -89,6 +89,8 @@ class MainWindow(QMainWindow):
 
         self.lungpressuredata = deque()
         self.lungpressurepeakdata = deque()
+        self.peeppressuredata = deque()
+        self.peeppressurepeakdata = deque()
 
         self.lungpressure_line_pen = pg.mkPen(200, 100, 0)
         self.plotter = PlotWidget()
@@ -131,6 +133,9 @@ class MainWindow(QMainWindow):
         self.hbox.addWidget(self.txrxtable)
         #self.hbox.addLayout
 
+        self.bipap = BipapThread("", self.generator)
+        self.bipapthreadcreated = False
+
         self.peepdial.valueChanged.connect(self.peepDialChanged)
         self.peeplcd.display(self.peepdial.value())
         self.peakdial.valueChanged.connect(self.peakDialChanged)
@@ -153,6 +158,7 @@ class MainWindow(QMainWindow):
         self.lowminitdial.valueChanged.connect(self.lowminitDialChanged)
         self.lowminitlcd.display(self.lowminitdial.value())
         self.alarm.hide()
+        self.startpush.hide()
 
         self.s = ""
         self.s2 = ""
@@ -173,10 +179,11 @@ class MainWindow(QMainWindow):
 
     def checkSensorLimitChanged(self):
         #strtx = str(self.peakdial.value()) + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value()) + "\r\n"
-        #print(strtx)
+        #self.strtx = "<peak,12," + str(self.peakdial.value()) + "> "
+        #print(self.strtx)
         if self.sensorThreadCreated:
             if self.flag_sensorlimit_tx:
-                self.strtx = str(self.peakdial.value()) + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value())
+                self.strtx = "<peak,12," + str(self.peakdial.value()) + "> " # + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value())
                 self.sensor.txsensordata(self.strtx)
                 self.flag_sensorlimit_tx = False
 
@@ -302,7 +309,7 @@ class MainWindow(QMainWindow):
                 if len(self.lungpressurepeakdata) > self.maxLen:
                     self.lungpressurepeakdata.popleft()
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
-                self.lungpressuredata.append(float(lst[1]) + float(self.peepdial.value()))
+                self.lungpressuredata.append(float(lst[0]) + float(self.peepdial.value()))
                 self.curve1.setData(self.lungpressuredata)
                 self.curve2.setData(self.lungpressurepeakdata)
             except:
@@ -318,14 +325,10 @@ class MainWindow(QMainWindow):
         self.maxLen = 100  # max number of data points to show on graph
         if(len(lst) > 1):
             try:
-                if len(self.lungpressuredata) > self.maxLen:
-                    self.lungpressuredata.popleft()  # remove oldest
-                if len(self.lungpressurepeakdata) > self.maxLen:
-                    self.lungpressurepeakdata.popleft()
-                self.lungpressurepeakdata.append(float(self.peakdial.value()))
-                self.lungpressuredata.append(float(lst[1]) + float(self.peepdial.value()))
-                self.curve1.setData(self.lungpressuredata)
-                self.curve2.setData(self.lungpressurepeakdata)
+                if len(self.peeppressuredata) > self.maxLen:
+                    self.peeppressuredata.popleft()  # remove oldest
+                self.peeppressuredata.append(float(lst[1]) + float(self.peepdial.value()))
+                self.curve1.setData(self.peeppressuredata)
             except:
                 pass
             else:
@@ -347,26 +350,6 @@ class MainWindow(QMainWindow):
                 self.primaryThreadCreated = False
                 del self.primaryThread
                 self.runloop.setEnabled(True)
-
-        #elif data_stream == "Loop":
-        #    self.primaryThread.exit() ###
-        #    self.worker = WorkerThread(self.s, self.generator)
-        #    self.workerThread = QThread()
-        #    self.workerThread.started.connect(self.worker.run)
-        #    self.worker.signal.connect(self.write_info)
-        #    self.worker.moveToThread(self.workerThread)
-        #    self.workerThread.start()
-        #    self.workerThreadCreated = True
-        #    print("Starting Worker Thread")
-
-        #if data_stream == "Stopped":
-        #    self.worker = WorkerThread(self.s)
-        #    self.workerThread = QThread()
-        #    self.workerThread.started.connect(self.worker.run)
-        #    self.worker.signal.connect(self.write_info)
-        #    self.worker.moveToThread(self.workerThread)
-        #    self.workerThread.start()
-        #    print("Starting Thread")
 
     @Slot()
     def on_gengcode_clicked(self):
@@ -457,6 +440,18 @@ class MainWindow(QMainWindow):
             self.stackedWidget.setCurrentIndex(1)
         else:
             self.stackedWidget.setCurrentIndex(0)
+
+    @Slot()
+    def on_startpush_clicked(self):
+        if not self.bipapthreadcreated:
+            self.bipapThread = QThread()
+            self.bipapThread.started.connect(self.bipap.run)
+            #self.bipap.signal.connect(self...)
+            self.bipap.moveToThread(self.bipapThread)
+            self.bipapThread.start()
+            self.bipapthreadcreated = True
+            print("Bipap Thread Created")
+        self.bipap.StartMoving()
 
     @Slot()
     def on_connect_clicked(self):
