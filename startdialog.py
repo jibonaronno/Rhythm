@@ -22,6 +22,11 @@ class StartDialog(QDialog):
         self.timer.start(1060)
         self.setWindowModality(Qt.ApplicationModal)
         self.exec_()
+    
+    @Slot()
+    def on_ok_clicked(self):
+        self.timer.stop()
+        self.close()
 
     def hideText(self):
         self.label01.hide()

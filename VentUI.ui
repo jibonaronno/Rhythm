@@ -24,16 +24,6 @@
           <property name="leftMargin">
            <number>10</number>
           </property>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="monitoringPort">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>50</height>
-             </size>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="1">
            <widget class="QPushButton" name="connect">
             <property name="minimumSize">
@@ -76,19 +66,6 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="scanPorts">
-            <property name="minimumSize">
-             <size>
-              <width>120</width>
-              <height>50</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Scan Ports</string>
-            </property>
-           </widget>
-          </item>
           <item row="6" column="1">
            <widget class="QPushButton" name="btninit">
             <property name="enabled">
@@ -118,16 +95,6 @@
             </property>
             <property name="text">
              <string>Run Loop</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="portsList">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>50</height>
-             </size>
             </property>
            </widget>
           </item>
@@ -174,6 +141,52 @@
            <widget class="QPushButton" name="startpush">
             <property name="text">
              <string>Start Push</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="scanPorts">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Scan Ports</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QComboBox" name="portsList">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>50</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QComboBox" name="monitoringPort">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>50</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QPushButton" name="btnhault">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Stop</string>
             </property>
            </widget>
           </item>
@@ -226,7 +239,7 @@
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">color:white</string>
+               <string notr="true">background-color: rgb(200,200,20)</string>
               </property>
               <property name="minimum">
                <number>250</number>
@@ -314,6 +327,9 @@
                 <width>100</width>
                 <height>100</height>
                </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(200,20,20)</string>
               </property>
               <property name="minimum">
                <number>1</number>
@@ -444,6 +460,9 @@
                 <height>100</height>
                </size>
               </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(20,100,10)</string>
+              </property>
               <property name="minimum">
                <number>8</number>
               </property>
@@ -484,6 +503,9 @@
                 <width>100</width>
                 <height>100</height>
                </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(0,20,20)</string>
               </property>
               <property name="minimum">
                <number>21</number>

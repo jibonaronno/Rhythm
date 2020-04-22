@@ -11,8 +11,8 @@ class GcodeGenerator(object):
 
     def ComputeBipap(self):
         self.ACC=1000
-        self.xmax = 60
-        self.xamb = 12
+        self.xmax = 75 #60
+        self.xamb = 40 #12
         self.xrect = 30
         self.xcon = self.xamb + 5
 
@@ -24,9 +24,9 @@ class GcodeGenerator(object):
     
     def ComputeCMV(self):
         self.ACC=1000
-        self.xmax = 60
-        self.xamb = 12
-        self.xrect = 30
+        self.xmax = 75
+        self.xamb = 40
+        self.xrect = 29
         self.vtmax = 800
         self.Dt = self.xmax - self.xrect
         self.xav = self.xrect * (self.vt / self.vtmax)
