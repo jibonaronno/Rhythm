@@ -33,5 +33,6 @@ import struct
 #import RPi.GPIO as GPIO
 from time import sleep
 
-class AutoDetect(QObject):
-    pass
+class AutoDetectMarlin(QObject):
+    def __init__(self):
+        pass

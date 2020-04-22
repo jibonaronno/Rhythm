@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
         self.derivative_pen = pg.mkPen(200, 200, 10)
         self.derivative_pen_in = pg.mkPen(10, 200, 10)
         self.derivative_pen_out = pg.mkPen(10, 200, 200)
-        self.dvcurve = self.plotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
+        #self.dvcurve = self.plotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
 
         self.inhale_t_count = 0
         self.inhale_t = 0
@@ -115,6 +115,8 @@ class MainWindow(QMainWindow):
         self.flowplotter = PlotWidget()
         self.flowplotter.showGrid(x=True, y=True, alpha=None)
         self.flowplotter.setTitle("Flow")
+
+        self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
 
         self.volplotter = PlotWidget()
         self.volplotter.showGrid(x=True, y=True, alpha=None)
