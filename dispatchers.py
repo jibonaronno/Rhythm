@@ -6,11 +6,16 @@ import enum
 from os.path import join, dirname, abspath
 from qtpy.QtCore import Slot, QTimer, QThread, Signal, QObject, Qt
 
+class GcodeStates(enum.Enum):
+    WAIT_FOR_TIMEOUT = 1
+    GCODE_SENT = 2
+    READY_TO_SEND = 3
+
 class PrimaryThread(QObject):
     signal = Signal(str)
 
-    def __init__(self, s, codegen):
-        self.s = s
+    def __init__(self, serialPort, codegen):
+        self.serialPort = serialPort
         #self.json = JsonSettings("settings.json")
         self.codegen = codegen #GcodeGenerator(int(self.json.dict['vt']), int(self.json.dict['rr']), int(self.json.dict['ie']), int(self.json.dict['fio2']))
         self.codegen.GenerateCMV()
@@ -28,21 +33,21 @@ class PrimaryThread(QObject):
             for line in self.codelist:
                 if self.flagStop:
                     break
-                #self.s.reset_input_buffer()
-                self.s.write((str(line) + "\r\n").encode("utf-8"))
+                #self.serialPort.reset_input_buffer()
+                self.serialPort.write((str(line) + "\r\n").encode("utf-8"))
                 time.sleep(0.5)
-                in_waiting = self.s.in_waiting
+                in_waiting = self.serialPort.in_waiting
                 while in_waiting == 0:
                     time.sleep(1)
-                    in_waiting = self.s.in_waiting
+                    in_waiting = self.serialPort.in_waiting
                     
                 jMessage = ""
-                while self.s.in_waiting:
-                    #print(self.s.readline().decode('ascii'))
-                    lst = self.s.readlines()
+                while self.serialPort.in_waiting:
+                    #print(self.serialPort.readline().decode('ascii'))
+                    lst = self.serialPort.readlines()
                     for itm in lst:
                         jMessage += itm.decode('ascii')
-                        #jMessage += self.s.readline().decode('ascii')
+                        #jMessage += self.serialPort.readline().decode('ascii')
                     if "busy" in jMessage:
                         time.sleep(1)
                         continue
@@ -54,11 +59,6 @@ class PrimaryThread(QObject):
         except Exception as e:
             pprint.pprint(e)
             self.signal.emit("Stopped")
-
-class GcodeStates(enum.Enum):
-    WAIT_FOR_TIMEOUT = 1
-    GCODE_SENT = 2
-    READY_TO_SEND = 3
 
 class BipapThread(QObject):
     signal = Signal(str)
@@ -109,14 +109,13 @@ class BipapThread(QObject):
                         if (time.perf_counter() - self.Tic) >= 1:
                             print("Gcode Executed\r\n")
                             self.gcode_exec_state = GcodeStates.READY_TO_SEND
-
             except serial.SerialException as ex:
                 print("Error In SerialException" + ex.strerror)
 
 class WorkerThread(QObject):
     signal = Signal(str)
-    def __init__(self, s, codegen):
-        self.s = s
+    def __init__(self, serialPort, codegen):
+        self.serialPort = serialPort
         self.codegen = codegen
         self.codegen.GenerateCMV()
         self.codelist = self.codegen.gcodestr.splitlines()
@@ -146,18 +145,18 @@ class WorkerThread(QObject):
                 for line in self.codelist:
                     if self.flagStop:
                         break
-                    self.s.write((str(line)+"\r\n").encode('utf-8'))
+                    self.serialPort.write((str(line)+"\r\n").encode('utf-8'))
                     time.sleep(0.1)
-                    in_waiting = self.s.in_waiting
+                    in_waiting = self.serialPort.in_waiting
                     while in_waiting == 0:
                         time.sleep(1)
-                        in_waiting = self.s.in_waiting
+                        in_waiting = self.serialPort.in_waiting
                         
                     jMessage = ""
                     while "ok" not in jMessage:
-                        while self.s.in_waiting:
-                            #print(self.s.readline().decode('ascii'))
-                            lst = self.s.readlines()
+                        while self.serialPort.in_waiting:
+                            #print(self.serialPort.readline().decode('ascii'))
+                            lst = self.serialPort.readlines()
                             for itm in lst:
                                 jMessage += itm.decode('ascii')
                     self.signal.emit(str(line) + " - " + jMessage)
@@ -167,8 +166,8 @@ class WorkerThread(QObject):
 
 class SensorThread(QObject):
     signal = Signal(str)
-    def __init__(self, s):
-        self.s = s
+    def __init__(self, serialPort):
+        self.serialPort = serialPort
         self.flagStop = False
         self.jMessage = ""
         self._beep = False
@@ -192,13 +191,13 @@ class SensorThread(QObject):
             if self.flagStop:
                 break
             try:
-                jMessage = self.s.readline().decode('ascii')
+                jMessage = self.serialPort.readline().decode('ascii')
                 self.signal.emit(jMessage)
                 if self._beep:
                     self._beep = False
-                    self.s.write("A\r\n".encode('utf-8'))
+                    self.serialPort.write("A\r\n".encode('utf-8'))
                 if self.flag_sensorlimit_tx:
                     self.flag_sensorlimit_tx = False
-                    self.s.write(self.strdata.encode('utf-8'))
+                    self.serialPort.write(self.strdata.encode('utf-8'))
             except serial.SerialException as ex:
                 print("Error In SerialException" + ex.strerror)

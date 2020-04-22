@@ -1,6 +1,7 @@
 import math
 import sys
 from os.path import join, dirname, abspath
+from machinesetup import MachineSetup
 
 class GcodeGenerator(object):
     def __init__(self, vt, rr, ie, fio2):
@@ -8,33 +9,36 @@ class GcodeGenerator(object):
         self.rr = rr
         self.ie = ie
         self.fio2 = fio2
-
-    def ComputeBipap(self):
         self.ACC=1000
         self.xmax = 75 #60
         self.xamb = 40 #12
         self.xrect = 30
-        self.xcon = self.xamb + 5
+        self.xcon_offset = 5
+        self.vtmax = 5000
 
-        self.vtmax = 800
+        self.machinesetup = MachineSetup()
+        self.ACC = self.machinesetup.ACC
+        self.xmax = self.machinesetup.xmax
+        self.xamb = self.machinesetup.xamb
+        self.xrect = self.machinesetup.xrect
+        self.xcon_offset = self.machinesetup.xcon_offset
+        self.vtmax = self.machinesetup.vtmax
+        print(str(self.ACC) + "," + str(self.xmax) + "," + str(self.xamb) + "," + str(self.xrect) + "," + str(self.xcon_offset) + "," + str(self.vtmax))
+
+    def ComputeBipap(self):
+        self.xcon = self.xamb + self.xcon_offset
         self.Dt = self.xmax - self.xrect
         self.xav = self.xrect * (self.vt / self.vtmax)
         self.Dp = self.Dt + self.xav
         self.TDMS = 0        
     
     def ComputeCMV(self):
-        self.ACC=1000
-        self.xmax = 75
-        self.xamb = 40
-        self.xrect = 29
-        self.vtmax = 800
         self.Dt = self.xmax - self.xrect
         self.xav = self.xrect * (self.vt / self.vtmax)
         self.Dp = self.Dt + self.xav
         self.TDMS = 0
 
         self.Kie =  1/self.ie
-        self.vmax = 5000
         self.BCT = 60*(1-0.24) / self.rr
         self.Ti = self.BCT / (1 + (1 / self.Kie))
         self.Th = self.BCT - self.Ti

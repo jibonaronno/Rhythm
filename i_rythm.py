@@ -27,16 +27,14 @@ from gcodegenerator import GcodeGenerator
 from dispatchers import PrimaryThread, WorkerThread, SensorThread, BipapThread
 from wavegenerator import WaveMapper
 from startdialog import StartDialog
-
+from machinesetup import MachineSetup
 from math import pi, sin
 from PyQt5.QtMultimedia import *
 import struct
-
 #import RPi.GPIO as GPIO
 from time import sleep
 
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -61,14 +59,8 @@ class MainWindow(QMainWindow):
         self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
         self.table.setItem(0,2, QTableWidgetItem(self.settings_dict[r"rr"]))
         self.table.setItem(0,3, QTableWidgetItem(self.settings_dict[r"fio2"]))
-        #self.table.itemChanged.connect(self.SaveSettings)
 
         self.wave = WaveMapper()
-        
-        #self.vt = int(self.settings_dict[r"vt"])
-        #self.rr = int(self.settings_dict[r"rr"])
-        #self.ie = int(self.settings_dict[r"ie"])
-        #self.fio2 = int(self.settings_dict[r"fio2"])
 
         self.vt = self.vtdial.value()
         self.ie = self.iedial.value()
@@ -79,6 +71,8 @@ class MainWindow(QMainWindow):
         self.verticalLayout_2.addWidget(self.table)
 
         self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
+
+        self.loadMachineSetup(self.generator)
 
         self.motion_table = QTableWidget(self)
         self.motion_table_headers = ['variables', 'values']
@@ -133,7 +127,7 @@ class MainWindow(QMainWindow):
         self.verticalLayout_2.addWidget(self.flowplotter)
         self.verticalLayout_2.addWidget(self.volplotter)
         self.motion_table.hide()
-        self.flowplotter.hide()
+        #self.flowplotter.hide()
         self.volplotter.hide()
 
         self.gcodetable = QTableWidget(self)
@@ -186,15 +180,15 @@ class MainWindow(QMainWindow):
 
         #self.vtdial.setStyleSheet("{ background-color: rgb(20,20,20) }")
 
-        self.s = ""
-        self.s2 = ""
+        self.serialMarlin = ""
+        self.serialSensor = ""
         self.ports = list(port_list.comports())
 
         self.primaryThreadCreated = False
         self.workerThreadCreated = False
         self.sensorThreadCreated = False
-        self.serialPortOpen = False
-        self.serialSensorOpen = False
+        self.marlinPortOpen = False
+        self.sensorPortOpen = False
         self.gengcode.hide()
         self.childrenMakeMouseTransparen()
 
@@ -233,10 +227,31 @@ class MainWindow(QMainWindow):
         msg.setInformativeText(msgstr + "Controller Not Connected")
         msg.setWindowTitle("Controller Error")
         msg.setStandardButtons(QMessageBox.Ok)
-        #msg.setDetailedText("One of the controller "+ msgstr +" is not connected")
-        #msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        retval = msg.exec_()
-        #print(f"value of pressed message box button:{retval}")
+        msg.exec_()
+
+    def loadMachineSetup(self, generator):
+        self.t_acc.setText(str(generator.ACC))
+        self.t_xmax.setText(str(generator.xmax))
+        self.t_xamb.setText(str(generator.xamb))
+        self.t_xrect.setText(str(generator.xrect))
+        self.t_xconoffset.setText(str(generator.xcon_offset))
+        self.t_vtmax.setText(str(generator.vtmax))
+
+    @Slot()
+    def on_btnmachinesetup_clicked(self):
+        self.stackedWidget.setMinimumHeight(230)
+        self.stackedWidget.setCurrentIndex(3)
+
+    @Slot()
+    def on_btnsavemachinesetup_clicked(self):
+        self.generator.ACC = int(self.t_acc.text())
+        self.generator.xmax = int(self.t_xmax.text())
+        self.generator.xamb = int(self.t_xamb.text())
+        self.generator.xrect = int(self.t_xrect.text())
+        self.generator.xcon_offset = int(self.t_xconoffset.text())
+        self.generator.vtmax = int(self.t_vtmax.text())
+        self.generator.machinesetup.save()
+
 
     def automatePorts(self):
         self.ports = list(port_list.comports())
@@ -256,7 +271,7 @@ class MainWindow(QMainWindow):
                         break
                 for line in xlines:
                     if b"Marlin" in line:
-                        print(f"1. Marlin is in {self.selected_ports[0][0]}")
+                        print(f"1. Marlin is in {self.selected_ports[1][0]}")
                         self.ComPorts['Marlin']= self.selected_ports[1][0]
                         uart.close()
                 if self.ComPorts['Marlin'] == "NA":
@@ -275,7 +290,7 @@ class MainWindow(QMainWindow):
                         print(f"2. Marlin is in {self.selected_ports[0][0]}")
                         uart2.close()
                         self.ComPorts['Marlin']= self.selected_ports[0][0]
-                if self.ComPorts['Marlin'] == "NA":
+                if self.ComPorts['Sensor'] == "NA":
                     self.ComPorts['Sensor'] = self.selected_ports[0][0]
                 time.sleep(1)
             
@@ -301,21 +316,21 @@ class MainWindow(QMainWindow):
 
     def autoConnect(self):
         try:
-            if not self.serialPortOpen:
+            if not self.marlinPortOpen:
                 if self.ComPorts['Marlin'] != 'NA':
                     print("Serial Port Name : " + self.ComPorts['Marlin'])
-                    self.s = serial.Serial(self.ComPorts['Marlin'], baudrate=115200, timeout=1)
+                    self.serialMarlin = serial.Serial(self.ComPorts['Marlin'], baudrate=115200, timeout=1)
                     time.sleep(1)
-                    self.serialPortOpen = True
-                    while self.s.in_waiting:
-                        self.s.readline()
+                    self.marlinPortOpen = True
+                    while self.serialMarlin.in_waiting:
+                        self.serialMarlin.readline()
             if self.ComPorts['Sensor'] != 'NA':
-                if not self.serialSensorOpen:
-                    self.s2 = serial.Serial(self.ComPorts['Sensor'], baudrate=115200, timeout=1)
-                    self.serialSensorOpen = True
+                if not self.sensorPortOpen:
+                    self.serialSensor = serial.Serial(self.ComPorts['Sensor'], baudrate=115200, timeout=1)
+                    self.sensorPortOpen = True
             
         except serial.SerialException as ex:
-            self.serialPortOpen = False
+            self.marlinPortOpen = False
             print(ex.strerror)
             print("Error Opening Serial Port..........................................")
         else:
@@ -558,7 +573,7 @@ class MainWindow(QMainWindow):
     def on_btninit_clicked(self):
         if not self.workerThreadCreated:
             if not self.primaryThreadCreated:
-                self.primary = PrimaryThread(self.s, self.generator)
+                self.primary = PrimaryThread(self.serialMarlin, self.generator)
                 self.primaryThread = QThread()
                 self.primaryThread.started.connect(self.primary.run)
                 self.primary.signal.connect(self.write_info)
@@ -566,9 +581,9 @@ class MainWindow(QMainWindow):
                 self.primaryThread.start()
                 self.primaryThreadCreated = True
                 print("Starting Primary Thread")
-        if self.serialSensorOpen:
+        if self.sensorPortOpen:
             if not self.sensorThreadCreated:
-                self.sensor = SensorThread(self.s2)
+                self.sensor = SensorThread(self.serialSensor)
                 self.sensorThread = QThread()
                 self.sensorThread.started.connect(self.sensor.run)
                 self.sensor.signal.connect(self.LungSensorData)
@@ -581,7 +596,7 @@ class MainWindow(QMainWindow):
     def on_runloop_clicked(self):
         if not self.primaryThreadCreated:
             if not self.workerThreadCreated:
-                self.worker = WorkerThread(self.s, self.generator)
+                self.worker = WorkerThread(self.serialMarlin, self.generator)
                 self.workerThread = QThread()
                 self.workerThread.started.connect(self.worker.run)
                 self.worker.signal.connect(self.write_info)
@@ -592,7 +607,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_disconnect_clicked(self):
-        if self.serialPortOpen:
+        if self.marlinPortOpen:
             if self.workerThreadCreated:
                 self.worker.Stop()
                 self.workerThread.exit()
@@ -609,11 +624,11 @@ class MainWindow(QMainWindow):
                 self.sensorThread.exit()
                 self.sensorThread.wait()
                 self.sensorThreadCreated = False
-            self.s.close()
-            if self.serialSensorOpen:
-                self.s2.close()
-            self.serialPortOpen = False
-            self.serialSensorOpen = False
+            self.serialMarlin.close()
+            if self.sensorPortOpen:
+                self.serialSensor.close()
+            self.marlinPortOpen = False
+            self.sensorPortOpen = False
             self.connect.setEnabled(True)
             self.disconnect.setEnabled(False)
             self.runloop.setEnabled(False)
@@ -622,6 +637,7 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_btnalarmpage_clicked(self):
         #self.stackedWidget = QStackerWidget()
+        self.stackedWidget.setMinimumHeight(110)
         if self.btnalarmpage.isChecked():
             self.stackedWidget.setCurrentIndex(1)
         else:
@@ -642,26 +658,26 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_connect_clicked(self):
         try:
-            if not self.serialPortOpen:
+            if not self.marlinPortOpen:
                 print("Serial Port Name : " + self.portsList.currentText())
-                self.s = serial.Serial(self.portsList.currentText(), baudrate=115200, timeout=1)
-                #self.s.open()
+                self.serialMarlin = serial.Serial(self.portsList.currentText(), baudrate=115200, timeout=1)
+                #self.serialMarlin.open()
                 time.sleep(1)
-                self.serialPortOpen = True
-                #self.s.write("\r\n\r\n") # Hit enter a few times to wake the Printrbot
+                self.marlinPortOpen = True
+                #self.serialMarlin.write("\r\n\r\n") # Hit enter a few times to wake the Printrbot
                 #time.sleep(2)   # Wait for Printrbot to initialize
-                while self.s.in_waiting:
-                    self.s.readline()
-                    #print(self.s.readline().decode("ascii"))
-                #self.s.flushInput()  # Flush startup text in serial input
+                while self.serialMarlin.in_waiting:
+                    self.serialMarlin.readline()
+                    #print(self.serialMarlin.readline().decode("ascii"))
+                #self.serialMarlin.flushInput()  # Flush startup text in serial input
                 #monitoringPort
             if self.portsList.currentText() != self.monitoringPort.currentText():
-                if not self.serialSensorOpen:
-                    self.s2 = serial.Serial(self.monitoringPort.currentText(), baudrate=115200, timeout=1)
-                    self.serialSensorOpen = True
+                if not self.sensorPortOpen:
+                    self.serialSensor = serial.Serial(self.monitoringPort.currentText(), baudrate=115200, timeout=1)
+                    self.sensorPortOpen = True
             
         except serial.SerialException as ex:
-            self.serialPortOpen = False
+            self.marlinPortOpen = False
             print(ex.strerror)
             print("Error Opening Serial Port..........................................")
         else:
@@ -737,5 +753,5 @@ if __name__ == '__main__':
 
     mw_class_instance = MainWindow()
     mw = qtmodern.windows.ModernWindow(mw_class_instance)
-    mw.show()
+    mw.showFullScreen()
     sys.exit(app.exec_())
