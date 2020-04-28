@@ -11,7 +11,7 @@ import pyqtgraph as pg
 from collections import deque
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QPushButton
 
 import math
 import os
@@ -27,6 +27,7 @@ from gcodegenerator import GcodeGenerator
 from dispatchers import PrimaryThread, WorkerThread, SensorThread, BipapThread
 from wavegenerator import WaveMapper
 from startdialog import StartDialog
+from modes import MachineRunModes, BipapReturns, BipapLookup
 from machinesetup import MachineSetup
 from math import pi, sin
 from PyQt5.QtMultimedia import *
@@ -51,6 +52,13 @@ class MainWindow(QMainWindow):
         pprint.pprint(self.settings_dict)
 
         self.wave = WaveMapper()
+        
+        # Setting up Runmode for BiPAP. Call a cyclic function in LungSensorData(...) BipapLookup.lookUp(pressure)
+        # This function will return BipapReturns.Continue or BipapReturns.Stop
+        self.runMode = MachineRunModes.CMV
+        self.ipap = 8
+        self.bipapReturns = BipapReturns.Continue
+        self.bipapLookup = BipapLookup()
 
         self.vt = self.vtdial.value()
         self.ie = self.iedial.value()
@@ -429,6 +437,12 @@ class MainWindow(QMainWindow):
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(lst[0]) + float(self.peepdial.value()))
 
+                #In Bipapmode 
+                if self.runMode == MachineRunModes.BiPAP:
+                    if self.bipapLookup.lookUp(lst[0] + self.peepdial.value()) == BipapReturns.Stop:
+                        print("lookup returns stop....")
+                        self.bipap.Stop()
+
                 if len(self.deriv_points) == 0:
                     self.timesnap = 0.0
                 else:
@@ -609,6 +623,7 @@ class MainWindow(QMainWindow):
             self.bipapthreadcreated = True
             print("Bipap Thread Created")
         self.bipap.StartMoving()
+        self.runMode = MachineRunModes.BiPAP
 
     @Slot()
     def on_connect_clicked(self):

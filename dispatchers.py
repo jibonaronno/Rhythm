@@ -99,7 +99,7 @@ class BipapThread(QObject):
                     if self.gcode_exec_state == GcodeStates.READY_TO_SEND:
                         #self.serl.write()
                         self.gcode_move_count += 1
-                        if self.gcode_move_count >= 5:
+                        if self.gcode_move_count >= 30:
                             self.pause = True
                             self.gcode_move_count = 0
                         else:
