@@ -41,9 +41,7 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
 
         startdlg = StartDialog(None)
-        startdlg.show()
-
-        #self.verticalLayout_2 = QVBoxLayout()
+        
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
         window_title = "Rhythm"
@@ -51,14 +49,6 @@ class MainWindow(QMainWindow):
         self.json = JsonSettings("settings.json")
         self.settings_dict = self.json.dict
         pprint.pprint(self.settings_dict)
-        self.table = QTableWidget(self)
-        self.table.setRowCount(2)
-        self.table.setColumnCount(5)
-        self.table.setHorizontalHeaderLabels(self.tableHeaders)
-        self.table.setItem(0,0, QTableWidgetItem(self.settings_dict[r"vt"]))
-        self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
-        self.table.setItem(0,2, QTableWidgetItem(self.settings_dict[r"rr"]))
-        self.table.setItem(0,3, QTableWidgetItem(self.settings_dict[r"fio2"]))
 
         self.wave = WaveMapper()
 
@@ -67,19 +57,9 @@ class MainWindow(QMainWindow):
         self.rr = self.rrdial.value()
         self.fio2 = self.fiodial.value()
 
-        self.table.hide()
-        self.verticalLayout_2.addWidget(self.table)
-
         self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
 
         self.loadMachineSetup(self.generator)
-
-        self.motion_table = QTableWidget(self)
-        self.motion_table_headers = ['variables', 'values']
-        self.motion_table.setColumnCount(2)
-        self.motion_table.setRowCount(10)
-        self.motion_table.setHorizontalHeaderLabels(self.motion_table_headers)
-        self.motion_table.hide()
 
         self.lungpressuredata = deque()
         self.lungpressurepeakdata = deque()
@@ -122,13 +102,10 @@ class MainWindow(QMainWindow):
         self.volplotter.showGrid(x=True, y=True, alpha=None)
         self.volplotter.setTitle("Volume")
         
-        #self.motion_table.setSizeAdjustPolicy(QtWidget.QAbstractScrollArea.AdjustToContents)
         self.CalculateSettings()
-        self.verticalLayout_2.addWidget(self.motion_table)
         self.verticalLayout_2.addWidget(self.plotter)
         self.verticalLayout_2.addWidget(self.flowplotter)
         self.verticalLayout_2.addWidget(self.volplotter)
-        self.motion_table.hide()
         #self.flowplotter.hide()
         self.volplotter.hide()
 
@@ -368,12 +345,6 @@ class MainWindow(QMainWindow):
         self.lowminitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.himinitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 
-    def update_param_table(self):
-        self.table.setItem(0,0, QTableWidgetItem(self.settings_dict[r"vt"]))
-        self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
-        self.table.setItem(0,2, QTableWidgetItem(self.settings_dict[r"rr"]))
-        self.table.setItem(0,3, QTableWidgetItem(self.settings_dict[r"fio2"]))
-
     def peepDialChanged(self):
         self.peeplcd.display(self.peepdial.value())
         self.flag_sensorlimit_tx = True
@@ -402,7 +373,6 @@ class MainWindow(QMainWindow):
         self.vtlcd.display(self.vtdial.value())
         self.vt = self.vtdial.value()
         self.settings_dict[r"vt"] = str(self.vt)
-        self.update_param_table()
         self.SaveSettings()
 
     def ieDialChanged(self):
@@ -410,21 +380,18 @@ class MainWindow(QMainWindow):
         self.ielcd.display(self.iedial.value())
         self.ie = self.iedial.value()
         self.settings_dict[r"ie"] = str(self.ie)
-        self.update_param_table()
         self.SaveSettings()
 
     def rrDialChanged(self):
         self.rrlcd.display(self.rrdial.value())
         self.rr = self.rrdial.value()
         self.settings_dict[r"rr"] = str(self.rr)
-        self.update_param_table()
         self.SaveSettings()
 
     def fioDialChanged(self):
         self.fiolcd.display(self.fiodial.value())
         self.fio2 = self.fiodial.value()
         self.settings_dict[r"fio2"] = str(self.fio2)
-        self.update_param_table()
         self.SaveSettings()
 
     
@@ -446,20 +413,6 @@ class MainWindow(QMainWindow):
         #self.fio2 = int(self.settings_dict[r"fio2"])
         self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
         self.generator.GenerateCMV()
-        self.motion_table.setItem(0,0, QTableWidgetItem('Dp'))
-        self.motion_table.setItem(0,1, QTableWidgetItem(str(self.generator.Dp)))
-        self.motion_table.setItem(1,0, QTableWidgetItem('Dr'))
-        self.motion_table.setItem(1,1, QTableWidgetItem(str(self.generator.Dt)))
-        self.motion_table.setItem(2,0, QTableWidgetItem('Dt'))
-        self.motion_table.setItem(2,1, QTableWidgetItem(str(self.generator.Dt)))
-        self.motion_table.setItem(3,0, QTableWidgetItem('Ti'))
-        self.motion_table.setItem(3,1, QTableWidgetItem(str(self.generator.Ti)))
-        self.motion_table.setItem(4,0, QTableWidgetItem('Th'))
-        self.motion_table.setItem(4,1, QTableWidgetItem(str(self.generator.Th)))
-        self.motion_table.setItem(5,0, QTableWidgetItem('Vi'))
-        self.motion_table.setItem(5,1, QTableWidgetItem(str(self.generator.Vi)))
-        self.motion_table.setItem(6,0, QTableWidgetItem('Vh'))
-        self.motion_table.setItem(6,1, QTableWidgetItem(str(self.generator.Vh)))
 
     def LungSensorData(self, data_stream):
         #print(data_stream.split(','))
