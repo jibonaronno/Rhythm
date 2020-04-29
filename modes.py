@@ -12,13 +12,13 @@ class BipapReturns(enum.Enum):
 
 class BipapLookup(object):
     def __init__(self):
-        self.ipap = 8
+        self.ipap = 8.0
     
-    def setIpap(self, ipap):
+    def setIpap(self, ipap=0.0):
         self.ipap = ipap
 
-    def lookUp(self, pressure):
+    def lookUp(self, pressure=0.0):
         if pressure > self.ipap:
-            return BipapReturns.Stop
+            return True
         else:
-            return BipapReturns.Continue
+            return False

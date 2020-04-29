@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys
 from os.path import join, dirname, abspath
+import queue
 import serial
 import serial.tools.list_ports as port_list
 from qtpy import uic
@@ -24,7 +25,7 @@ import json
 import pprint
 
 from gcodegenerator import GcodeGenerator
-from dispatchers import PrimaryThread, WorkerThread, SensorThread, BipapThread
+from dispatchers import PrimaryThread, WorkerThread, SensorThread, BipapThread, BipapInitializationThread
 from wavegenerator import WaveMapper
 from startdialog import StartDialog
 from modes import MachineRunModes, BipapReturns, BipapLookup
@@ -56,9 +57,10 @@ class MainWindow(QMainWindow):
         # Setting up Runmode for BiPAP. Call a cyclic function in LungSensorData(...) BipapLookup.lookUp(pressure)
         # This function will return BipapReturns.Continue or BipapReturns.Stop
         self.runMode = MachineRunModes.CMV
-        self.ipap = 8
+        self.ipap = 15.0
         self.bipapReturns = BipapReturns.Continue
         self.bipapLookup = BipapLookup()
+        self.lst = []
 
         self.vt = self.vtdial.value()
         self.ie = self.iedial.value()
@@ -134,9 +136,12 @@ class MainWindow(QMainWindow):
         self.txrxtablevisible = False
         self.hbox.addWidget(self.txrxtable)
 
-        self.bipap = BipapThread("", self.generator)
+        #self.bipap = BipapThread("", self.generator)
+        self.pressureque = queue.Queue()
+        self.bipap_init_threadcreated = False
         self.bipapthreadcreated = False
 
+        self.modecombobox.currentIndexChanged.connect(self.modeselectionchanged)
         self.peepdial.valueChanged.connect(self.peepDialChanged)
         self.peeplcd.display(self.peepdial.value())
         self.peakdial.valueChanged.connect(self.peakDialChanged)
@@ -159,7 +164,7 @@ class MainWindow(QMainWindow):
         self.lowminitdial.valueChanged.connect(self.lowminitDialChanged)
         self.lowminitlcd.display(self.lowminitdial.value())
         self.alarm.hide()
-        #self.startpush.hide()
+        self.startpush.hide()
         self.btnhault.hide()
         self.portsList.hide()
         self.monitoringPort.hide()
@@ -170,6 +175,8 @@ class MainWindow(QMainWindow):
         self.serialMarlin = ""
         self.serialSensor = ""
         self.ports = list(port_list.comports())
+
+        self.bipapthreadcreated = False
 
         self.primaryThreadCreated = False
         self.workerThreadCreated = False
@@ -182,6 +189,9 @@ class MainWindow(QMainWindow):
         self.flag_sensorlimit_tx = True
         self.sensorLimitTimer = QTimer(self)
         self.sensorLimitTimer.timeout.connect(self.checkSensorLimitChanged)
+
+        self.modecombobox.addItem("CMV")
+        self.modecombobox.addItem("BiPAP")
 
         self.ComPorts = {'Marlin':'NA', 'Sensor':'NA'}
         self.selected_ports = []
@@ -223,6 +233,39 @@ class MainWindow(QMainWindow):
         self.t_xrect.setText(str(generator.xrect))
         self.t_xconoffset.setText(str(generator.xcon_offset))
         self.t_vtmax.setText(str(generator.vtmax))
+
+    # @Slot()
+    # def on_btncmv_clicked(self):
+    #     self.buttonstack.setCurrentIndex(0)
+    #     pass
+
+    # @Slot()
+    # def on_btnbipap_clicked(self):
+    #     self.buttonstack.setCurrentIndex(1)
+    #     pass
+
+    @Slot()
+    def on_btninitbipap_clicked(self):
+        if self.sensorPortOpen:
+            if not self.sensorThreadCreated:
+                self.sensor = SensorThread(self.serialSensor, self.pressureque)
+                self.sensorThread = QThread()
+                self.sensorThread.started.connect(self.sensor.run)
+                self.sensor.signal.connect(self.LungSensorData)
+                self.sensor.moveToThread(self.sensorThread)
+                self.sensorThread.start()
+                self.sensorThreadCreated = True
+                print("Starting Sensor Thread ...")
+        if not self.bipap_init_threadcreated:
+            if not self.bipapthreadcreated:
+                self.bipapinit = BipapInitializationThread(self.serialMarlin, self.generator, self.pressureque)
+                self.bipapinitThread = QThread()
+                self.bipapinitThread.started.connect(self.bipapinit.run)
+                self.bipapinit.signal.connect(self.write_info)
+                self.bipapinit.moveToThread(self.bipapinitThread)
+                self.bipapinitThread.start()
+                self.bipap_init_threadcreated = True
+                print("Starting bipap_init Thread")
 
     @Slot()
     def on_btnmachinesetup_clicked(self):
@@ -353,6 +396,12 @@ class MainWindow(QMainWindow):
         self.lowminitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.himinitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 
+    def modeselectionchanged(self):
+        if "CMV" in self.modecombobox.currentText():
+            self.buttonstack.setCurrentIndex(0)
+        elif "BiPAP" in self.modecombobox.currentText():
+            self.buttonstack.setCurrentIndex(2)
+
     def peepDialChanged(self):
         self.peeplcd.display(self.peepdial.value())
         self.flag_sensorlimit_tx = True
@@ -424,9 +473,9 @@ class MainWindow(QMainWindow):
 
     def LungSensorData(self, data_stream):
         #print(data_stream.split(','))
-        lst = data_stream.split(",")
+        self.lst = data_stream.split(",")
         self.maxLen = 100  # max number of data points to show on graph
-        if(len(lst) > 1):
+        if(len(self.lst) > 1):
             try:
                 if len(self.lungpressuredata) > self.maxLen:
                     self.lungpressuredata.popleft()  # remove oldest
@@ -435,20 +484,34 @@ class MainWindow(QMainWindow):
                 if len(self.dvdata) > self.maxLen:
                     self.dvdata.popleft()
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
-                self.lungpressuredata.append(float(lst[0]) + float(self.peepdial.value()))
+                self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
 
                 #In Bipapmode 
                 if self.runMode == MachineRunModes.BiPAP:
-                    if self.bipapLookup.lookUp(lst[0] + self.peepdial.value()) == BipapReturns.Stop:
-                        print("lookup returns stop....")
-                        self.bipap.Stop()
+                    #print("Bipap")
+                    try:
+                        #if self.bipapLookup.lookUp(float(self.lst[0]) + float(self.peepdial.value())):
+                        #print(str(float(self.lst[0]) + float(self.peepdial.value())))
+                        if self.ipap < float(float(self.lst[0]) + float(self.peepdial.value())):
+                            print("lookup returns stop....")
+                            if self.bipap.serialmutex.tryLock():
+                                self.bipap.StopMoving()
+                                self.bipap.codegen.GenerateBiPAP()
+                                self.bipap.serl.write(self.bipap.codegen.gcodebipap_back.encode("utf-8"))
+                                #time.sleep(1)
+                                #self.bipap.serl.flash
+                                self.bipap.codegen.bipapstep = 0
+                                self.bipap.StartMovingAfter(2.7)
+                                self.bipap.serialmutex.unlock()
+                    except:
+                        print("ERROR bipapLookup")
 
                 if len(self.deriv_points) == 0:
                     self.timesnap = 0.0
                 else:
                     self.timesnap = time.perf_counter() - self.tic
 
-                self.deriv_points.append([(float(lst[0]) + float(self.peepdial.value())), self.timesnap])
+                self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
                 if len(self.deriv_points) > 3:
                     self.deriv_points.popleft()
                     #self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
@@ -485,24 +548,24 @@ class MainWindow(QMainWindow):
             except:
                 pass
             else:
-                if (float(lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
+                if (float(self.lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
                     if self.sensorThreadCreated:
                         self.sensor.beep()
 
     def peepSensorData(self, data_stream):
         #print(data_stream.split(','))
-        lst = data_stream.split(",")
+        self.lst = data_stream.split(",")
         self.maxLen = 100  # max number of data points to show on graph
-        if(len(lst) > 1):
+        if(len(self.lst) > 1):
             try:
                 if len(self.peeppressuredata) > self.maxLen:
                     self.peeppressuredata.popleft()  # remove oldest
-                self.peeppressuredata.append(float(lst[1]) + float(self.peepdial.value()))
+                self.peeppressuredata.append(float(self.lst[1]) + float(self.peepdial.value()))
                 self.curve1.setData(self.peeppressuredata)
             except:
                 pass
             else:
-                if (float(lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
+                if (float(self.lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
                     if self.sensorThreadCreated:
                         self.sensor.beep()
 
@@ -520,6 +583,13 @@ class MainWindow(QMainWindow):
                 self.primaryThreadCreated = False
                 del self.primaryThread
                 self.runloop.setEnabled(True)
+        if "Endbipapinit" in data_stream:
+            if self.bipap_init_threadcreated:
+                self.bipapinitThread.exit()
+                self.bipapinitThread.wait()
+                self.bipap_init_threadcreated = False
+                del self.bipapinitThread
+                print("bipapinitThread Closed")
 
     @Slot()
     def on_gengcode_clicked(self):
@@ -552,7 +622,7 @@ class MainWindow(QMainWindow):
                 print("Starting Primary Thread")
         if self.sensorPortOpen:
             if not self.sensorThreadCreated:
-                self.sensor = SensorThread(self.serialSensor)
+                self.sensor = SensorThread(self.serialSensor, self.pressureque)
                 self.sensorThread = QThread()
                 self.sensorThread.started.connect(self.sensor.run)
                 self.sensor.signal.connect(self.LungSensorData)
@@ -593,6 +663,11 @@ class MainWindow(QMainWindow):
                 self.sensorThread.exit()
                 self.sensorThread.wait()
                 self.sensorThreadCreated = False
+            if self.bipap_init_threadcreated:
+                self.bipapinit.Stop()
+                self.bipapinitThread.exit()
+                self.bipapinitThread.wait()
+                self.bipap_init_threadcreated = False
             self.serialMarlin.close()
             if self.sensorPortOpen:
                 self.serialSensor.close()
@@ -615,6 +690,7 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_startpush_clicked(self):
         if not self.bipapthreadcreated:
+            self.bipap = BipapThread(self.serialMarlin, self.generator, self.pressureque)
             self.bipapThread = QThread()
             self.bipapThread.started.connect(self.bipap.run)
             #self.bipap.signal.connect(self...)

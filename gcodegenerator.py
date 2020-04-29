@@ -16,6 +16,10 @@ class GcodeGenerator(object):
         self.xcon_offset = 5
         self.vtmax = 5000
 
+        self.gcodebipap = ""
+        self.bipapstep = 0
+        self.gcodebipap_back = ""
+
         self.machinesetup = MachineSetup()
         self.ACC = self.machinesetup.ACC
         self.xmax = self.machinesetup.xmax
@@ -90,8 +94,16 @@ class GcodeGenerator(object):
         
     def GenerateCMV(self):
         self.ComputeCMV()
+        self.gcodeinit = "G21\r\nG80\r\nG90\r\nM92 X80 Y80\r\nG28 X0Y0 F500\r\nM92 X800 Y800\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC)
         self.gcodeprimary = "G21\r\nG80\r\nG90\r\nG28 X0Y0 F500\r\nM92 X800 Y800\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC)+"\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
+        #self.gcodeprimary = "G21\r\nG80\r\nG90\r\n"
         self.gcodestr =  "G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+"\r\n" +"G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
-       # self.gcodestr = "M201 X" + str(int(self.ACC_inhale)) + " Y" + str(int(self.ACC_exhale)) + "\r\n" + " G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.Vi))+"\r\n"+ "M201 X"+ str(int(self.ACC_exhale)) + " Y"+ str(int(self.ACC_exhale)) + "\r\n" +" G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.Vh))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
-        with open('primary.gcode', 'w') as writer:
-            writer.write(self.gcodeprimary)
+        #self.gcodestr = "M201 X" + str(int(self.ACC_inhale)) + " Y" + str(int(self.ACC_exhale)) + "\r\n" + " G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.Vi))+"\r\n"+ "M201 X"+ str(int(self.ACC_exhale)) + " Y"+ str(int(self.ACC_exhale)) + "\r\n" +" G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.Vh))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
+        #with open('primary.gcode', 'w') as writer:
+            #writer.write(self.gcodeprimary)
+
+    def GenerateBiPAP(self):
+        self.ComputeCMV()
+        self.gcodebipap = "G01 X" + str(int(self.Dt) + int(self.bipapstep))+" Y"+str(int(self.Dt) + int(self.bipapstep))+" F"+str(int(self.ViAvg))+"\r\n"
+        self.bipapstep += 1
+        self.gcodebipap_back = "G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n"
