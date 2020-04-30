@@ -14,7 +14,7 @@ class GcodeStates(enum.Enum):
 
 class BipapInitializationThread(QObject):
     signal = Signal(str)
-    #ppsignal = Signal([])
+    ppsignal = Signal(list)
 
     def __init__(self, serialPort, codegen, que):
         self.pressureque = que
@@ -74,10 +74,16 @@ class BipapInitializationThread(QObject):
                         #time.sleep(0.1)
                         #in_waiting = self.serialPort.in_waiting
                         #self.serialPort.reset_input_buffer()
+                    while self.pressureque.qsize() <= 0:
+                        pass
+
                     if self.pressureque.qsize() > 0:
                         pressure = self.pressureque.get(False)
-                        self.position_pressure_list.append([self.variableDt, pressure])
-                        self.variableDt += 1
+                        if "\n" in pressure:
+                            pass
+                        else:
+                            self.position_pressure_list.append([self.variableDt, pressure])
+                            self.variableDt += 1
 
                 except serial.SerialException as ex:
                     print("Error In SerialException During Bipap Pushing" + str(ex.strerror))
@@ -87,9 +93,12 @@ class BipapInitializationThread(QObject):
                     pprint.pprint(e)
                     self.signal.emit("Endbipapinit")
             
+            self.ppsignal.emit(self.position_pressure_list)
+
             self.ustr = "G01 X"+str(self.codegen.Dt) + " Y"+str(self.codegen.Dt)+"\r\n"
             self.serialPort.write((self.ustr.encode("utf-8")))
             pprint.pprint(self.position_pressure_list)
+            print("pressure list from thread")
 
             self.signal.emit("Endbipapinit")
         except serial.SerialException as ex:
@@ -230,9 +239,11 @@ class WorkerThread(QObject):
     def __init__(self, serialPort, codegen):
         self.serialPort = serialPort
         self.codegen = codegen
-        self.codegen.GenerateCMV()
+        ###self.codegen.GenerateCMV()
         self.codelist = self.codegen.gcodestr.splitlines()
         #pprint.pprint(self.codelist)
+        ##self.codegen.GenerateBiPAP()
+        ##self.codelist = self.codegen.gcodebipap.splitlines()
         self.linecount = len(self.codelist)
         #for idxx in range(self.linecount):
         #    print(self.codelist[idxx])
@@ -245,8 +256,10 @@ class WorkerThread(QObject):
 
     def updateGcode(self, codegen):
         self.codegen = codegen
-        self.codegen.GenerateCMV()
+        ###self.codegen.GenerateCMV()
         self.codelist = self.codegen.gcodestr.splitlines()
+        ##self.codegen.GenerateBipap()
+        ##self.codelist = self.codegen.gcodebipap.splitlines()
 
     @Slot()
     def run(self):

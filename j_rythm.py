@@ -112,7 +112,7 @@ class MainWindow(QMainWindow):
         self.volplotter.showGrid(x=True, y=True, alpha=None)
         self.volplotter.setTitle("Volume")
         
-        self.CalculateSettings()
+        ###self.CalculateSettings()
         self.verticalLayout_2.addWidget(self.plotter)
         self.verticalLayout_2.addWidget(self.flowplotter)
         self.verticalLayout_2.addWidget(self.volplotter)
@@ -262,6 +262,7 @@ class MainWindow(QMainWindow):
                 self.bipapinitThread = QThread()
                 self.bipapinitThread.started.connect(self.bipapinit.run)
                 self.bipapinit.signal.connect(self.write_info)
+                self.bipapinit.ppsignal.connect(self.endBipap)
                 self.bipapinit.moveToThread(self.bipapinitThread)
                 self.bipapinitThread.start()
                 self.bipap_init_threadcreated = True
@@ -281,315 +282,6 @@ class MainWindow(QMainWindow):
         self.generator.xcon_offset = int(self.t_xconoffset.text())
         self.generator.vtmax = int(self.t_vtmax.text())
         self.generator.machinesetup.save()
-
-
-    def automatePorts(self):
-        self.ports = list(port_list.comports())
-        for port in self.ports:
-            for itm in port:
-                if "USB" in itm:
-                    self.selected_ports.append(port)
-        xlines = []
-        if len(self.selected_ports) > 1:
-            try:
-                uart = serial.Serial(self.selected_ports[1][0], baudrate=115200, timeout=1)
-                time.sleep(1.5)
-                while uart.in_waiting:
-                    line = uart.readline()
-                    xlines.append(line)
-                    if len(xlines) > 30:
-                        break
-                for line in xlines:
-                    if b"Marlin" in line:
-                        print(f"1. Marlin is in {self.selected_ports[1][0]}")
-                        self.ComPorts['Marlin']= self.selected_ports[1][0]
-                        uart.close()
-                if self.ComPorts['Marlin'] == "NA":
-                    self.ComPorts['Sensor'] = self.selected_ports[1][0]
-                time.sleep(1)
-                xlines.clear()
-                uart2 = serial.Serial(self.selected_ports[0][0], baudrate=115200, timeout=1)
-                time.sleep(1.5)
-                while uart2.in_waiting:
-                    line = uart2.readline()
-                    xlines.append(line)
-                    if len(xlines) > 30:
-                        break
-                for line in xlines:
-                    if b"Marlin" in line:
-                        print(f"2. Marlin is in {self.selected_ports[0][0]}")
-                        uart2.close()
-                        self.ComPorts['Marlin']= self.selected_ports[0][0]
-                if self.ComPorts['Sensor'] == "NA":
-                    self.ComPorts['Sensor'] = self.selected_ports[0][0]
-                time.sleep(1)
-            
-            except serial.SerialException as ex:
-                print("Error In SerialException - aumatePorts()" + ex.strerror)
-
-        elif len(self.selected_ports) > 0:
-            uart2 = serial.Serial(self.selected_ports[0][0], baudrate=115200, timeout=1)
-            time.sleep(1.5)
-            while uart2.in_waiting:
-                line = uart2.readline()
-                xlines.append(line)
-                if len(xlines) > 30:
-                    break
-            for line in xlines:
-                if b"Marlin" in line:
-                    print(f"2. Marlin is in {self.selected_ports[0][0]}")
-                    uart2.close()
-                    self.ComPorts['Marlin']= self.selected_ports[0][0]
-            if self.ComPorts['Marlin'] == "NA":
-                self.ComPorts['Sensor'] = self.selected_ports[0][0]
-            time.sleep(1)
-
-    def autoConnect(self):
-        try:
-            if not self.marlinPortOpen:
-                if self.ComPorts['Marlin'] != 'NA':
-                    print("Serial Port Name : " + self.ComPorts['Marlin'])
-                    self.serialMarlin = serial.Serial(self.ComPorts['Marlin'], baudrate=115200, timeout=1)
-                    time.sleep(1)
-                    self.marlinPortOpen = True
-                    while self.serialMarlin.in_waiting:
-                        self.serialMarlin.readline()
-            if self.ComPorts['Sensor'] != 'NA':
-                if not self.sensorPortOpen:
-                    self.serialSensor = serial.Serial(self.ComPorts['Sensor'], baudrate=115200, timeout=1)
-                    self.sensorPortOpen = True
-            
-        except serial.SerialException as ex:
-            self.marlinPortOpen = False
-            print(ex.strerror)
-            print("Error Opening Serial Port..........................................")
-        else:
-            self.connect.setEnabled(False)
-            self.disconnect.setEnabled(True)
-            self.btninit.setEnabled(True)
-
-    def checkSensorLimitChanged(self):
-        #strtx = str(self.peakdial.value()) + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value()) + "\r\n"
-        #self.strtx = "<peak,12," + str(self.peakdial.value()) + "> "
-        #print(self.strtx)
-        if self.sensorThreadCreated:
-            if self.flag_sensorlimit_tx:
-                self.strtx = "<peak,12," + str(self.peakdial.value()) + "> " # + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value())
-                self.sensor.txsensordata(self.strtx)
-                self.flag_sensorlimit_tx = False
-
-
-    def childrenMakeMouseTransparen(self):
-        self.label_13.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.vtlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.ilcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.ielcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.rrlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.fiolcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.label_15.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.label_17.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.label_14.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.label_16.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.peaklcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.peeplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.lowplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.lowminitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.himinitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-
-    def modeselectionchanged(self):
-        if "CMV" in self.modecombobox.currentText():
-            self.buttonstack.setCurrentIndex(0)
-        elif "BiPAP" in self.modecombobox.currentText():
-            self.buttonstack.setCurrentIndex(2)
-
-    def peepDialChanged(self):
-        self.peeplcd.display(self.peepdial.value())
-        self.flag_sensorlimit_tx = True
-
-    def peakDialChanged(self):
-        self.peaklcd.display(self.peakdial.value())
-        self.flag_sensorlimit_tx = True
-
-    def lowpDialChanged(self):
-        self.lowplcd.display(self.lowpdial.value())
-        self.flag_sensorlimit_tx = True
-
-    def himinitDialChanged(self):
-        self.himinitlcd.display(self.himinitdial.value())
-        self.flag_sensorlimit_tx = True
-
-    def lowminitDialChanged(self):
-        self.lowminitlcd.display(self.lowminitdial.value())
-        self.flag_sensorlimit_tx = True
-
-    def ipapDialChanged(self):
-        self.ipaplcd.display(self.ipapdial.value())
-        self.flag_sensorlimit_tx = True
-
-    def vtDialChanged(self):
-        self.vtlcd.display(self.vtdial.value())
-        self.vt = self.vtdial.value()
-        self.settings_dict[r"vt"] = str(self.vt)
-        self.SaveSettings()
-
-    def ieDialChanged(self):
-        self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
-        self.ielcd.display(self.iedial.value())
-        self.ie = self.iedial.value()
-        self.settings_dict[r"ie"] = str(self.ie)
-        self.SaveSettings()
-
-    def rrDialChanged(self):
-        self.rrlcd.display(self.rrdial.value())
-        self.rr = self.rrdial.value()
-        self.settings_dict[r"rr"] = str(self.rr)
-        self.SaveSettings()
-
-    def fioDialChanged(self):
-        self.fiolcd.display(self.fiodial.value())
-        self.fio2 = self.fiodial.value()
-        self.settings_dict[r"fio2"] = str(self.fio2)
-        self.SaveSettings()
-
-    
-    def ShowGcodeTable(self):
-        codelist = self.generator.gcodestr.splitlines()
-        rowcount = len(codelist)
-        self.gcodetable.setRowCount(rowcount)
-        self.gcodetable.setColumnCount(1)
-        for i in range(rowcount):
-            self.gcodetable.setItem(i, 0, QTableWidgetItem(codelist[i]))
-
-    def CalculateSettings(self):
-        del self.generator
-        ###self.json = JsonSettings("settings.json")
-        ###self.settings_dict = self.json.dict
-        #self.vt = int(self.settings_dict[r"vt"])
-        #self.rr = int(self.settings_dict[r"rr"])
-        #self.ie = int(self.settings_dict[r"ie"])
-        #self.fio2 = int(self.settings_dict[r"fio2"])
-        self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
-        self.generator.GenerateCMV()
-
-    def LungSensorData(self, data_stream):
-        #print(data_stream.split(','))
-        self.lst = data_stream.split(",")
-        self.maxLen = 100  # max number of data points to show on graph
-        if(len(self.lst) > 1):
-            try:
-                if len(self.lungpressuredata) > self.maxLen:
-                    self.lungpressuredata.popleft()  # remove oldest
-                if len(self.lungpressurepeakdata) > self.maxLen:
-                    self.lungpressurepeakdata.popleft()
-                if len(self.dvdata) > self.maxLen:
-                    self.dvdata.popleft()
-                self.lungpressurepeakdata.append(float(self.peakdial.value()))
-                self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
-
-                #In Bipapmode 
-                if self.runMode == MachineRunModes.BiPAP:
-                    #print("Bipap")
-                    try:
-                        #if self.bipapLookup.lookUp(float(self.lst[0]) + float(self.peepdial.value())):
-                        #print(str(float(self.lst[0]) + float(self.peepdial.value())))
-                        if self.ipap < float(float(self.lst[0]) + float(self.peepdial.value())):
-                            print("lookup returns stop....")
-                            if self.bipap.serialmutex.tryLock():
-                                self.bipap.StopMoving()
-                                self.bipap.codegen.GenerateBiPAP()
-                                self.bipap.serl.write(self.bipap.codegen.gcodebipap_back.encode("utf-8"))
-                                #time.sleep(1)
-                                #self.bipap.serl.flash
-                                self.bipap.codegen.bipapstep = 0
-                                self.bipap.StartMovingAfter(2.7)
-                                self.bipap.serialmutex.unlock()
-                    except:
-                        print("ERROR bipapLookup")
-
-                if len(self.deriv_points) == 0:
-                    self.timesnap = 0.0
-                else:
-                    self.timesnap = time.perf_counter() - self.tic
-
-                self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
-                if len(self.deriv_points) > 3:
-                    self.deriv_points.popleft()
-                    #self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
-                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
-                else:
-                    self.dvdata.append(0.0)
-
-                if(len(self.deriv_points) >= 3):
-                    if self.dvdata[-1] > 1:
-                        self.curve1.setPen(self.derivative_pen_in)
-                        self.inhale_t_count += 1
-                        self.flag_idle = False
-                        self.idle_count = 0
-                    elif self.dvdata[-1] < -1:
-                        self.curve1.setPen(self.derivative_pen_out)
-                        self.exhale_t_count += 1
-                        self.flag_idle = False
-                        self.idle_count = 0
-                    else:
-                        if not self.flag_idle:
-                            self.idle_count += 1
-                            if self.idle_count > 2:
-                                print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
-                                self.flag_idle = True
-                                self.idle_count = 3
-                                self.inhale_t_count = 0
-                                self.exhale_t_count = 0
-
-                self.tic = time.perf_counter()
-
-                self.curve1.setData(self.lungpressuredata)
-                self.curve2.setData(self.lungpressurepeakdata)
-                self.dvcurve.setData(self.dvdata)
-            except:
-                pass
-            else:
-                if (float(self.lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
-                    if self.sensorThreadCreated:
-                        self.sensor.beep()
-
-    def peepSensorData(self, data_stream):
-        #print(data_stream.split(','))
-        self.lst = data_stream.split(",")
-        self.maxLen = 100  # max number of data points to show on graph
-        if(len(self.lst) > 1):
-            try:
-                if len(self.peeppressuredata) > self.maxLen:
-                    self.peeppressuredata.popleft()  # remove oldest
-                self.peeppressuredata.append(float(self.lst[1]) + float(self.peepdial.value()))
-                self.curve1.setData(self.peeppressuredata)
-            except:
-                pass
-            else:
-                if (float(self.lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
-                    if self.sensorThreadCreated:
-                        self.sensor.beep()
-
-    def write_info(self, data_stream):
-        rcount = self.txrxtable.rowCount()
-        self.txrxtable.insertRow(rcount)
-        self.txrxtable.setItem(rcount,0, QTableWidgetItem(data_stream))
-        self.txrxtable.scrollToBottom()
-        self.txrxtable.resizeColumnsToContents()
-        self.txrxtable.resizeRowsToContents()
-        if data_stream == "StoppedOK":
-            if self.primaryThreadCreated:
-                self.primaryThread.exit()
-                self.primaryThread.wait()
-                self.primaryThreadCreated = False
-                del self.primaryThread
-                self.runloop.setEnabled(True)
-        if "Endbipapinit" in data_stream:
-            if self.bipap_init_threadcreated:
-                self.bipapinitThread.exit()
-                self.bipapinitThread.wait()
-                self.bipap_init_threadcreated = False
-                del self.bipapinitThread
-                print("bipapinitThread Closed")
 
     @Slot()
     def on_gengcode_clicked(self):
@@ -630,6 +322,24 @@ class MainWindow(QMainWindow):
                 self.sensorThread.start()
                 self.sensorThreadCreated = True
                 print("Starting Sensor Thread ...")
+
+    
+    @Slot()
+    def on_btnrunbploop_clicked(self):
+        pprint.pprint(self.pparr)
+        self.generator.GenerateBiPAP(self.pparr, self.ipapdial.value())
+        print(self.generator.gcodestr)
+        if not self.primaryThreadCreated:
+            if not self.workerThreadCreated:
+                self.worker = WorkerThread(self.serialMarlin, self.generator)
+                self.workerThread = QThread()
+                self.workerThread.started.connect(self.worker.run)
+                self.worker.signal.connect(self.write_info)
+                self.worker.moveToThread(self.workerThread)
+                self.workerThread.start()
+                self.workerThreadCreated = True
+                print("Starting Worker Thread")
+                
 
     @Slot()
     def on_runloop_clicked(self):
@@ -769,6 +479,320 @@ class MainWindow(QMainWindow):
     def on_alarm_clicked(self):
         self.wave.playstart()
 
+    def automatePorts(self):
+        self.ports = list(port_list.comports())
+        for port in self.ports:
+            for itm in port:
+                if "USB" in itm:
+                    self.selected_ports.append(port)
+        xlines = []
+        if len(self.selected_ports) > 1:
+            try:
+                uart = serial.Serial(self.selected_ports[1][0], baudrate=115200, timeout=1)
+                time.sleep(1.5)
+                while uart.in_waiting:
+                    line = uart.readline()
+                    xlines.append(line)
+                    if len(xlines) > 30:
+                        break
+                for line in xlines:
+                    if b"Marlin" in line:
+                        print(f"1. Marlin is in {self.selected_ports[1][0]}")
+                        self.ComPorts['Marlin']= self.selected_ports[1][0]
+                        uart.close()
+                if self.ComPorts['Marlin'] == "NA":
+                    self.ComPorts['Sensor'] = self.selected_ports[1][0]
+                time.sleep(1)
+                xlines.clear()
+                uart2 = serial.Serial(self.selected_ports[0][0], baudrate=115200, timeout=1)
+                time.sleep(1.5)
+                while uart2.in_waiting:
+                    line = uart2.readline()
+                    xlines.append(line)
+                    if len(xlines) > 30:
+                        break
+                for line in xlines:
+                    if b"Marlin" in line:
+                        print(f"2. Marlin is in {self.selected_ports[0][0]}")
+                        uart2.close()
+                        self.ComPorts['Marlin']= self.selected_ports[0][0]
+                if self.ComPorts['Sensor'] == "NA":
+                    self.ComPorts['Sensor'] = self.selected_ports[0][0]
+                time.sleep(1)
+            
+            except serial.SerialException as ex:
+                print("Error In SerialException - aumatePorts()" + ex.strerror)
+
+        elif len(self.selected_ports) > 0:
+            uart2 = serial.Serial(self.selected_ports[0][0], baudrate=115200, timeout=1)
+            time.sleep(1.5)
+            while uart2.in_waiting:
+                line = uart2.readline()
+                xlines.append(line)
+                if len(xlines) > 30:
+                    break
+            for line in xlines:
+                if b"Marlin" in line:
+                    print(f"2. Marlin is in {self.selected_ports[0][0]}")
+                    uart2.close()
+                    self.ComPorts['Marlin']= self.selected_ports[0][0]
+            if self.ComPorts['Marlin'] == "NA":
+                self.ComPorts['Sensor'] = self.selected_ports[0][0]
+            time.sleep(1)
+
+    def autoConnect(self):
+        try:
+            if not self.marlinPortOpen:
+                if self.ComPorts['Marlin'] != 'NA':
+                    print("Serial Port Name : " + self.ComPorts['Marlin'])
+                    self.serialMarlin = serial.Serial(self.ComPorts['Marlin'], baudrate=115200, timeout=1)
+                    time.sleep(1)
+                    self.marlinPortOpen = True
+                    while self.serialMarlin.in_waiting:
+                        self.serialMarlin.readline()
+            if self.ComPorts['Sensor'] != 'NA':
+                if not self.sensorPortOpen:
+                    self.serialSensor = serial.Serial(self.ComPorts['Sensor'], baudrate=115200, timeout=1)
+                    self.sensorPortOpen = True
+            
+        except serial.SerialException as ex:
+            self.marlinPortOpen = False
+            print(ex.strerror)
+            print("Error Opening Serial Port..........................................")
+        else:
+            self.connect.setEnabled(False)
+            self.disconnect.setEnabled(True)
+            self.btninit.setEnabled(True)
+
+    def checkSensorLimitChanged(self):
+        #strtx = str(self.peakdial.value()) + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value()) + "\r\n"
+        #self.strtx = "<peak,12," + str(self.peakdial.value()) + "> "
+        #print(self.strtx)
+        if self.sensorThreadCreated:
+            if self.flag_sensorlimit_tx:
+                self.strtx = "<peak,12," + str(self.peakdial.value()) + "> " # + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value())
+                self.sensor.txsensordata(self.strtx)
+                self.flag_sensorlimit_tx = False
+
+
+    def childrenMakeMouseTransparen(self):
+        self.label_13.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.vtlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.ilcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.ielcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.rrlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.fiolcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.label_15.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.label_17.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.label_14.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.label_16.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.peaklcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.peeplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.lowplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.lowminitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.himinitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.ipaplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+
+    def modeselectionchanged(self):
+        if "CMV" in self.modecombobox.currentText():
+            self.buttonstack.setCurrentIndex(0)
+            self.stackedWidget.setCurrentIndex(0)
+        elif "BiPAP" in self.modecombobox.currentText():
+            self.buttonstack.setCurrentIndex(2)
+            self.stackedWidget.setCurrentIndex(2)
+
+    def peepDialChanged(self):
+        self.peeplcd.display(self.peepdial.value())
+        self.flag_sensorlimit_tx = True
+
+    def peakDialChanged(self):
+        self.peaklcd.display(self.peakdial.value())
+        self.flag_sensorlimit_tx = True
+
+    def lowpDialChanged(self):
+        self.lowplcd.display(self.lowpdial.value())
+        self.flag_sensorlimit_tx = True
+
+    def himinitDialChanged(self):
+        self.himinitlcd.display(self.himinitdial.value())
+        self.flag_sensorlimit_tx = True
+
+    def lowminitDialChanged(self):
+        self.lowminitlcd.display(self.lowminitdial.value())
+        self.flag_sensorlimit_tx = True
+
+    def ipapDialChanged(self):
+        self.ipaplcd.display(self.ipapdial.value())
+        self.flag_sensorlimit_tx = True
+        if self.workerThreadCreated:
+            self.generator.GenerateBiPAP(self.pparr, self.ipapdial.value())
+            self.worker.updateGcode(self.generator)
+
+
+    def vtDialChanged(self):
+        self.vtlcd.display(self.vtdial.value())
+        self.vt = self.vtdial.value()
+        self.settings_dict[r"vt"] = str(self.vt)
+        self.SaveSettings()
+
+    def ieDialChanged(self):
+        self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
+        self.ielcd.display(self.iedial.value())
+        self.ie = self.iedial.value()
+        self.settings_dict[r"ie"] = str(self.ie)
+        self.SaveSettings()
+
+    def rrDialChanged(self):
+        self.rrlcd.display(self.rrdial.value())
+        self.rr = self.rrdial.value()
+        self.settings_dict[r"rr"] = str(self.rr)
+        self.SaveSettings()
+
+    def fioDialChanged(self):
+        self.fiolcd.display(self.fiodial.value())
+        self.fio2 = self.fiodial.value()
+        self.settings_dict[r"fio2"] = str(self.fio2)
+        self.SaveSettings()
+
+    
+    def ShowGcodeTable(self):
+        codelist = self.generator.gcodestr.splitlines()
+        rowcount = len(codelist)
+        self.gcodetable.setRowCount(rowcount)
+        self.gcodetable.setColumnCount(1)
+        for i in range(rowcount):
+            self.gcodetable.setItem(i, 0, QTableWidgetItem(codelist[i]))
+
+    def CalculateSettings(self):
+        del self.generator
+        self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
+        self.generator.GenerateCMV()
+
+    def LungSensorData(self, data_stream):
+        #print(data_stream.split(','))
+        self.lst = data_stream.split(",")
+        self.maxLen = 100  # max number of data points to show on graph
+        if(len(self.lst) > 1):
+            try:
+                if len(self.lungpressuredata) > self.maxLen:
+                    self.lungpressuredata.popleft()  # remove oldest
+                if len(self.lungpressurepeakdata) > self.maxLen:
+                    self.lungpressurepeakdata.popleft()
+                if len(self.dvdata) > self.maxLen:
+                    self.dvdata.popleft()
+                self.lungpressurepeakdata.append(float(self.peakdial.value()))
+                self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
+
+                # #In Bipapmode 
+                # if self.runMode == MachineRunModes.BiPAP:
+                #     #print("Bipap")
+                #     try:
+                #         #if self.bipapLookup.lookUp(float(self.lst[0]) + float(self.peepdial.value())):
+                #         #print(str(float(self.lst[0]) + float(self.peepdial.value())))
+                #         if self.ipap < float(float(self.lst[0]) + float(self.peepdial.value())):
+                #             print("lookup returns stop....")
+                #             if self.bipap.serialmutex.tryLock():
+                #                 self.bipap.StopMoving()
+                #                 self.bipap.codegen.GenerateBiPAP()
+                #                 self.bipap.serl.write(self.bipap.codegen.gcodebipap_back.encode("utf-8"))
+                #                 #time.sleep(1)
+                #                 #self.bipap.serl.flash
+                #                 self.bipap.codegen.bipapstep = 0
+                #                 self.bipap.StartMovingAfter(2.7)
+                #                 self.bipap.serialmutex.unlock()
+                #     except:
+                #         print("ERROR bipapLookup")
+
+                if len(self.deriv_points) == 0:
+                    self.timesnap = 0.0
+                else:
+                    self.timesnap = time.perf_counter() - self.tic
+
+                self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+                if len(self.deriv_points) > 3:
+                    self.deriv_points.popleft()
+                    #self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
+                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
+                else:
+                    self.dvdata.append(0.0)
+
+                if(len(self.deriv_points) >= 3):
+                    if self.dvdata[-1] > 1:
+                        self.curve1.setPen(self.derivative_pen_in)
+                        self.inhale_t_count += 1
+                        self.flag_idle = False
+                        self.idle_count = 0
+                    elif self.dvdata[-1] < -1:
+                        self.curve1.setPen(self.derivative_pen_out)
+                        self.exhale_t_count += 1
+                        self.flag_idle = False
+                        self.idle_count = 0
+                    else:
+                        if not self.flag_idle:
+                            self.idle_count += 1
+                            if self.idle_count > 2:
+                                ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
+                                self.flag_idle = True
+                                self.idle_count = 3
+                                self.inhale_t_count = 0
+                                self.exhale_t_count = 0
+
+                self.tic = time.perf_counter()
+
+                self.curve1.setData(self.lungpressuredata)
+                self.curve2.setData(self.lungpressurepeakdata)
+                self.dvcurve.setData(self.dvdata)
+            except:
+                pass
+            else:
+                if (float(self.lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
+                    if self.sensorThreadCreated:
+                        self.sensor.beep()
+
+    def peepSensorData(self, data_stream):
+        #print(data_stream.split(','))
+        self.lst = data_stream.split(",")
+        self.maxLen = 100  # max number of data points to show on graph
+        if(len(self.lst) > 1):
+            try:
+                if len(self.peeppressuredata) > self.maxLen:
+                    self.peeppressuredata.popleft()  # remove oldest
+                self.peeppressuredata.append(float(self.lst[1]) + float(self.peepdial.value()))
+                self.curve1.setData(self.peeppressuredata)
+            except:
+                pass
+            else:
+                if (float(self.lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
+                    if self.sensorThreadCreated:
+                        self.sensor.beep()
+
+    def write_info(self, data_stream):
+        rcount = self.txrxtable.rowCount()
+        self.txrxtable.insertRow(rcount)
+        self.txrxtable.setItem(rcount,0, QTableWidgetItem(data_stream))
+        self.txrxtable.scrollToBottom()
+        self.txrxtable.resizeColumnsToContents()
+        self.txrxtable.resizeRowsToContents()
+        if data_stream == "StoppedOK":
+            if self.primaryThreadCreated:
+                self.primaryThread.exit()
+                self.primaryThread.wait()
+                self.primaryThreadCreated = False
+                del self.primaryThread
+                self.runloop.setEnabled(True)
+        if "Endbipapinit" in data_stream:
+            if self.bipap_init_threadcreated:
+                self.bipapinitThread.exit()
+                self.bipapinitThread.wait()
+                self.bipap_init_threadcreated = False
+                del self.bipapinitThread
+                print("bipapinitThread Closed")
+
+    def endBipap(self, pparr):
+        self.pparr = pparr
+        pprint.pprint(self.pparr)
+        self.btnrunbploop.setEnabled(True)
+
 class JsonSettings(object):
     def __init__(self , location):
         self.location = os.path.expandvars(location)
@@ -788,9 +812,9 @@ class JsonSettings(object):
             return True
         except:
             return False
-
     def _load(self):
         self.dict = json.load(open(self.location , "r"))
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
