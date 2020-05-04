@@ -168,7 +168,7 @@ class MainWindow(QMainWindow):
         self.himinitlcd.display(self.himinitdial.value())
         self.lowminitdial.valueChanged.connect(self.lowminitDialChanged)
         self.lowminitlcd.display(self.lowminitdial.value())
-        self.alarm.hide()
+        #self.alarm.hide()
         self.startpush.hide()
         self.btnhault.hide()
         self.portsList.hide()
