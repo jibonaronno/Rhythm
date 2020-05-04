@@ -4,6 +4,7 @@ import pprint
 import time
 import enum
 import queue
+from queue import Queue
 from os.path import join, dirname, abspath
 from qtpy.QtCore import Slot, QTimer, QThread, Signal, QObject, Qt, QMutex
 
@@ -236,9 +237,10 @@ class BipapThread(QObject):
 
 class WorkerThread(QObject):
     signal = Signal(str)
-    def __init__(self, serialPort, codegen):
+    def __init__(self, serialPort, codegen, commandque:Queue):
         self.serialPort = serialPort
         self.codegen = codegen
+        self.commandque = commandque
         ###self.codegen.GenerateCMV()
         self.codelist = self.codegen.gcodestr.splitlines()
         #pprint.pprint(self.codelist)
@@ -248,6 +250,7 @@ class WorkerThread(QObject):
         #for idxx in range(self.linecount):
         #    print(self.codelist[idxx])
         #self.idx = 0
+        self.flagexit = False
         self.flagStop = False
         super().__init__()
 
@@ -275,18 +278,30 @@ class WorkerThread(QObject):
                     time.sleep(0.1)
                     in_waiting = self.serialPort.in_waiting
                     while in_waiting == 0:
-                        time.sleep(1)
+                        if self.commandque.qsize() > 0:
+                            if self.commandque.get() == "exit":
+                                self.flagexit = True
+                                break
+                        time.sleep(0.5) #1
                         in_waiting = self.serialPort.in_waiting
-                        
+
+                    if self.flagexit:
+                        self.flagStop = True
+                        break
+
                     jMessage = ""
                     while "ok" not in jMessage:
                         while self.serialPort.in_waiting:
-                            #print(self.serialPort.readline().decode('ascii'))
+                            if self.commandque.qsize() > 0:
+                                if self.commandque.get() == "exit":
+                                    self.flagexit = True
+                                    self.flagStop = True
+                                    break
                             lst = self.serialPort.readlines()
                             for itm in lst:
                                 jMessage += itm.decode('ascii')
                     self.signal.emit(str(line) + " - " + jMessage)
-                    #time.sleep(self.codegen.Ti+self.codegen.Th)
+                    
             except serial.SerialException as ex:
                 print("Error In SerialException" + ex.strerror)
 

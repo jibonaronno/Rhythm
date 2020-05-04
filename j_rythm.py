@@ -26,12 +26,14 @@ import pprint
 
 from gcodegenerator import GcodeGenerator
 from dispatchers import PrimaryThread, WorkerThread, SensorThread, BipapThread, BipapInitializationThread
+from kalmanlib import kalman
 from wavegenerator import WaveMapper
 from startdialog import StartDialog
 from modes import MachineRunModes, BipapReturns, BipapLookup
 from machinesetup import MachineSetup
 from math import pi, sin
 from PyQt5.QtMultimedia import *
+from datalogger import DataLogger
 import struct
 #import RPi.GPIO as GPIO
 from time import sleep
@@ -75,6 +77,7 @@ class MainWindow(QMainWindow):
         self.lungpressurepeakdata = deque()
         self.peeppressuredata = deque()
         self.peeppressurepeakdata = deque()
+        self.kalmandata = deque()
 
         self.dvdata = deque()
         self.deriv_points = deque()
@@ -87,6 +90,8 @@ class MainWindow(QMainWindow):
         self.plotter.setTitle("Pressure")
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
         self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
+        self.kalmanpen = pg.mkPen(20, 100, 20)
+        self.curve3 = self.plotter.plot(0,0, "kalman", pen = self.kalmanpen)
 
         self.derivative_pen = pg.mkPen(200, 200, 10)
         self.derivative_pen_in = pg.mkPen(10, 200, 10)
@@ -117,7 +122,7 @@ class MainWindow(QMainWindow):
         self.verticalLayout_2.addWidget(self.flowplotter)
         self.verticalLayout_2.addWidget(self.volplotter)
         #self.flowplotter.hide()
-        self.volplotter.hide()
+        #self.volplotter.hide()
 
         self.gcodetable = QTableWidget(self)
         self.gcodetable.setRowCount(1)
@@ -170,6 +175,8 @@ class MainWindow(QMainWindow):
         self.monitoringPort.hide()
         self.scanPorts.hide()
 
+        self.kalman = kalman()
+
         #self.vtdial.setStyleSheet("{ background-color: rgb(20,20,20) }")
 
         self.serialMarlin = ""
@@ -185,6 +192,9 @@ class MainWindow(QMainWindow):
         self.sensorPortOpen = False
         self.gengcode.hide()
         self.childrenMakeMouseTransparen()
+
+        self.datalogger = DataLogger()
+        self.log_interval_count = 0
 
         self.flag_sensorlimit_tx = True
         self.sensorLimitTimer = QTimer(self)
@@ -331,7 +341,8 @@ class MainWindow(QMainWindow):
         print(self.generator.gcodestr)
         if not self.primaryThreadCreated:
             if not self.workerThreadCreated:
-                self.worker = WorkerThread(self.serialMarlin, self.generator)
+                self.worker_cmd_que = queue.Queue()
+                self.worker = WorkerThread(self.serialMarlin, self.generator, self.worker_cmd_que)
                 self.workerThread = QThread()
                 self.workerThread.started.connect(self.worker.run)
                 self.worker.signal.connect(self.write_info)
@@ -345,7 +356,8 @@ class MainWindow(QMainWindow):
     def on_runloop_clicked(self):
         if not self.primaryThreadCreated:
             if not self.workerThreadCreated:
-                self.worker = WorkerThread(self.serialMarlin, self.generator)
+                self.worker_cmd_que = queue.Queue()
+                self.worker = WorkerThread(self.serialMarlin, self.generator, self.worker_cmd_que)
                 self.workerThread = QThread()
                 self.workerThread.started.connect(self.worker.run)
                 self.worker.signal.connect(self.write_info)
@@ -355,9 +367,14 @@ class MainWindow(QMainWindow):
                 print("Starting Worker Thread")
 
     @Slot()
+    def on_btnstoploop_clicked(self):
+        pass
+
+    @Slot()
     def on_disconnect_clicked(self):
         if self.marlinPortOpen:
             if self.workerThreadCreated:
+                self.worker_cmd_que.put("exit")
                 self.worker.Stop()
                 self.workerThread.exit()
                 self.workerThread.wait()
@@ -414,28 +431,9 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_connect_clicked(self):
         try:
-            if not self.marlinPortOpen:
-                print("Serial Port Name : " + self.portsList.currentText())
-                self.serialMarlin = serial.Serial(self.portsList.currentText(), baudrate=115200, timeout=1)
-                #self.serialMarlin.open()
-                time.sleep(1)
-                self.marlinPortOpen = True
-                #self.serialMarlin.write("\r\n\r\n") # Hit enter a few times to wake the Printrbot
-                #time.sleep(2)   # Wait for Printrbot to initialize
-                while self.serialMarlin.in_waiting:
-                    self.serialMarlin.readline()
-                    #print(self.serialMarlin.readline().decode("ascii"))
-                #self.serialMarlin.flushInput()  # Flush startup text in serial input
-                #monitoringPort
-            if self.portsList.currentText() != self.monitoringPort.currentText():
-                if not self.sensorPortOpen:
-                    self.serialSensor = serial.Serial(self.monitoringPort.currentText(), baudrate=115200, timeout=1)
-                    self.sensorPortOpen = True
-            
-        except serial.SerialException as ex:
-            self.marlinPortOpen = False
-            print(ex.strerror)
-            print("Error Opening Serial Port..........................................")
+            self.autoConnect()
+        except Exception as ex:
+            pprint.pprint(ex)
         else:
             self.connect.setEnabled(False)
             self.disconnect.setEnabled(True)
@@ -636,7 +634,7 @@ class MainWindow(QMainWindow):
         self.SaveSettings()
 
     def ieDialChanged(self):
-        self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
+        #self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
         self.ielcd.display(self.iedial.value())
         self.ie = self.iedial.value()
         self.settings_dict[r"ie"] = str(self.ie)
@@ -680,8 +678,18 @@ class MainWindow(QMainWindow):
                     self.lungpressurepeakdata.popleft()
                 if len(self.dvdata) > self.maxLen:
                     self.dvdata.popleft()
+                if len(self.kalmandata) > self.maxLen:
+                    self.kalmandata.popleft()
+
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
+                self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
+
+                #Logging the data @ 100 data received
+                self.log_interval_count += 1
+                if self.log_interval_count >= 100:
+                    self.log_interval_count = 0
+                    self.datalogger.writeBlock(self.lungpressuredata)
 
                 # #In Bipapmode 
                 # if self.runMode == MachineRunModes.BiPAP:
@@ -709,6 +717,7 @@ class MainWindow(QMainWindow):
                     self.timesnap = time.perf_counter() - self.tic
 
                 self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+                #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
                 if len(self.deriv_points) > 3:
                     self.deriv_points.popleft()
                     #self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
@@ -741,6 +750,7 @@ class MainWindow(QMainWindow):
 
                 self.curve1.setData(self.lungpressuredata)
                 self.curve2.setData(self.lungpressurepeakdata)
+                self.curve3.setData(self.kalmandata)
                 self.dvcurve.setData(self.dvdata)
             except:
                 pass

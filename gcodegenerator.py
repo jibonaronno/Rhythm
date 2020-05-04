@@ -6,6 +6,7 @@ import pprint
 
 class GcodeGenerator(object):
     def __init__(self, vt, rr, ie, fio2):
+        self.vtfactor = 1.0
         self.vt = vt
         self.rr = rr
         self.ie = ie
@@ -107,7 +108,7 @@ class GcodeGenerator(object):
     
     def ComputeCMV(self):
         self.Dt = self.xmax - self.xrect
-        self.xav = self.xrect * (self.vt / self.vtmax)
+        self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
         self.Dp = self.Dt + self.xav
         self.TDMS = 0
 
