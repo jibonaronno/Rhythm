@@ -775,7 +775,7 @@ class MainWindow(QMainWindow):
             else:
                 if (float(self.lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
                     if self.sensorThreadCreated:
-                        self.sensor.beep()
+                        self.wave.playfile()
 
     def write_info(self, data_stream):
         rcount = self.txrxtable.rowCount()
