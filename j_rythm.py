@@ -79,6 +79,8 @@ class MainWindow(QMainWindow):
         self.peeppressuredata = deque()
         self.peeppressurepeakdata = deque()
         self.kalmandata = deque()
+        self.voldata = deque()
+        self.sumofvolume = 0.0
 
         self.dvdata = deque()
         self.deriv_points = deque()
@@ -114,9 +116,11 @@ class MainWindow(QMainWindow):
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
 
+        self.volplotter_pen = pg.mkPen(200, 20, 10)
         self.volplotter = PlotWidget()
         self.volplotter.showGrid(x=True, y=True, alpha=None)
         self.volplotter.setTitle("Volume")
+        self.volcurve = self.volplotter.plot(0,0,"volcurve", self.volplotter_pen)
         
         ###self.CalculateSettings()
         self.verticalLayout_2.addWidget(self.plotter)
@@ -479,7 +483,8 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_alarm_clicked(self):
         #self.wave.playstart()
-        self.wave.playfile()
+        #self.wave.playfile()
+        self.wave.BeepBeep()
 
     def automatePorts(self):
         self.ports = list(port_list.comports())
@@ -684,6 +689,8 @@ class MainWindow(QMainWindow):
                     self.dvdata.popleft()
                 if len(self.kalmandata) > self.maxLen:
                     self.kalmandata.popleft()
+                if len(self.voldata) > self.maxLen:
+                    self.voldata.popleft()
 
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(self.lst[1]) + float(self.peepdial.value()))
@@ -726,7 +733,9 @@ class MainWindow(QMainWindow):
                     self.deriv_points.popleft()
                     #self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
                     ###self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
-                    self.dvdata.append(float(self.lst[1]))
+                    self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[2])))
+                    self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
+                    self.voldata.append(self.sumofvolume)
                 else:
                     self.dvdata.append(0.0)
 
@@ -741,6 +750,7 @@ class MainWindow(QMainWindow):
                         self.exhale_t_count += 1
                         self.flag_idle = False
                         self.idle_count = 0
+                        self.sumofvolume = 0.0
                     else:
                         if not self.flag_idle:
                             self.idle_count += 1
@@ -757,6 +767,7 @@ class MainWindow(QMainWindow):
                 self.curve2.setData(self.lungpressurepeakdata)
                 self.curve3.setData(self.kalmandata)
                 self.dvcurve.setData(self.dvdata)
+                self.volcurve.setData(self.voldata)
             except:
                 pass
             else:

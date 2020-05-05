@@ -74,7 +74,7 @@ class WaveMapper(QObject):
         '''
         self.data.clear()
         #for k in range(1 * 22050):
-        for k in range(int(22050 / 4)):
+        for k in range(int(22050 / 8)):
             t = k / 22050.0
             value = int(self.volume * sin(2 * pi * self.frequency * t))
             self.data.append(struct.pack("<h", value))
@@ -83,7 +83,7 @@ class WaveMapper(QObject):
         self.volume = value
 
     def BeepBeep(self):
-        self.changeFrequency(1000)
+        self.changeFrequency(2000)
         self.changeVolume(1000)
         self.play()
 
