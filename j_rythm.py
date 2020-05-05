@@ -475,7 +475,8 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_alarm_clicked(self):
-        self.wave.playstart()
+        #self.wave.playstart()
+        self.wave.playfile()
 
     def automatePorts(self):
         self.ports = list(port_list.comports())

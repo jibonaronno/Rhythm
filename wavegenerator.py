@@ -8,6 +8,7 @@ from math import pi, sin
 from qtpy.QtCore import Slot, QTimer, QThread, Signal, QObject, Qt
 from PyQt5.QtCore import QBuffer, QByteArray, QIODevice, Qt
 from PyQt5.QtMultimedia import QAudio, QAudioDeviceInfo, QAudioFormat, QAudioOutput
+from PyQt5.QtMultimedia import QSound
 from collections import deque
 
 class WaveMapper(QObject):
@@ -28,6 +29,8 @@ class WaveMapper(QObject):
         self.timer = QTimer()
         self.timer.timeout.connect(self.PlayTimeOut)
         self.melodylist = [[800, 100],[1200, 100],[500, 100]]
+
+        self.qsnd = QSound("beep.wav")
 
     def playstart(self):
         self.melodylen = len(self.melodylist)
@@ -60,6 +63,9 @@ class WaveMapper(QObject):
         self.buffer.open(QIODevice.ReadOnly)
         self.buffer.seek(0)
         self.output.start(self.buffer)
+
+    def playfile(self):
+        self.qsnd.play()
 
     def createData(self):
         '''
