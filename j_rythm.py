@@ -213,6 +213,10 @@ class MainWindow(QMainWindow):
         self.ComPorts = {'Marlin':'NA', 'Sensor':'NA'}
         self.selected_ports = []
 
+        #self.ComPorts['Marlin'] = "COM16"
+        #self.ComPorts['Sensor'] = "COM5"
+        #self.ComPorts['Marlin'] = "ttyACM0"
+        #self.ComPorts['Sensor'] = "ttyACM1"
         self.automatePorts()
         pprint.pprint(self.ComPorts)
 
@@ -732,10 +736,10 @@ class MainWindow(QMainWindow):
                 if len(self.deriv_points) > 3:
                     self.deriv_points.popleft()
                     #self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
-                    ###self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
-                    self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[2])))
-                    self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
-                    self.voldata.append(self.sumofvolume)
+                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
+                    #self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[2])))
+                    #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
+                    #self.voldata.append(self.sumofvolume)
                 else:
                     self.dvdata.append(0.0)
 
@@ -768,7 +772,7 @@ class MainWindow(QMainWindow):
                 self.curve2.setData(self.lungpressurepeakdata)
                 self.curve3.setData(self.kalmandata)
                 self.dvcurve.setData(self.dvdata)
-                self.volcurve.setData(self.voldata)
+                #self.volcurve.setData(self.voldata)
             except:
                 pass
             else:
