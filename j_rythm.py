@@ -483,8 +483,8 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_alarm_clicked(self):
         #self.wave.playstart()
-        #self.wave.playfile()
-        self.wave.BeepBeep()
+        self.wave.playfile()
+        #self.wave.BeepBeep()
 
     def automatePorts(self):
         self.ports = list(port_list.comports())
@@ -745,6 +745,7 @@ class MainWindow(QMainWindow):
                         self.inhale_t_count += 1
                         self.flag_idle = False
                         self.idle_count = 0
+                        self.wave.playin()
                     elif self.dvdata[-1] < -1:
                         self.curve1.setPen(self.derivative_pen_out)
                         self.exhale_t_count += 1

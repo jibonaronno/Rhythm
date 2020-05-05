@@ -31,6 +31,7 @@ class WaveMapper(QObject):
         self.melodylist = [[800, 100],[1200, 100],[500, 100]]
 
         self.qsnd = QSound("beep.wav")
+        self.qsndin = QSound("beepin.wav")
 
     def playstart(self):
         self.melodylen = len(self.melodylist)
@@ -66,6 +67,9 @@ class WaveMapper(QObject):
 
     def playfile(self):
         self.qsnd.play()
+
+    def playin(self):
+        self.qsndin.play()
 
     def createData(self):
         '''
