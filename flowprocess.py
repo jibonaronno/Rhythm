@@ -27,5 +27,5 @@ class FlowProcess(object):
 
         self.flow = 0.0        
 
-    def CalculateFlow(self):
-        pass
+    def CalculateFlow(self, deltap):
+        return self.CDD * self.Korifice * math.sqrt(deltap)

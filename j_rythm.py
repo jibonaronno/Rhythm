@@ -27,6 +27,7 @@ import pprint
 from gcodegenerator import GcodeGenerator
 from dispatchers import PrimaryThread, WorkerThread, SensorThread, BipapThread, BipapInitializationThread
 from kalmanlib import kalman
+from flowprocess import FlowProcess
 from wavegenerator import WaveMapper
 from startdialog import StartDialog
 from modes import MachineRunModes, BipapReturns, BipapLookup
@@ -140,6 +141,8 @@ class MainWindow(QMainWindow):
         self.txrxtable.hide()
         self.txrxtablevisible = False
         self.hbox.addWidget(self.txrxtable)
+
+        self.flowprocess = FlowProcess()
 
         #self.bipap = BipapThread("", self.generator)
         self.pressureque = queue.Queue()
@@ -520,7 +523,7 @@ class MainWindow(QMainWindow):
                 time.sleep(1)
             
             except serial.SerialException as ex:
-                print("Error In SerialException - aumatePorts()" + ex.strerror)
+                print("Error In SerialException - aumatePorts()" + str(ex.strerror))
 
         elif len(self.selected_ports) > 0:
             uart2 = serial.Serial(self.selected_ports[0][0], baudrate=115200, timeout=1)
@@ -683,8 +686,8 @@ class MainWindow(QMainWindow):
                     self.kalmandata.popleft()
 
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
-                self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
-                self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
+                self.lungpressuredata.append(float(self.lst[1]) + float(self.peepdial.value()))
+                self.kalmandata.append(self.kalman.Estimate(float(self.lst[1]) + float(self.peepdial.value())))
 
                 #Logging the data @ 100 data received
                 self.log_interval_count += 1
@@ -717,12 +720,13 @@ class MainWindow(QMainWindow):
                 else:
                     self.timesnap = time.perf_counter() - self.tic
 
-                self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+                self.deriv_points.append([(float(self.lst[1]) + float(self.peepdial.value())), self.timesnap])
                 #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
                 if len(self.deriv_points) > 3:
                     self.deriv_points.popleft()
                     #self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
-                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
+                    ###self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
+                    self.dvdata.append(float(self.lst[1]))
                 else:
                     self.dvdata.append(0.0)
 
@@ -758,7 +762,8 @@ class MainWindow(QMainWindow):
             else:
                 if (float(self.lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
                     if self.sensorThreadCreated:
-                        self.sensor.beep()
+                        self.wave.playfile()
+                        #self.sensor.beep()
 
     def peepSensorData(self, data_stream):
         #print(data_stream.split(','))
