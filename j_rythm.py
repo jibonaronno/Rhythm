@@ -683,7 +683,7 @@ class MainWindow(QMainWindow):
         #print(data_stream.split(','))
         self.lst = data_stream.split(",")
         self.maxLen = 100  # max number of data points to show on graph
-        if(len(self.lst) > 1):
+        if(len(self.lst) > 2):
             try:
                 if len(self.lungpressuredata) > self.maxLen:
                     self.lungpressuredata.popleft()  # remove oldest
