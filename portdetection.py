@@ -37,12 +37,26 @@ from time import sleep
 class DetectDevices(object):
     def __init__(self):
         self.ports = []
+        self.usbports = []
         self.selected_ports = []
 
     def listPorts(self):
         from serial.tools.list_ports import comports
         self.ports = list(comports())
         return self.ports
+
+    def listUsbPorts(self):
+        self.listPorts()
+        if len(self.ports) > 1:
+            for port in self.ports:
+                if 'USB' in port[2]:
+                    self.usbports.append(port)
+
+    def printUsbPorts(self):
+        self.listUsbPorts()
+        if len(self.usbports) > 0:
+            for port in self.usbports:
+                print(port[0] + port[1] + port[2])
 
     def automatePorts(self):
         from serial.tools.list_ports import comports

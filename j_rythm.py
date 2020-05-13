@@ -48,10 +48,7 @@ class MainWindow(QMainWindow):
 
         #startdlg = StartDialog(None)
         devices = DetectDevices()
-        ports = devices.listPorts()
-        for port in ports:
-            for itm in port:
-                print(str(itm))
+        devices.printUsbPorts()
         
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
