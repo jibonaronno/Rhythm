@@ -30,6 +30,7 @@ from kalmanlib import kalman
 from flowprocess import FlowProcess
 from wavegenerator import WaveMapper
 from startdialog import StartDialog
+from portdetection import DetectDevices
 from modes import MachineRunModes, BipapReturns, BipapLookup
 from machinesetup import MachineSetup
 from math import pi, sin
@@ -45,7 +46,12 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
 
-        startdlg = StartDialog(None)
+        #startdlg = StartDialog(None)
+        devices = DetectDevices()
+        ports = devices.listPorts()
+        for port in ports:
+            for itm in port:
+                print(str(itm))
         
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
@@ -217,6 +223,7 @@ class MainWindow(QMainWindow):
         #self.ComPorts['Sensor'] = "COM5"
         #self.ComPorts['Marlin'] = "ttyACM0"
         #self.ComPorts['Sensor'] = "ttyACM1"
+        '''
         self.automatePorts()
         pprint.pprint(self.ComPorts)
 
@@ -227,7 +234,7 @@ class MainWindow(QMainWindow):
             self.showdialog("Motion Controller")
         else:
             self.autoConnect()
-            
+        '''    
         self.sensorLimitTimer.start(1000)
 
     def showdialog2(self, msg):
