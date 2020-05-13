@@ -48,7 +48,9 @@ class MainWindow(QMainWindow):
 
         #startdlg = StartDialog(None)
         devices = DetectDevices()
-        devices.printUsbPorts()
+        #devices.printPorts()
+        #devices.printUsbPorts()
+        devices.detectCustomBoards()
         
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
@@ -191,6 +193,7 @@ class MainWindow(QMainWindow):
 
         self.serialMarlin = ""
         self.serialSensor = ""
+        self.serialEncoder = ""
         self.ports = list(port_list.comports())
 
         self.bipapthreadcreated = False
@@ -220,6 +223,7 @@ class MainWindow(QMainWindow):
         #self.ComPorts['Sensor'] = "COM5"
         #self.ComPorts['Marlin'] = "ttyACM0"
         #self.ComPorts['Sensor'] = "ttyACM1"
+        
         '''
         self.automatePorts()
         pprint.pprint(self.ComPorts)
@@ -231,7 +235,8 @@ class MainWindow(QMainWindow):
             self.showdialog("Motion Controller")
         else:
             self.autoConnect()
-        '''    
+        '''
+
         self.sensorLimitTimer.start(1000)
 
     def showdialog2(self, msg):

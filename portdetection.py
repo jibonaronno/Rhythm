@@ -47,16 +47,56 @@ class DetectDevices(object):
 
     def listUsbPorts(self):
         self.listPorts()
-        if len(self.ports) > 1:
+        if len(self.ports) > 0:
             for port in self.ports:
                 if 'USB' in port[2]:
                     self.usbports.append(port)
+
+    def printPorts(self):
+        self.listPorts()
+        if len(self.ports) > 0:
+            for port in self.ports:
+                for itm in port:
+                    print(itm)
 
     def printUsbPorts(self):
         self.listUsbPorts()
         if len(self.usbports) > 0:
             for port in self.usbports:
                 print(port[0] + port[1] + port[2])
+
+
+    def detectCustomBoards(self):
+        self.listUsbPorts()
+        if len(self.usbports) > 0:
+            for port in self.usbports:
+                pprint.pprint(self.connectAndRead(port))
+
+
+    def connectAndRead(self, port):
+        xlines = []
+        print(f"Opening Port : {port[0]}")
+        indx = 0
+        try:
+            uart = serial.Serial(port[0], baudrate=115200, timeout=1)
+            time.sleep(1.5)
+            #while uart.in_waiting:
+            while indx < 10:
+                indx += 1
+                line = uart.readline()
+                #print(line.decode('ascii'))
+                #time.sleep(0.2)
+                xlines.append(line)
+                if len(xlines) > 10:
+                    break
+            if len(xlines) > 0:
+                return xlines
+            else:
+                return ["NONE"]
+        
+        except Exception as e:
+            print(f"Error Connect Or Reading Serial Port:{port[0]} " + str(e))
+
 
     def automatePorts(self):
         from serial.tools.list_ports import comports
