@@ -47,10 +47,7 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
 
         #startdlg = StartDialog(None)
-        devices = DetectDevices()
-        #devices.printPorts()
-        #devices.printUsbPorts()
-        devices.detectCustomBoards()
+
         
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
@@ -216,7 +213,7 @@ class MainWindow(QMainWindow):
         self.modecombobox.addItem("CMV")
         self.modecombobox.addItem("BiPAP")
 
-        self.ComPorts = {'Marlin':'NA', 'Sensor':'NA'}
+        self.ComPorts = {'Marlin':'NA', 'Sensor':'NA', 'Encoder':'NA'}
         self.selected_ports = []
 
         #self.ComPorts['Marlin'] = "COM16"
@@ -236,6 +233,26 @@ class MainWindow(QMainWindow):
         else:
             self.autoConnect()
         '''
+
+        self.devices = DetectDevices()
+        print("All Ports: ")
+        self.devices.printPorts()
+        print("USB Ports: ")
+        self.devices.printUsbPorts()
+        print("\r\n")
+        self.devices.detectCustomBoards()
+        print('Marlin Port : ' + self.devices.MarlinPort[0])
+        print('Encoder Port : ' + self.devices.EncoderPort[0])
+        print('Sensor Port : ' + self.devices.SensorPort[0])
+
+        self.ComPorts['Marlin'] = self.devices.MarlinPort[0]
+        self.ComPorts['Encoder'] = self.devices.EncoderPort[0]
+        self.ComPorts['Sensor'] = self.devices.SensorPort[0]
+
+        if self.ComPorts['Marlin'] == 'NA':
+            self.showdialog("Motion Controller")
+        else:
+            self.autoConnect()
 
         self.sensorLimitTimer.start(1000)
 
@@ -450,6 +467,14 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_connect_clicked(self):
+        self.devices.detectCustomBoards()
+        print('Marlin Port : ' + self.devices.MarlinPort[0])
+        print('Encoder Port : ' + self.devices.EncoderPort[0])
+        print('Sensor Port : ' + self.devices.SensorPort[0])
+
+        self.ComPorts['Marlin'] = self.devices.MarlinPort[0]
+        self.ComPorts['Encoder'] = self.devices.EncoderPort[0]
+        self.ComPorts['Sensor'] = self.devices.SensorPort[0]
         try:
             self.autoConnect()
         except Exception as ex:

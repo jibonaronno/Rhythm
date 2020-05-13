@@ -39,6 +39,9 @@ class DetectDevices(object):
         self.ports = []
         self.usbports = []
         self.selected_ports = []
+        self.MarlinPort = ["NA"]
+        self.SensorPort = ["NA"]
+        self.EncoderPort = ["NA"]
 
     def listPorts(self):
         from serial.tools.list_ports import comports
@@ -47,30 +50,44 @@ class DetectDevices(object):
 
     def listUsbPorts(self):
         self.listPorts()
+        self.usbports.clear()
         if len(self.ports) > 0:
             for port in self.ports:
                 if 'USB' in port[2]:
                     self.usbports.append(port)
+                    print('USB Detected : ' + port[2])
 
     def printPorts(self):
         self.listPorts()
         if len(self.ports) > 0:
             for port in self.ports:
-                for itm in port:
-                    print(itm)
+                print(port[0])
+                #for itm in port:
+                    #print(itm)
 
     def printUsbPorts(self):
         self.listUsbPorts()
         if len(self.usbports) > 0:
             for port in self.usbports:
-                print(port[0] + port[1] + port[2])
+                print(port[0])
 
 
     def detectCustomBoards(self):
+        uart_lines = []
         self.listUsbPorts()
+        print(f"Number of USB Ports : {len(self.usbports)}")
         if len(self.usbports) > 0:
             for port in self.usbports:
-                pprint.pprint(self.connectAndRead(port))
+                uart_lines = self.connectAndRead(port)
+                for line in uart_lines:
+                    if b'Encoder Board' in line:
+                        self.EncoderPort = port
+                        break
+                    elif b'Marlin' in line:
+                        self.MarlinPort = port
+                        break
+                    else:
+                        self.SensorPort = port
 
 
     def connectAndRead(self, port):
