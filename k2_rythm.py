@@ -498,7 +498,7 @@ class MainWindow(QMainWindow):
                 self.encoderThreadCreated = True
 
     def on_encoder(self, data_stream):
-        #print(str(data_stream))
+        print(str(data_stream))
         self.onEncoderValue(data_stream)
 
     
@@ -805,7 +805,7 @@ class MainWindow(QMainWindow):
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
                 ''' Commented for testing '''
-                ####self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
+                self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
             except Exception as e:
                 print("LungSensorData(...) : " + str(e))
 
@@ -859,7 +859,7 @@ class MainWindow(QMainWindow):
                 '''
 
                 ''' Working code commented to see speed '''
-                ####self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
+                self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
 
                 #self.dvdata.append(float(self.lst[1]))
                 
@@ -868,13 +868,14 @@ class MainWindow(QMainWindow):
                 #self.dvdata.append(dflow * 1000000)
 
                 ''' Working Code commented to check speed '''
-                ####dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
-                ####self.voldata.append(self.flowprocess.sum_of_volume)
+                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
+                self.voldata.append(self.flowprocess.sum_of_volume)
                 
                 #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
                 #self.voldata.append(self.sumofvolume)
             else:
-                self.dvdata.append(0.0)
+                pass
+                ###self.dvdata.append(0.0)
 
             if(len(self.deriv_points) >= 3):
                 if self.dvdata[-1] > 1:

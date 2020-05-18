@@ -260,6 +260,18 @@ class EncoderThread(QObject):
             if self.flagStop:
                 break
             else:
+                jMessage = ""
+                in_waiting = self.serialport.in_waiting
+                while in_waiting == 0:
+                    time.sleep(0.5)
+                    in_waiting = self.serialport.in_waiting
+                
+                lst = self.serialport.readlines()
+                for itm in lst:
+                    jMessage = itm.decode('ascii')
+                    self.signal_pass_encoder.emit(jMessage)
+
+'''
                 for char in self.serialport.read():
                     self.line.append(chr(char))
                     if chr(char) == '\n':
@@ -267,6 +279,7 @@ class EncoderThread(QObject):
                         self.line.clear()
                         self.signal_pass_encoder.emit(self.rec_data)
                         #print(self.rec_data)
+'''
 
 class WorkerThread(QObject):
     signal = Signal(str)
