@@ -315,24 +315,52 @@ class MainWindow(QMainWindow):
                 if parts[0] == '1':
                     value = int(parts[1])
                     self.changeVTdial(value)
+                if parts[0] == '2':
+                    value = int(parts[1])
+                    self.changeIEdial(value)
+                if parts[0] == '3':
+                    value = int(parts[1])
+                    self.changeRRdial(value)
+                if parts[0] == '4':
+                    value = int(parts[1])
+                    self.changeFIOdial(value)
+                if parts[0] == '5':
+                    self.change_set(parts[1])
 
 
     def changeVTdial(self, incr = 1):
-        vt_max = self.vtdial.maximum()
-        vt_min = self.vtdial.minimum()
-        vt_now = self.vtdial.value()
-        if(incr > 0):
-            if vt_now >= vt_max:
-                return
-            else:
-                vt_now += incr
-                self.vtdial.setValue(vt_now)
-        else:
-            if vt_now <= vt_min:
-                return
-            else:
-                vt_now -= 1
-                self.vtdial.setValue(vt_now)
+        if self.vtdial.isEnabled():
+            self.changedial(incr, self.vtdial)
+
+    def changeIEdial(self, incr=1):
+        if self.iedial.isEnabled():
+            self.changedial(incr, self.iedial)
+
+    def changeRRdial(self, incr=1):
+        if self.rrdial.isEnabled():
+            self.changedial(incr, self.rrdial)
+
+    def changeFIOdial(self, incr=1):
+        if self.fiodial.isEnabled():
+            self.changedial(incr, self.fiodial)
+
+    def changedial(self, incr = 1, dial=None):
+        if dial != None:
+            dial_max = dial.maximum()
+            dial_min = dial.minimum()
+            dial_now = dial.value()
+            if(incr == 1):
+                if dial_now >= dial_max:
+                    return
+                else:
+                    dial_now += incr
+                    dial.setValue(dial_now)
+            elif(incr == 0):
+                if dial_now <= dial_min:
+                    return
+                else:
+                    dial_now -= 1
+                    dial.setValue(dial_now)
 
 
     def getStreamData(self, line):
@@ -357,6 +385,14 @@ class MainWindow(QMainWindow):
         self.fiodial.setEnabled(False)
         self.btnchangeset.setText("Change")
         self.flagEditCmv = False
+
+    def change_set(self, cmd):
+        print(cmd)
+        if '3' in cmd:
+            if self.flagEditCmv:
+                self.setCmvParams()
+            else:
+                self.changeCmvParams()
 
     @Slot()
     def on_btnchangeset_clicked(self):
@@ -462,7 +498,7 @@ class MainWindow(QMainWindow):
                 self.encoderThreadCreated = True
 
     def on_encoder(self, data_stream):
-        print(str(data_stream))
+        #print(str(data_stream))
         self.onEncoderValue(data_stream)
 
     
