@@ -172,8 +172,8 @@ class GcodeGenerator(object):
 
         #print(self.gcodeinit)
         #print("\r\n")
-        print("Gcode Primary : ")
-        print(self.gcodeprimary)
+        ##print("Gcode Primary : ")
+        ##print(self.gcodeprimary)
         #self.gcodestr = "M201 X" + str(int(self.ACC_inhale)) + " Y" + str(int(self.ACC_exhale)) + "\r\n" + " G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.Vi))+"\r\n"+ "M201 X"+ str(int(self.ACC_exhale)) + " Y"+ str(int(self.ACC_exhale)) + "\r\n" +" G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.Vh))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
         #with open('primary.gcode', 'w') as writer:
             #writer.write(self.gcodeprimary)
