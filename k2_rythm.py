@@ -31,6 +31,7 @@ from flowprocess import FlowProcess
 from wavegenerator import WaveMapper
 from startdialog import StartDialog
 from portdetection import DetectDevices
+from backfeed import Backfeed
 from modes import MachineRunModes, BipapReturns, BipapLookup
 from machinesetup import MachineSetup
 from math import pi, sin
@@ -149,6 +150,9 @@ class MainWindow(QMainWindow):
         self.hbox.addWidget(self.txrxtable)
 
         self.flowprocess = FlowProcess()
+        print("D_ratio : " + str(self.flowprocess.diameter_ratio))
+        print("orifice area : " + str(self.flowprocess.orifice_area))
+        print("inlet area : " + str(self.flowprocess.inlet_area))
         print("Korifice : " + str(self.flowprocess.Korifice))
 
         #self.bipap = BipapThread("", self.generator)
@@ -185,7 +189,7 @@ class MainWindow(QMainWindow):
         self.monitoringPort.hide()
         self.scanPorts.hide()
 
-        self.kalman = kalman()
+        self.kalman = kalman(1.2)
 
         #self.vtdial.setStyleSheet("{ background-color: rgb(20,20,20) }")
 
@@ -254,6 +258,7 @@ class MainWindow(QMainWindow):
         self.ComPorts['Sensor'] = self.devices.SensorPort[0]
 
         self.autoConnect()
+        
 
         '''
         if self.ComPorts['Marlin'] == 'NA':
@@ -300,6 +305,71 @@ class MainWindow(QMainWindow):
     # def on_btnbipap_clicked(self):
     #     self.buttonstack.setCurrentIndex(1)
     #     pass
+
+    def onEncoderValue(self, msg):
+        parts = None
+        value = 2
+        if len(msg) <= 7:
+            parts = msg.split(':')
+            if len(parts) > 1:
+                if parts[0] == '1':
+                    value = int(parts[1])
+                    self.changeVTdial(value)
+
+
+    def changeVTdial(self, incr = 1):
+        vt_max = self.vtdial.maximum()
+        vt_min = self.vtdial.minimum()
+        vt_now = self.vtdial.value()
+        if(incr > 0):
+            if vt_now >= vt_max:
+                return
+            else:
+                vt_now += incr
+                self.vtdial.setValue(vt_now)
+        else:
+            if vt_now <= vt_min:
+                return
+            else:
+                vt_now -= 1
+                self.vtdial.setValue(vt_now)
+
+
+    def getStreamData(self, line):
+        elements = line.split('\t')
+        if len(elements) > 2:
+            print(str(elements[1]))
+
+    flagEditCmv = False
+
+    def changeCmvParams(self):
+        self.vtdial.setEnabled(True)
+        self.iedial.setEnabled(True)
+        self.rrdial.setEnabled(True)
+        self.fiodial.setEnabled(True)
+        self.btnchangeset.setText("Set")
+        self.flagEditCmv = True
+
+    def setCmvParams(self):
+        self.vtdial.setEnabled(False)
+        self.iedial.setEnabled(False)
+        self.rrdial.setEnabled(False)
+        self.fiodial.setEnabled(False)
+        self.btnchangeset.setText("Change")
+        self.flagEditCmv = False
+
+    @Slot()
+    def on_btnchangeset_clicked(self):
+        if self.flagEditCmv:
+            self.setCmvParams()
+        else:
+            self.changeCmvParams()
+
+    @Slot()
+    def on_btnstream_clicked(self):
+        self.streamer = Backfeed('prolog.log')
+        self.streamer.setCallback(self.getStreamData)
+        self.streamer.Start(50)
 
     @Slot()
     def on_btninitbipap_clicked(self):
@@ -392,7 +462,8 @@ class MainWindow(QMainWindow):
                 self.encoderThreadCreated = True
 
     def on_encoder(self, data_stream):
-        pass
+        print(str(data_stream))
+        self.onEncoderValue(data_stream)
 
     
     @Slot()
@@ -681,108 +752,125 @@ class MainWindow(QMainWindow):
     def LungSensorData(self, data_stream):
         #print(data_stream.split(','))
         self.lst = data_stream.split(",")
-        self.maxLen = 100  # max number of data points to show on graph
+        self.maxLen = 300  # max number of data points to show on graph
         if(len(self.lst) > 2):
-            try:
-                if len(self.lungpressuredata) > self.maxLen:
-                    self.lungpressuredata.popleft()  # remove oldest
-                if len(self.lungpressurepeakdata) > self.maxLen:
-                    self.lungpressurepeakdata.popleft()
-                if len(self.dvdata) > self.maxLen:
-                    self.dvdata.popleft()
-                if len(self.kalmandata) > self.maxLen:
-                    self.kalmandata.popleft()
-                if len(self.voldata) > self.maxLen:
-                    self.voldata.popleft()
+            if len(self.lungpressuredata) > self.maxLen:
+                self.lungpressuredata.popleft()  # remove oldest
+            if len(self.lungpressurepeakdata) > self.maxLen:
+                self.lungpressurepeakdata.popleft()
+            if len(self.dvdata) > self.maxLen:
+                self.dvdata.popleft()
+            if len(self.kalmandata) > self.maxLen:
+                self.kalmandata.popleft()
+            if len(self.voldata) > self.maxLen:
+                self.voldata.popleft()
 
-                self.lungpressurepeakdata.append(float(self.peakdial.value()))
-                self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
-                self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
+            self.lungpressurepeakdata.append(float(self.peakdial.value()))
+            self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
+            self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
 
-                #Logging the data @ 100 data received
-                self.log_interval_count += 1
-                if self.log_interval_count >= 100:
-                    self.log_interval_count = 0
-                    self.datalogger.writeBlock(self.lungpressuredata)
+            #Logging the data @ 100 data received
+            '''
+            self.log_interval_count += 1
+            if self.log_interval_count >= 100:
+                self.log_interval_count = 0
+                self.datalogger.writeBlock(self.lungpressuredata)
+            '''
+            # #In Bipapmode 
+            # if self.runMode == MachineRunModes.BiPAP:
+            #     #print("Bipap")
+            #     try:
+            #         #if self.bipapLookup.lookUp(float(self.lst[0]) + float(self.peepdial.value())):
+            #         #print(str(float(self.lst[0]) + float(self.peepdial.value())))
+            #         if self.ipap < float(float(self.lst[0]) + float(self.peepdial.value())):
+            #             print("lookup returns stop....")
+            #             if self.bipap.serialmutex.tryLock():
+            #                 self.bipap.StopMoving()
+            #                 self.bipap.codegen.GenerateBiPAP()
+            #                 self.bipap.serl.write(self.bipap.codegen.gcodebipap_back.encode("utf-8"))
+            #                 #time.sleep(1)
+            #                 #self.bipap.serl.flash
+            #                 self.bipap.codegen.bipapstep = 0
+            #                 self.bipap.StartMovingAfter(2.7)
+            #                 self.bipap.serialmutex.unlock()
+            #     except:
+            #         print("ERROR bipapLookup")
 
-                # #In Bipapmode 
-                # if self.runMode == MachineRunModes.BiPAP:
-                #     #print("Bipap")
-                #     try:
-                #         #if self.bipapLookup.lookUp(float(self.lst[0]) + float(self.peepdial.value())):
-                #         #print(str(float(self.lst[0]) + float(self.peepdial.value())))
-                #         if self.ipap < float(float(self.lst[0]) + float(self.peepdial.value())):
-                #             print("lookup returns stop....")
-                #             if self.bipap.serialmutex.tryLock():
-                #                 self.bipap.StopMoving()
-                #                 self.bipap.codegen.GenerateBiPAP()
-                #                 self.bipap.serl.write(self.bipap.codegen.gcodebipap_back.encode("utf-8"))
-                #                 #time.sleep(1)
-                #                 #self.bipap.serl.flash
-                #                 self.bipap.codegen.bipapstep = 0
-                #                 self.bipap.StartMovingAfter(2.7)
-                #                 self.bipap.serialmutex.unlock()
-                #     except:
-                #         print("ERROR bipapLookup")
-
-                if len(self.deriv_points) == 0:
-                    self.timesnap = 0.0
-                else:
-                    self.timesnap = time.perf_counter() - self.tic
-
-                self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
-                #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
-                if len(self.deriv_points) > 3:
-                    self.deriv_points.popleft()
-                    #self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
-                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
-                    #self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[2])))
-                    #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
-                    #self.voldata.append(self.sumofvolume)
-                else:
-                    self.dvdata.append(0.0)
-
-                if(len(self.deriv_points) >= 3):
-                    if self.dvdata[-1] > 1:
-                        self.curve1.setPen(self.derivative_pen_in)
-                        self.inhale_t_count += 1
-                        self.flag_idle = False
-                        self.idle_count = 0
-                        if not self.breath_in_tick:
-                            self.breath_in_tick = True
-                            self.wave.playin()
-                    elif self.dvdata[-1] < -1:
-                        self.curve1.setPen(self.derivative_pen_out)
-                        self.exhale_t_count += 1
-                        self.flag_idle = False
-                        self.idle_count = 0
-                        self.sumofvolume = 0.0
-                        if self.breath_in_tick:
-                            self.breath_in_tick = False
-                    else:
-                        if not self.flag_idle:
-                            self.idle_count += 1
-                            if self.idle_count > 2:
-                                ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
-                                self.flag_idle = True
-                                self.idle_count = 3
-                                self.inhale_t_count = 0
-                                self.exhale_t_count = 0
-
-                self.tic = time.perf_counter()
-
-                self.curve1.setData(self.lungpressuredata)
-                self.curve2.setData(self.lungpressurepeakdata)
-                self.curve3.setData(self.kalmandata)
-                self.dvcurve.setData(self.dvdata)
-                #self.volcurve.setData(self.voldata)
-            except Exception as e:
-                print("error in LungSensorData section 0x03 : " + str(e))
+            if len(self.deriv_points) == 0:
+                self.timesnap = 0.0
             else:
-                if (float(self.lst[0]) + float(self.peepdial.value())) > self.peakdial.value():
-                    if self.sensorThreadCreated:
-                        self.wave.playfile()
-                        #self.sensor.beep()
+                self.timesnap = time.perf_counter() - self.tic
+
+            self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+            #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
+            if len(self.deriv_points) > 3:
+                self.deriv_points.popleft()
+                '''
+                cannot remember its effect. seems not fisible output in case of peak detection could be delayed a bit.
+                self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
+                '''
+                '''
+                Working code for derivative data from lung pressure data.
+                self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
+                '''
+
+                '''
+                Following instruction will derive the data from the kalman of lung pressure.
+                '''
+                self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
+
+                #self.dvdata.append(float(self.lst[1]))
+                
+                #self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[1])))
+                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
+                print("Flow -- " + str(dflow * 1000000))
+                #self.dvdata.append(dflow * 1000000)
+                self.voldata.append(self.flowprocess.sum_of_volume)
+                
+                #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
+                #self.voldata.append(self.sumofvolume)
+            else:
+                self.dvdata.append(0.0)
+
+            if(len(self.deriv_points) >= 3):
+                if self.dvdata[-1] > 1:
+                    self.curve1.setPen(self.derivative_pen_in)
+                    self.inhale_t_count += 1
+                    self.flag_idle = False
+                    self.idle_count = 0
+                    if not self.breath_in_tick:
+                        self.breath_in_tick = True
+                        self.wave.playin()
+                elif self.dvdata[-1] < -1:
+                    self.curve1.setPen(self.derivative_pen_out)
+                    self.exhale_t_count += 1
+                    self.flag_idle = False
+                    self.idle_count = 0
+                    self.sumofvolume = 0.0
+                    if self.breath_in_tick:
+                        self.breath_in_tick = False
+                else:
+                    if not self.flag_idle:
+                        self.idle_count += 1
+                        if self.idle_count > 2:
+                            ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
+                            self.flag_idle = True
+                            self.idle_count = 3
+                            self.inhale_t_count = 0
+                            self.exhale_t_count = 0
+
+            self.tic = time.perf_counter()
+
+            self.curve1.setData(self.lungpressuredata)
+            self.curve2.setData(self.lungpressurepeakdata)
+            self.curve3.setData(self.kalmandata)
+            self.dvcurve.setData(self.dvdata)
+            self.volcurve.setData(self.voldata)
+            
+            if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
+                if self.sensorThreadCreated:
+                    self.wave.playfile()
+                    #self.sensor.beep()
 
     def peepSensorData(self, data_stream):
         #print(data_stream.split(','))

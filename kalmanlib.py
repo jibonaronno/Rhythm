@@ -9,7 +9,7 @@ from os.path import join, dirname, abspath
 from qtpy.QtCore import Slot, QTimer, QThread, Signal, QObject, Qt, QMutex
 
 class kalman(object):
-    def __init__(self):
+    def __init__(self, time_step = 0.1):
         ##########################################################################
         # Model
         # Estimates
@@ -30,7 +30,7 @@ class kalman(object):
         self.average_length = 30
         self.data = []
 
-        self.time_step = 0.1
+        self.time_step = time_step
         self.sumofsteps = 0
         self.index = 0
 

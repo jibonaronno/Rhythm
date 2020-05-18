@@ -106,6 +106,7 @@ class BipapInitializationThread(QObject):
             print("Error In SerialException" + str(ex.strerror))
             self.signal.emit("Stopped")
         except Exception as e:
+            print('Error From Bipap run..')
             pprint.pprint(e)
             self.signal.emit("Stopped")
 
@@ -235,6 +236,38 @@ class BipapThread(QObject):
             except serial.SerialException as ex:
                 print("Error In SerialException" + str(ex.strerror))
 
+class EncoderThread(QObject):
+    signal_pass_encoder = Signal(str)
+    def __init__(self, serialport):
+        self.rec_bytecount = 0
+        self.line = []
+        self.rec_data = ""
+        self.flagStop = False
+        self.serialport = serialport
+        #self.thread = QThread()
+        #self.thread.started.connect(self.run)
+        #self.signal_pass_encoder.connect(callback)
+        #self.moveToThread(self.thread)
+        #self.thread.start()
+        super().__init__()
+
+    def Stop(self):
+        self.flagStop = True
+
+    @Slot()
+    def run(self):
+        while True:
+            if self.flagStop:
+                break
+            else:
+                for char in self.serialport.read():
+                    self.line.append(chr(char))
+                    if chr(char) == '\n':
+                        self.rec_data = "".join(self.line)
+                        self.line.clear()
+                        self.signal_pass_encoder.emit(self.rec_data)
+                        #print(self.rec_data)
+
 class WorkerThread(QObject):
     signal = Signal(str)
     def __init__(self, serialPort, codegen, commandque:Queue):
@@ -303,7 +336,7 @@ class WorkerThread(QObject):
                     self.signal.emit(str(line) + " - " + jMessage)
                     
             except serial.SerialException as ex:
-                print("Error In SerialException" + ex.strerror)
+                print("Error In SerialException" + str(ex))
 
 class SensorThread(QObject):
     signal = Signal(str)

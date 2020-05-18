@@ -29,6 +29,10 @@ class GcodeGenerator(object):
         self.xrect = self.machinesetup.xrect
         self.xcon_offset = self.machinesetup.xcon_offset
         self.vtmax = self.machinesetup.vtmax
+        self.motor_i_min = self.machinesetup.motor_i_min
+        self.presmm = self.machinesetup.presmm
+        self.postsmm = self.machinesetup.postsmm
+        self.home_sense = self.machinesetup.home_sense
         print(str(self.ACC) + "," + str(self.xmax) + "," + str(self.xamb) + "," + str(self.xrect) + "," + str(self.xcon_offset) + "," + str(self.vtmax))
 
     def getAxisdistanceFromIpap(self, pparr, ipap):
@@ -160,9 +164,16 @@ class GcodeGenerator(object):
         
     def GenerateCMV(self):
         self.ComputeCMV()
-        self.gcodeinit = "G21\r\nG80\r\nG90\r\nM92 X80 Y80\r\nG28 X0Y0 F500\r\nM92 X800 Y800\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC)
-        self.gcodeprimary = "G21\r\nG80\r\nG90\r\nM92 X80 Y80\r\nG28 X0Y0 F500\r\nM92 X800 Y800\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC)+"\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
+        self.gcodeinit = "G21\r\nG80\r\nG90\r\nM92 X" + str(self.presmm) +" Y"+ str(self.presmm) +"\r\nG28 X0Y0 F500\r\nM92 X" + str(self.postsmm) + " Y" + str(self.postsmm) + "\r\nM906 X"+ str(self.motor_i_min) + " Y" + str(self.motor_i_min) +"\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC)
+        self.gcodeprimary = "G21\r\nG80\r\nG90\r\nM92 X"+ str(self.presmm) +" Y"+ str(self.presmm) + "\r\nM914 X" + str(self.home_sense) + " Y" + str(self.home_sense) +"\r\nG28 X0Y0 F500\r\nM92 X"+ str(self.postsmm) +" Y"+ str(self.postsmm) + "\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC) + "\r\nM906 X"+ str(self.motor_i_min) + " Y" + str(self.motor_i_min) + "\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
+        #self.gcodeprimary = "G21\r\nG80\r\nG90\r\nM92 X"+ str(self.presmm) +" Y"+ str(self.presmm) +"\r\nG28 X0Y0 F500\r\nM92 X"+ str(self.postsmm) +" Y"+ str(self.postsmm) + "\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC) + "\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
+        
         self.gcodestr =  "M107\r\nG01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+"\r\nM106 S255\r\n" +"G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
+
+        #print(self.gcodeinit)
+        #print("\r\n")
+        print("Gcode Primary : ")
+        print(self.gcodeprimary)
         #self.gcodestr = "M201 X" + str(int(self.ACC_inhale)) + " Y" + str(int(self.ACC_exhale)) + "\r\n" + " G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.Vi))+"\r\n"+ "M201 X"+ str(int(self.ACC_exhale)) + " Y"+ str(int(self.ACC_exhale)) + "\r\n" +" G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.Vh))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
         #with open('primary.gcode', 'w') as writer:
             #writer.write(self.gcodeprimary)

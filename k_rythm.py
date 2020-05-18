@@ -681,7 +681,7 @@ class MainWindow(QMainWindow):
     def LungSensorData(self, data_stream):
         #print(data_stream.split(','))
         self.lst = data_stream.split(",")
-        self.maxLen = 100  # max number of data points to show on graph
+        self.maxLen = 300  # max number of data points to show on graph
         if(len(self.lst) > 2):
             try:
                 if len(self.lungpressuredata) > self.maxLen:
@@ -735,8 +735,12 @@ class MainWindow(QMainWindow):
                 if len(self.deriv_points) > 3:
                     self.deriv_points.popleft()
                     #self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
-                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
-                    #self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[2])))
+                    #self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
+
+                    #self.dvdata.append(float(self.lst[1]))
+                    
+                    self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[1])))
+                    
                     #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
                     #self.voldata.append(self.sumofvolume)
                 else:
@@ -779,7 +783,7 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print("error in LungSensorData section 0x03 : " + str(e))
             else:
-                if (float(self.lst[0]) + float(self.peepdial.value())) > self.peakdial.value():
+                if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
                     if self.sensorThreadCreated:
                         self.wave.playfile()
                         #self.sensor.beep()

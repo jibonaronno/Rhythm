@@ -34,6 +34,10 @@ class MachineSetup(object):
         self.xrect = int(self.jsn.dict['xrect'])
         self.xcon_offset = int(self.jsn.dict['xcon_offset'])
         self.vtmax = int(self.jsn.dict['vtmax'])
+        self.motor_i_min = int(self.jsn.dict['motor_i_min'])
+        self.presmm = int(self.jsn.dict['pre_step_mm'])
+        self.postsmm = int(self.jsn.dict['post_step_mm'])
+        self.home_sense = int(self.jsn.dict['home_sense'])
 
     def save(self):
         self.jsn.dict['ACC'] = str(self.ACC)

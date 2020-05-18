@@ -509,9 +509,6 @@
             </property>
             <widget class="QWidget" name="page">
              <widget class="QDial" name="vtdial">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
               <property name="geometry">
                <rect>
                 <x>10</x>
@@ -605,9 +602,6 @@
               </property>
              </widget>
              <widget class="QDial" name="iedial">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
               <property name="geometry">
                <rect>
                 <x>110</x>
@@ -740,9 +734,6 @@
               </property>
              </widget>
              <widget class="QDial" name="rrdial">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
               <property name="geometry">
                <rect>
                 <x>210</x>
@@ -787,9 +778,6 @@
               </property>
              </widget>
              <widget class="QDial" name="fiodial">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
               <property name="geometry">
                <rect>
                 <x>310</x>
@@ -920,25 +908,6 @@
               </property>
               <property name="text">
                <string>Mode : CMV</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="btnchangeset">
-              <property name="geometry">
-               <rect>
-                <x>420</x>
-                <y>30</y>
-                <width>75</width>
-                <height>40</height>
-               </rect>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>40</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Change</string>
               </property>
              </widget>
             </widget>
