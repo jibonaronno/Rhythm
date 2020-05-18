@@ -861,10 +861,12 @@ class MainWindow(QMainWindow):
                 #self.dvdata.append(float(self.lst[1]))
                 
                 #self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[1])))
-                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
                 #print("Flow -- " + str(dflow * 1000000))
                 #self.dvdata.append(dflow * 1000000)
-                self.voldata.append(self.flowprocess.sum_of_volume)
+
+                ''' Working Code commented to check speed '''
+                ####dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
+                ####self.voldata.append(self.flowprocess.sum_of_volume)
                 
                 #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
                 #self.voldata.append(self.sumofvolume)
