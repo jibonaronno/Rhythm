@@ -801,9 +801,12 @@ class MainWindow(QMainWindow):
             if len(self.voldata) > self.maxLen:
                 self.voldata.popleft()
 
-            self.lungpressurepeakdata.append(float(self.peakdial.value()))
-            self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
-            self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
+            try:
+                self.lungpressurepeakdata.append(float(self.peakdial.value()))
+                self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
+                self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
+            except Exception as e:
+                print("LungSensorData(...) : " + str(e))
 
             #Logging the data @ 100 data received
             '''
