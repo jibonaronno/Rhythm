@@ -856,7 +856,9 @@ class MainWindow(QMainWindow):
                 '''
                 Following instruction will derive the data from the kalman of lung pressure.
                 '''
-                self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
+
+                ''' Working code commented to see speed '''
+                ####self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
 
                 #self.dvdata.append(float(self.lst[1]))
                 
