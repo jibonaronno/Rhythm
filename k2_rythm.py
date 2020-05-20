@@ -846,7 +846,7 @@ class MainWindow(QMainWindow):
             if len(self.deriv_points) > 3:
                 self.deriv_points.popleft()
                 '''
-                cannot remember its effect. seems not fisible output in case of peak detection could be delayed a bit.
+                cannot remember its effect. seems not feasible output in case of peak detection could be delayed a bit.
                 self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
                 '''
                 '''
@@ -857,7 +857,6 @@ class MainWindow(QMainWindow):
                 '''
                 Following instruction will derive the data from the kalman of lung pressure.
                 '''
-
                 ''' Working code commented to see speed '''
                 self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
 

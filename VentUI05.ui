@@ -21,13 +21,13 @@
        <widget class="QStackedWidget" name="stackedWidget_2">
         <property name="minimumSize">
          <size>
-          <width>100</width>
+          <width>200</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>130</width>
+          <width>200</width>
           <height>16777215</height>
          </size>
         </property>
@@ -40,7 +40,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>131</width>
+            <width>152</width>
             <height>574</height>
            </rect>
           </property>
@@ -65,7 +65,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>140</width>
+               <width>150</width>
                <height>520</height>
               </size>
              </property>
@@ -76,7 +76,7 @@
               <widget class="QWidget" name="layoutWidget">
                <property name="geometry">
                 <rect>
-                 <x>0</x>
+                 <x>10</x>
                  <y>10</y>
                  <width>121</width>
                  <height>420</height>
@@ -164,7 +164,7 @@
                    </size>
                   </property>
                   <property name="text">
-                   <string>Gcode</string>
+                   <string>Show/Hide Gcode</string>
                   </property>
                  </widget>
                 </item>
