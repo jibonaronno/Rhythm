@@ -314,6 +314,16 @@ class MainWindow(QMainWindow):
     #     self.buttonstack.setCurrentIndex(1)
     #     pass
 
+    left_panel_visible = True
+
+    def show_hide_LeftPanel(self):
+        if self.left_panel_visible:
+            self.stackedWidget_2.hide()
+            self.left_panel_visible = False
+        else:
+            self.left_panel_visible = True
+            self.stackedWidget_2.show()
+
     def onEncoderValue(self, msg):
         parts = None
         value = 2
@@ -331,7 +341,10 @@ class MainWindow(QMainWindow):
                     self.changeRRdial(value)
                 if parts[0] == '4':
                     value = int(parts[1])
-                    self.changeFIOdial(value)
+                    if value < 3:
+                        self.changeFIOdial(value)
+                    elif value == 3:
+                        self.show_hide_LeftPanel()
                 if parts[0] == '5':
                     self.change_set(parts[1])
 
