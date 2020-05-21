@@ -498,7 +498,7 @@ class MainWindow(QMainWindow):
                 self.encoderThreadCreated = True
 
     def on_encoder(self, data_stream):
-        print(str(data_stream))
+        #print(str(data_stream))
         self.onEncoderValue(data_stream)
 
     
@@ -535,7 +535,7 @@ class MainWindow(QMainWindow):
                 print("Starting Worker Thread")
 
     @Slot()
-    def on_btnstoploop_clicked(self):
+    def on_btnstopcmv_clicked(self):
         pass
 
     @Slot()

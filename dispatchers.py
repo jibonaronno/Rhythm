@@ -299,9 +299,13 @@ class WorkerThread(QObject):
         self.flagexit = False
         self.flagStop = False
         super().__init__()
+        self.respondQue = Queue()
 
     def Stop(self):
         self.flagStop = True
+
+    def Resume(self):
+        self.flagStop = False
 
     def updateGcode(self, codegen):
         self.codegen = codegen
@@ -315,34 +319,26 @@ class WorkerThread(QObject):
         lst = []
         while 1:
             if self.flagStop:
-                break
+                time.sleep(1)
+                if self.respondQue.qsize() <= 0:
+                    self.respondQue.put("stopped")
+                continue
+            if self.commandque.qsize() > 0:
+                if self.commandque.get() == "exit":
+                    self.flagexit = True
+                    break
             try:
                 for line in self.codelist:
-                    if self.flagStop:
-                        break
                     self.serialPort.write((str(line)+"\r\n").encode('utf-8'))
                     time.sleep(0.1)
                     in_waiting = self.serialPort.in_waiting
                     while in_waiting == 0:
-                        if self.commandque.qsize() > 0:
-                            if self.commandque.get() == "exit":
-                                self.flagexit = True
-                                break
                         time.sleep(0.5) #1
                         in_waiting = self.serialPort.in_waiting
-
-                    if self.flagexit:
-                        self.flagStop = True
-                        break
 
                     jMessage = ""
                     while "ok" not in jMessage:
                         while self.serialPort.in_waiting:
-                            if self.commandque.qsize() > 0:
-                                if self.commandque.get() == "exit":
-                                    self.flagexit = True
-                                    self.flagStop = True
-                                    break
                             lst = self.serialPort.readlines()
                             for itm in lst:
                                 jMessage += itm.decode('ascii')
