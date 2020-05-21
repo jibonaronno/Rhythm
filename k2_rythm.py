@@ -288,6 +288,14 @@ class MainWindow(QMainWindow):
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec_()
 
+    def pauseVentilator(self):
+        if self.workerThreadCreated:
+            self.worker.Stop()
+
+    def resumeVentilator(self):
+        if self.workerThreadCreated:
+            self.worker.Resume()
+
     def loadMachineSetup(self, generator):
         self.t_acc.setText(str(generator.ACC))
         self.t_xmax.setText(str(generator.xmax))
@@ -534,9 +542,12 @@ class MainWindow(QMainWindow):
                 self.workerThreadCreated = True
                 print("Starting Worker Thread")
 
+            elif self.workerThreadCreated:
+                self.worker.Resume()
+
     @Slot()
     def on_btnstopcmv_clicked(self):
-        pass
+        self.pauseVentilator()
 
     @Slot()
     def on_disconnect_clicked(self):

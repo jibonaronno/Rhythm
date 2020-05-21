@@ -40,7 +40,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>131</width>
+            <width>142</width>
             <height>574</height>
            </rect>
           </property>
@@ -118,7 +118,7 @@
                  <widget class="QPushButton" name="btnstopcmv">
                   <property name="minimumSize">
                    <size>
-                    <width>0</width>
+                    <width>100</width>
                     <height>40</height>
                    </size>
                   </property>
@@ -142,7 +142,7 @@
                    </size>
                   </property>
                   <property name="text">
-                   <string>Machine Setup</string>
+                   <string>Setup</string>
                   </property>
                  </widget>
                 </item>
@@ -200,12 +200,12 @@
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>0</width>
+                    <width>100</width>
                     <height>40</height>
                    </size>
                   </property>
                   <property name="text">
-                   <string>alarm</string>
+                   <string>Alarm</string>
                   </property>
                  </widget>
                 </item>
@@ -276,7 +276,7 @@
                  <widget class="QPushButton" name="btnstream">
                   <property name="minimumSize">
                    <size>
-                    <width>0</width>
+                    <width>100</width>
                     <height>40</height>
                    </size>
                   </property>
