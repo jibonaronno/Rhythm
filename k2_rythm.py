@@ -40,6 +40,7 @@ from datalogger import DataLogger
 import struct
 #import RPi.GPIO as GPIO
 from time import sleep
+import pyautogui
 
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
@@ -243,7 +244,7 @@ class MainWindow(QMainWindow):
 
         
         self.devices = DetectDevices()
-       # print("All Ports: ")
+        # print("All Ports: ")
         #self.devices.printPorts()
         print("USB Ports: ")
         self.devices.printUsbPorts()
@@ -268,8 +269,33 @@ class MainWindow(QMainWindow):
         '''
 
         self.breath_in_tick = False # flag to play the breath in wave file for only once
-
         self.sensorLimitTimer.start(1000)
+
+        self.enc_elements = []
+        self.addEncoderElements()
+
+    enc_focus_index = 0
+    def addEncoderElements(self):
+        self.enc_elements.append(self.btninit)
+        self.enc_elements.append(self.runloop)
+        self.enc_elements.append(self.btnstopcmv)
+        self.enc_elements.append(self.gcodeshow)
+        self.enc_elements.append(self.btnalarmpage)
+        self.enc_elements.append(self.btnmachinesetup)
+        self.enc_elements.append(self.alarm)
+        self.enc_elements.append(self.btnchangeset)
+
+    def encrFocus(self, value=1):
+        if value == 1:
+            self.enc_focus_index += 1
+            print("Focus Index : " + str(self.enc_focus_index))
+            pyautogui.press('\t')
+            if self.enc_focus_index < len(self.enc_elements):
+                self.enc_elements[self.enc_focus_index].setFocus()
+        elif value == 0:
+            pyautogui.keyDown('shift')
+            pyautogui.press('\t')
+            pyautogui.keyUp('shift')
 
     def showdialog2(self, msg):
         d = QDialog()
@@ -346,7 +372,11 @@ class MainWindow(QMainWindow):
                     elif value == 3:
                         self.show_hide_LeftPanel()
                 if parts[0] == '5':
-                    self.change_set(parts[1])
+                    value = int(parts[1])
+                    if value < 3:
+                        self.encrFocus(value)
+                    elif value == 3:
+                        self.change_set(parts[1])
 
 
     def changeVTdial(self, incr = 1):
@@ -507,6 +537,9 @@ class MainWindow(QMainWindow):
                 self.sensorThread.start()
                 self.sensorThreadCreated = True
                 print("Starting Sensor Thread ...")
+
+
+    def startEncoderThread(self):
         if self.EncoderPortOpen:
             if not self.encoderThreadCreated:
                 print('Starting Encoder Thread')
@@ -695,6 +728,7 @@ class MainWindow(QMainWindow):
                 if not self.EncoderPortOpen:
                     self.serialEncoder = serial.Serial(self.ComPorts['Encoder'], baudrate=115200, timeout=0)
                     self.EncoderPortOpen = True
+                    self.startEncoderThread()
             
         except serial.SerialException as ex:
             self.marlinPortOpen = False

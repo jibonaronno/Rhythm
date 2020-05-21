@@ -47,9 +47,12 @@
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
             <widget class="QComboBox" name="modecombobox">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="minimumSize">
               <size>
-               <width>0</width>
+               <width>80</width>
                <height>40</height>
               </size>
              </property>
@@ -211,6 +214,9 @@
                 </item>
                 <item row="0" column="0">
                  <widget class="QPushButton" name="connect">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1597,6 +1603,45 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>btninit</tabstop>
+  <tabstop>runloop</tabstop>
+  <tabstop>btnstopcmv</tabstop>
+  <tabstop>gcodeshow</tabstop>
+  <tabstop>btnalarmpage</tabstop>
+  <tabstop>btnmachinesetup</tabstop>
+  <tabstop>alarm</tabstop>
+  <tabstop>btnchangeset</tabstop>
+  <tabstop>modecombobox</tabstop>
+  <tabstop>disconnect</tabstop>
+  <tabstop>btnstream</tabstop>
+  <tabstop>startpush</tabstop>
+  <tabstop>scanPorts</tabstop>
+  <tabstop>portsList</tabstop>
+  <tabstop>monitoringPort</tabstop>
+  <tabstop>gengcode</tabstop>
+  <tabstop>btnhault</tabstop>
+  <tabstop>btninitbipap</tabstop>
+  <tabstop>btnrunbploop</tabstop>
+  <tabstop>vtdial</tabstop>
+  <tabstop>iedial</tabstop>
+  <tabstop>rrdial</tabstop>
+  <tabstop>fiodial</tabstop>
+  <tabstop>connect</tabstop>
+  <tabstop>peakdial</tabstop>
+  <tabstop>peepdial</tabstop>
+  <tabstop>lowpdial</tabstop>
+  <tabstop>himinitdial</tabstop>
+  <tabstop>lowminitdial</tabstop>
+  <tabstop>ipapdial</tabstop>
+  <tabstop>t_acc</tabstop>
+  <tabstop>t_xmax</tabstop>
+  <tabstop>t_xamb</tabstop>
+  <tabstop>t_xrect</tabstop>
+  <tabstop>t_xconoffset</tabstop>
+  <tabstop>btnsavemachinesetup</tabstop>
+  <tabstop>t_vtmax</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
