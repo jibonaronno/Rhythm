@@ -364,7 +364,10 @@ class MainWindow(QMainWindow):
                     self.changeIEdial(value)
                 if parts[0] == '3':
                     value = int(parts[1])
-                    self.changeRRdial(value)
+                    if value < 3:
+                        self.changeRRdial(value)
+                    elif value == 3:
+                        self.emulateEnter()
                 if parts[0] == '4':
                     value = int(parts[1])
                     if value < 3:
@@ -378,6 +381,8 @@ class MainWindow(QMainWindow):
                     elif value == 3:
                         self.change_set(parts[1])
 
+    def emulateEnter(self):
+        pyautogui.press('enter')
 
     def changeVTdial(self, incr = 1):
         if self.vtdial.isEnabled():
