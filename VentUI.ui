@@ -27,7 +27,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>130</width>
+          <width>150</width>
           <height>16777215</height>
          </size>
         </property>
@@ -48,11 +48,11 @@
            <item>
             <widget class="QComboBox" name="modecombobox">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="minimumSize">
               <size>
-               <width>80</width>
+               <width>70</width>
                <height>40</height>
               </size>
              </property>
@@ -511,7 +511,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="page">
              <widget class="QDial" name="vtdial">
@@ -1404,14 +1404,14 @@
              <widget class="QLabel" name="labelipap">
               <property name="geometry">
                <rect>
-                <x>40</x>
-                <y>3</y>
+                <x>20</x>
+                <y>50</y>
                 <width>31</width>
                 <height>14</height>
                </rect>
               </property>
               <property name="text">
-               <string>#IPAP</string>
+               <string>IPAP</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -1444,6 +1444,9 @@
               <property name="segmentStyle">
                <enum>QLCDNumber::Flat</enum>
               </property>
+              <property name="intValue" stdset="0">
+               <number>25</number>
+              </property>
              </widget>
              <widget class="QDial" name="ipapdial">
               <property name="geometry">
@@ -1469,10 +1472,291 @@
               <property name="maximum">
                <number>30</number>
               </property>
+              <property name="value">
+               <number>25</number>
+              </property>
              </widget>
+             <widget class="QLCDNumber" name="ilcd_2">
+              <property name="geometry">
+               <rect>
+                <x>247</x>
+                <y>47</y>
+                <width>16</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color:black</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="digitCount">
+               <number>1</number>
+              </property>
+              <property name="segmentStyle">
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+              <property name="value" stdset="0">
+               <double>1.000000000000000</double>
+              </property>
+             </widget>
+             <widget class="QDial" name="rrdial_bipap">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="geometry">
+               <rect>
+                <x>310</x>
+                <y>10</y>
+                <width>100</width>
+                <height>100</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(20,100,10)</string>
+              </property>
+              <property name="minimum">
+               <number>8</number>
+              </property>
+              <property name="maximum">
+               <number>30</number>
+              </property>
+              <property name="value">
+               <number>14</number>
+              </property>
+             </widget>
+             <widget class="QLabel" name="label_18">
+              <property name="geometry">
+               <rect>
+                <x>230</x>
+                <y>54</y>
+                <width>21</width>
+                <height>16</height>
+               </rect>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color:black</string>
+              </property>
+              <property name="text">
+               <string>IE</string>
+              </property>
+             </widget>
+             <widget class="QLCDNumber" name="ielcd_2">
+              <property name="geometry">
+               <rect>
+                <x>267</x>
+                <y>47</y>
+                <width>28</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color:black</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="digitCount">
+               <number>1</number>
+              </property>
+              <property name="segmentStyle">
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+             </widget>
+             <widget class="QLabel" name="label_19">
+              <property name="geometry">
+               <rect>
+                <x>338</x>
+                <y>54</y>
+                <width>22</width>
+                <height>14</height>
+               </rect>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color:black</string>
+              </property>
+              <property name="text">
+               <string>RR</string>
+              </property>
+             </widget>
+             <widget class="QLCDNumber" name="rrlcd_2">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="geometry">
+               <rect>
+                <x>353</x>
+                <y>45</y>
+                <width>41</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color:black</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="digitCount">
+               <number>2</number>
+              </property>
+              <property name="segmentStyle">
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+              <property name="intValue" stdset="0">
+               <number>14</number>
+              </property>
+             </widget>
+             <widget class="QDial" name="iedial_bipap">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="geometry">
+               <rect>
+                <x>210</x>
+                <y>10</y>
+                <width>100</width>
+                <height>100</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(200,20,20)</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>5</number>
+              </property>
+              <property name="value">
+               <number>2</number>
+              </property>
+             </widget>
+             <widget class="QDial" name="ipapdial_2">
+              <property name="geometry">
+               <rect>
+                <x>110</x>
+                <y>10</y>
+                <width>100</width>
+                <height>100</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(20,40,30)</string>
+              </property>
+              <property name="minimum">
+               <number>5</number>
+              </property>
+              <property name="maximum">
+               <number>30</number>
+              </property>
+             </widget>
+             <widget class="QLCDNumber" name="ipaplcd_2">
+              <property name="geometry">
+               <rect>
+                <x>130</x>
+                <y>40</y>
+                <width>64</width>
+                <height>40</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color:blue</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="digitCount">
+               <number>3</number>
+              </property>
+              <property name="segmentStyle">
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+              <property name="intValue" stdset="0">
+               <number>5</number>
+              </property>
+             </widget>
+             <widget class="QLabel" name="labelipap_2">
+              <property name="geometry">
+               <rect>
+                <x>120</x>
+                <y>50</y>
+                <width>31</width>
+                <height>14</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>EPAP</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+             <zorder>iedial_bipap</zorder>
              <zorder>ipapdial</zorder>
              <zorder>labelipap</zorder>
              <zorder>ipaplcd</zorder>
+             <zorder>ilcd_2</zorder>
+             <zorder>rrdial_bipap</zorder>
+             <zorder>label_18</zorder>
+             <zorder>ielcd_2</zorder>
+             <zorder>label_19</zorder>
+             <zorder>rrlcd_2</zorder>
+             <zorder>ipapdial_2</zorder>
+             <zorder>ipaplcd_2</zorder>
+             <zorder>labelipap_2</zorder>
             </widget>
             <widget class="QWidget" name="page_4">
              <widget class="QWidget" name="formLayoutWidget">
