@@ -98,7 +98,7 @@ class MainWindow(QMainWindow):
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
         self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
         self.kalmanpen = pg.mkPen(20, 100, 20)
-        self.curve3 = self.plotter.plot(0,0, "kalman", pen = self.kalmanpen)
+        #self.curve3 = self.plotter.plot(0,0, "kalman", pen = self.kalmanpen)
 
         self.derivative_pen = pg.mkPen(200, 200, 10)
         self.derivative_pen_in = pg.mkPen(10, 200, 10)
@@ -904,40 +904,43 @@ class MainWindow(QMainWindow):
                 self.timesnap = 0.0
             else:
                 self.timesnap = time.perf_counter() - self.tic
+            try:
+                self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+                #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
+                if len(self.deriv_points) > 3:
+                    self.deriv_points.popleft()
+                    '''
+                    cannot remember its effect. seems not feasible output in case of peak detection could be delayed a bit.
+                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
+                    '''
+                    '''
+                    Working code for derivative data from lung pressure data.
+                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
+                    '''
 
-            self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
-            #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
-            if len(self.deriv_points) > 3:
-                self.deriv_points.popleft()
-                '''
-                cannot remember its effect. seems not feasible output in case of peak detection could be delayed a bit.
-                self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
-                '''
-                '''
-                Working code for derivative data from lung pressure data.
-                self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
-                '''
+                    '''
+                    Following instruction will derive the data from the kalman of lung pressure.
+                    '''
+                    ''' Working code commented to see speed '''
+                    #self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
 
-                '''
-                Following instruction will derive the data from the kalman of lung pressure.
-                '''
-                ''' Working code commented to see speed '''
-                #self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
+                    #self.dvdata.append(float(self.lst[1]))
+                    
+                    #self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[1])))
+                    #print("Flow -- " + str(dflow * 1000000))
+                    #self.dvdata.append(dflow * 1000000)
 
-                #self.dvdata.append(float(self.lst[1]))
+                    ''' Working Code commented to check speed '''
+                    dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
+                    self.voldata.append(self.flowprocess.sum_of_volume)
+                    self.dvdata.append(dflow)
+                    #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
+                    #self.voldata.append(self.sumofvolume)
                 
-                #self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[1])))
-                #print("Flow -- " + str(dflow * 1000000))
-                #self.dvdata.append(dflow * 1000000)
-
-                ''' Working Code commented to check speed '''
-                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
-                self.voldata.append(self.flowprocess.sum_of_volume)
-                self.dvdata.append(dflow)
-                #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
-                #self.voldata.append(self.sumofvolume)
-            else:
-                self.dvdata.append(0.0)
+                else:
+                    self.dvdata.append(0.0)
+            except Exception as e:
+                    print("Exception Section 0x05 : " + str(e))
 
             try:
                 if(len(self.deriv_points) >= 3):
@@ -973,14 +976,16 @@ class MainWindow(QMainWindow):
 
             self.curve1.setData(self.lungpressuredata)
             self.curve2.setData(self.lungpressurepeakdata)
-            self.curve3.setData(self.kalmandata)
+            #self.curve3.setData(self.kalmandata)
             self.dvcurve.setData(self.dvdata)
             self.volcurve.setData(self.kalmandata) # self.voldata)
-            
-            if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
-                if self.sensorThreadCreated:
-                    self.wave.playfile()
-                    #self.sensor.beep()
+            try:
+                if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
+                    if self.sensorThreadCreated:
+                        self.wave.playfile()
+                        #self.sensor.beep()
+            except Exception as e:
+                print("Exception Section 0x06" + str(e))
 
     def peepSensorData(self, data_stream):
         #print(data_stream.split(','))
