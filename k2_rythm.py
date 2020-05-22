@@ -868,7 +868,8 @@ class MainWindow(QMainWindow):
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
                 ''' Commented for testing '''
-                self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
+                ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
+                self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e))
 
