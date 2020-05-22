@@ -375,17 +375,21 @@ class SensorThread(QObject):
         while 1:
             if self.flagStop:
                 break
-            try:
-                jMessage = self.serialPort.readline().decode('ascii')
-                self.plst = jMessage.split(",")
-                self.signal.emit(jMessage)
-                if self.pressureque.qsize() <= 0:
-                    self.pressureque.put(self.plst[0])
-                if self._beep:
-                    self._beep = False
-                    self.serialPort.write("A\r\n".encode('utf-8'))
-                if self.flag_sensorlimit_tx:
-                    self.flag_sensorlimit_tx = False
-                    self.serialPort.write(self.strdata.encode('utf-8'))
-            except serial.SerialException as ex:
-                print("Error In SerialException" + ex.strerror)
+            # try:
+            jMessage = self.serialPort.readline().decode('ascii')
+            self.plst = jMessage.split(",")
+            self.signal.emit(jMessage)
+            if self.pressureque.qsize() <= 0:
+                self.pressureque.put(self.plst[0])
+            if self._beep:
+                self._beep = False
+                ##beep not applied. self.serialPort.write("A\r\n".encode('utf-8'))
+            if self.flag_sensorlimit_tx:
+                self.flag_sensorlimit_tx = False
+                self.serialPort.write(self.strdata.encode('utf-8'))
+                time.sleep(0.5)
+                #print('Sensor Peep Data : ' + self.strdata)
+            # except serial.SerialException as ex:
+            #     print("Exception In SensorThread SerialException: " + str(ex))
+            # except Exception as e:
+            #     print("Exception In Sensor Thread: " + str(e))

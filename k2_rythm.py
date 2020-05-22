@@ -747,11 +747,11 @@ class MainWindow(QMainWindow):
     def checkSensorLimitChanged(self):
         #strtx = str(self.peakdial.value()) + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value()) + "\r\n"
         #self.strtx = "<peak,12," + str(self.peakdial.value()) + "> "
-        #print(self.strtx)
         if self.sensorThreadCreated:
             if self.flag_sensorlimit_tx:
-                self.strtx = "<peak,12," + str(self.peakdial.value()) + "> " # + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value())
+                self.strtx = "<go," + str(self.peepdial.value()) + ".0,111>\r\n" # + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value())
                 self.sensor.txsensordata(self.strtx)
+                print(self.strtx)
                 self.flag_sensorlimit_tx = False
 
 
@@ -870,7 +870,7 @@ class MainWindow(QMainWindow):
                 ''' Commented for testing '''
                 self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
             except Exception as e:
-                print("LungSensorData(...) : " + str(e))
+                print("Exception in LungSensorData(...) : " + str(e))
 
             #Logging the data @ 100 data received
             '''
@@ -921,7 +921,7 @@ class MainWindow(QMainWindow):
                 Following instruction will derive the data from the kalman of lung pressure.
                 '''
                 ''' Working code commented to see speed '''
-                self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
+                #self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
 
                 #self.dvdata.append(float(self.lst[1]))
                 
@@ -930,9 +930,9 @@ class MainWindow(QMainWindow):
                 #self.dvdata.append(dflow * 1000000)
 
                 ''' Working Code commented to check speed '''
-                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
+                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
                 self.voldata.append(self.flowprocess.sum_of_volume)
-                
+                self.dvdata.append(dflow)
                 #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
                 #self.voldata.append(self.sumofvolume)
             else:
@@ -974,7 +974,7 @@ class MainWindow(QMainWindow):
             self.curve2.setData(self.lungpressurepeakdata)
             self.curve3.setData(self.kalmandata)
             self.dvcurve.setData(self.dvdata)
-            self.volcurve.setData(self.voldata)
+            self.volcurve.setData(self.kalmandata) # self.voldata)
             
             if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
                 if self.sensorThreadCreated:
