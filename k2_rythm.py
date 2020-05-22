@@ -1003,7 +1003,7 @@ class MainWindow(QMainWindow):
 
             self.curve1.setData(self.lungpressuredata)
             self.curve2.setData(self.lungpressurepeakdata)
-            self.curve3.setData(self.kalmandata)
+            #self.curve3.setData(self.kalmandata)
             self.dvcurve.setData(self.dvdata)
             self.volcurve.setData(self.kalmandata) # self.voldata)
             self.flowcurve.setData(self.flowdata)
