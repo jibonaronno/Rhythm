@@ -44,6 +44,10 @@ import pyautogui
 
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
+class AlarmTypes(enum.Enum):
+    NO_ALARM = 1
+    PEAK_PRESSURE = 2
+
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -105,6 +109,8 @@ class MainWindow(QMainWindow):
         self.derivative_pen_out = pg.mkPen(10, 200, 200)
         #self.dvcurve = self.plotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
 
+        self.flowpen = pg.mkPen(30,60,100, 50)
+
         self.inhale_t_count = 0
         self.inhale_t = 0
         self.exhale_t = 0
@@ -119,6 +125,9 @@ class MainWindow(QMainWindow):
         self.flowplotter.setTitle("Flow")
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
+        self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
+
+        self.flowdata = deque()
 
         self.volplotter_pen = pg.mkPen(200, 20, 10)
         self.volplotter = PlotWidget()
@@ -193,6 +202,8 @@ class MainWindow(QMainWindow):
         self.kalman = kalman(1.2)
 
         #self.vtdial.setStyleSheet("{ background-color: rgb(20,20,20) }")
+
+        self.AlarmNumber = AlarmTypes.NO_ALARM
 
         self.serialMarlin = ""
         self.serialSensor = ""
@@ -362,13 +373,16 @@ class MainWindow(QMainWindow):
                     self.changeVTdial(value)
                 if parts[0] == '2':
                     value = int(parts[1])
-                    self.changeIEdial(value)
+                    if value < 3:
+                        self.changeIEdial(value)
+                    elif value == 3:
+                        self.on_btninit_clicked()
                 if parts[0] == '3':
                     value = int(parts[1])
                     if value < 3:
                         self.changeRRdial(value)
                     elif value == 3:
-                        self.emulateEnter()
+                        self.emulateSpace()
                 if parts[0] == '4':
                     value = int(parts[1])
                     if value < 3:
@@ -384,6 +398,9 @@ class MainWindow(QMainWindow):
 
     def emulateEnter(self):
         pyautogui.press('enter')
+
+    def emulateSpace(self):
+        pyautogui.press('space')
 
     def changeVTdial(self, incr = 1):
         if self.vtdial.isEnabled():
@@ -867,13 +884,19 @@ class MainWindow(QMainWindow):
                 self.kalmandata.popleft()
             if len(self.voldata) > self.maxLen:
                 self.voldata.popleft()
+            if len(self.flowdata) > self.maxLen:
+                self.flowdata.popleft()
 
             try:
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
                 ''' Commented for testing '''
+
                 ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
                 self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
+
+                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
+                self.flowdata.append(dflow)
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e))
 
@@ -936,9 +959,9 @@ class MainWindow(QMainWindow):
                     #self.dvdata.append(dflow * 1000000)
 
                     ''' Working Code commented to check speed '''
-                    dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
-                    self.voldata.append(self.flowprocess.sum_of_volume)
-                    self.dvdata.append(dflow)
+                    
+                    #self.voldata.append(self.flowprocess.sum_of_volume)
+                    #self.dvdata.append(dflow)
                     #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
                     #self.voldata.append(self.sumofvolume)
                 else:
@@ -983,6 +1006,7 @@ class MainWindow(QMainWindow):
             self.curve3.setData(self.kalmandata)
             self.dvcurve.setData(self.dvdata)
             self.volcurve.setData(self.kalmandata) # self.voldata)
+            self.flowcurve.setData(self.flowdata)
             
             try:
                 if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
