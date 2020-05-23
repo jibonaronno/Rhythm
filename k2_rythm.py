@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import sys
+import enum
 from os.path import join, dirname, abspath
 import queue
 import serial
