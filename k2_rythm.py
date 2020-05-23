@@ -934,8 +934,8 @@ class MainWindow(QMainWindow):
                 self.timesnap = time.perf_counter() - self.tic
 
             try:
-                #self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
-                self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
+                self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+                #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
                 if len(self.deriv_points) > 3:
                     self.deriv_points.popleft()
                     '''
