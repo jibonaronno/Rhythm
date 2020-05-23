@@ -933,8 +933,8 @@ class MainWindow(QMainWindow):
                 self.timesnap = time.perf_counter() - self.tic
 
             try:
-                self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
-                #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
+                #self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+                self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
                 if len(self.deriv_points) > 3:
                     self.deriv_points.popleft()
                     '''
@@ -943,8 +943,8 @@ class MainWindow(QMainWindow):
                     '''
                     '''
                     Working code for derivative data from lung pressure data.
-                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
                     '''
+                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
 
                     '''
                     Following instruction will derive the data from the kalman of lung pressure.
