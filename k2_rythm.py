@@ -230,6 +230,9 @@ class MainWindow(QMainWindow):
         self.sensorLimitTimer = QTimer(self)
         self.sensorLimitTimer.timeout.connect(self.checkSensorLimitChanged)
 
+        self.sensorwatchtimer = QTimer(self)
+        self.sensorwatchtimer.timeout.connect(self.reconnectSensor)
+
         self.modecombobox.addItem("CMV")
         self.modecombobox.addItem("BiPAP")
         self.modecombobox.addItem("PS")
@@ -286,6 +289,20 @@ class MainWindow(QMainWindow):
 
         self.enc_elements = []
         self.addEncoderElements()
+
+    def reconnectSensor(self):
+        self.sensorwatchtimer.stop()
+        if self.sensorThreadCreated:
+            self.sensor.Stop()
+            self.sensorThread.exit()
+            self.sensorThread.wait()
+            self.sensorThreadCreated = False
+            if self.sensorPortOpen:
+                self.serialSensor.close()
+                time.sleep(1)
+        self.autoConnect()
+        self.on_btninit_clicked()
+        self.sensorwatchtimer.start(500)
 
     enc_focus_index = 0
     def addEncoderElements(self):
@@ -560,6 +577,7 @@ class MainWindow(QMainWindow):
                 self.sensor.moveToThread(self.sensorThread)
                 self.sensorThread.start()
                 self.sensorThreadCreated = True
+                self.sensorwatchtimer.start(500)
                 print("Starting Sensor Thread ...")
 
 
@@ -872,6 +890,7 @@ class MainWindow(QMainWindow):
 
     def LungSensorData(self, data_stream):
         #print(data_stream.split(','))
+        self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
         self.maxLen = 300  # max number of data points to show on graph
         if(len(self.lst) > 2):
