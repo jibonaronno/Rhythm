@@ -400,7 +400,7 @@ class MainWindow(QMainWindow):
         pyautogui.press('enter')
 
     def emulateSpace(self):
-        pyautogui.press('space')
+        pyautogui.press(' ')
 
     def changeVTdial(self, incr = 1):
         if self.vtdial.isEnabled():
