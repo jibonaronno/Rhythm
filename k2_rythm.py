@@ -992,35 +992,35 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print("Exception Section 0x05" + str(e))
 
-            #try:
-            if(len(self.deriv_points) >= 3):
-                if self.dvdata[-1] > 1:
-                    self.curve1.setPen(self.derivative_pen_in)
-                    self.inhale_t_count += 1
-                    self.flag_idle = False
-                    self.idle_count = 0
-                    if not self.breath_in_tick:
-                        self.breath_in_tick = True
-                        self.wave.playin()
-                elif self.dvdata[-1] < -1:
-                    self.curve1.setPen(self.derivative_pen_out)
-                    self.exhale_t_count += 1
-                    self.flag_idle = False
-                    self.idle_count = 0
-                    self.sumofvolume = 0.0
-                    if self.breath_in_tick:
-                        self.breath_in_tick = False
-                else:
-                    if not self.flag_idle:
-                        self.idle_count += 1
-                        if self.idle_count > 2:
-                            ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
-                            self.flag_idle = True
-                            self.idle_count = 3
-                            self.inhale_t_count = 0
-                            self.exhale_t_count = 0
-            #except Exception as e:
-            #    print("Exception Section:0X02 : " + str(e))
+            try:
+                if(len(self.deriv_points) >= 3):
+                    if self.dvdata[-1] > 1:
+                        self.curve1.setPen(self.derivative_pen_in)
+                        self.inhale_t_count += 1
+                        self.flag_idle = False
+                        self.idle_count = 0
+                        if not self.breath_in_tick:
+                            self.breath_in_tick = True
+                            self.wave.playin()
+                    elif self.dvdata[-1] < -1:
+                        self.curve1.setPen(self.derivative_pen_out)
+                        self.exhale_t_count += 1
+                        self.flag_idle = False
+                        self.idle_count = 0
+                        self.sumofvolume = 0.0
+                        if self.breath_in_tick:
+                            self.breath_in_tick = False
+                    else:
+                        if not self.flag_idle:
+                            self.idle_count += 1
+                            if self.idle_count > 2:
+                                ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
+                                self.flag_idle = True
+                                self.idle_count = 3
+                                self.inhale_t_count = 0
+                                self.exhale_t_count = 0
+            except Exception as e:
+                print("Exception Section:0X02 : " + str(e))
 
             self.tic = time.perf_counter()
 
@@ -1031,13 +1031,13 @@ class MainWindow(QMainWindow):
             self.volcurve.setData(self.kalmandata) # self.voldata)
             self.flowcurve.setData(self.flowdata)
             
-            #try:
-            if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
-                if self.sensorThreadCreated:
-                    self.wave.playfile()
-                    #self.sensor.beep()
-            #except Exception as e:
-            #    print("Exception section 0x06 : " + str(e))
+            try:
+                if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
+                    if self.sensorThreadCreated:
+                        self.wave.playfile()
+                        #self.sensor.beep()
+            except Exception as e:
+                print("Exception section 0x06 : " + str(e))
 
     def peepSensorData(self, data_stream):
         #print(data_stream.split(','))
