@@ -955,42 +955,42 @@ class MainWindow(QMainWindow):
             else:
                 self.timesnap = time.perf_counter() - self.tic
 
-            #try:
-            self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
-            #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
-            if len(self.deriv_points) > 3:
-                self.deriv_points.popleft()
-                '''
-                cannot remember its effect. seems not feasible output in case of peak detection could be delayed a bit.
-                self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
-                '''
-                '''
-                Working code for derivative data from lung pressure data.
-                '''
-                self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
+            try:
+                self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+                #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
+                if len(self.deriv_points) > 3:
+                    self.deriv_points.popleft()
+                    '''
+                    cannot remember its effect. seems not feasible output in case of peak detection could be delayed a bit.
+                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
+                    '''
+                    '''
+                    Working code for derivative data from lung pressure data.
+                    '''
+                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
 
-                '''
-                Following instruction will derive the data from the kalman of lung pressure.
-                '''
-                ''' Working code commented to see speed '''
-                #self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
+                    '''
+                    Following instruction will derive the data from the kalman of lung pressure.
+                    '''
+                    ''' Working code commented to see speed '''
+                    #self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
 
-                #self.dvdata.append(float(self.lst[1]))
-                
-                #self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[1])))
-                #print("Flow -- " + str(dflow * 1000000))
-                #self.dvdata.append(dflow * 1000000)
+                    #self.dvdata.append(float(self.lst[1]))
+                    
+                    #self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[1])))
+                    #print("Flow -- " + str(dflow * 1000000))
+                    #self.dvdata.append(dflow * 1000000)
 
-                ''' Working Code commented to check speed '''
-                
-                #self.voldata.append(self.flowprocess.sum_of_volume)
-                #self.dvdata.append(dflow)
-                #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
-                #self.voldata.append(self.sumofvolume)
-            else:
-                self.dvdata.append(0.0)
-            #except Exception as e:
-                #print("Exception Section 0x05" + str(e))
+                    ''' Working Code commented to check speed '''
+                    
+                    #self.voldata.append(self.flowprocess.sum_of_volume)
+                    #self.dvdata.append(dflow)
+                    #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
+                    #self.voldata.append(self.sumofvolume)
+                else:
+                    self.dvdata.append(0.0)
+            except Exception as e:
+                print("Exception Section 0x05" + str(e))
 
             #try:
             if(len(self.deriv_points) >= 3):
