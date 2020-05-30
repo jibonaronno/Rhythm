@@ -106,12 +106,12 @@ class MainWindow(QMainWindow):
         self.kalmanpen = pg.mkPen(20, 100, 20)
         self.curve3 = self.plotter.plot(0,0, "kalman", pen = self.kalmanpen)
 
-        self.derivative_pen = pg.mkPen(200, 200, 10)
+        self.derivative_pen = pg.mkPen(70,90,100, 100)
         self.derivative_pen_in = pg.mkPen(10, 200, 10)
         self.derivative_pen_out = pg.mkPen(10, 200, 200)
         #self.dvcurve = self.plotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
 
-        self.flowpen = pg.mkPen(10,90,100, 100)
+        self.flowpen = pg.mkPen(200, 200, 10)
 
         self.inhale_t_count = 0
         self.inhale_t = 0
@@ -1088,7 +1088,7 @@ class MainWindow(QMainWindow):
 
             '''Assign Flowdata to flow plotter curve '''
             self.flowcurve.setData(self.flowdata)
-            ##self.dvcurve.setData(self.dvdata)
+            self.dvcurve.setData(self.dvdata)
             
             try:
                 if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
