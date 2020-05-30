@@ -136,6 +136,7 @@ class MainWindow(QMainWindow):
         self.volplotter.showGrid(x=True, y=True, alpha=None)
         self.volplotter.setTitle("Volume")
         self.volcurve = self.volplotter.plot(0,0,"volcurve", self.volplotter_pen)
+        self.volpeakcurve = self.volplotter.plot(0,0,"volpeakcurve", self.volplotter_pen)
         
         ###self.CalculateSettings()
         self.verticalLayout_2.addWidget(self.plotter)
@@ -911,6 +912,10 @@ class MainWindow(QMainWindow):
             return None
         return res
 
+    from signals import SignalDetector
+
+    lung_detector = SignalDetector()
+
     def processSensorData(self, data_stream):
         pressure_data = self.parseSensorData(data_stream)
         if(pressure_data == None):
@@ -927,13 +932,21 @@ class MainWindow(QMainWindow):
             self.dvdata.popleft()
         if len(self.kalmandata) > self.maxLen:
             self.kalmandata.popleft()
+        if len(self.volpeakdata) > self.maxLen:
+            self.volpeakdata.popleft()
         if len(self.voldata) > self.maxLen:
             self.voldata.popleft()
         if len(self.flowdata) > self.maxLen:
             self.flowdata.popleft()
+        
+        '''Lung Pressure'''
         self.lungpressurepeakdata.append(float(self.peakdial.value()))
         self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
+        
+        '''Volume'''
         self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
+        
+        '''Flow'''
         dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
         self.flowdata.append(dflow)
         self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
@@ -957,6 +970,8 @@ class MainWindow(QMainWindow):
                 self.dvdata.popleft()
             if len(self.kalmandata) > self.maxLen:
                 self.kalmandata.popleft()
+            if len(self.volpeakdata) > self.maxLen:
+                self.volpeakdata.popleft()
             if len(self.voldata) > self.maxLen:
                 self.voldata.popleft()
             if len(self.flowdata) > self.maxLen:
@@ -967,8 +982,11 @@ class MainWindow(QMainWindow):
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
                 ''' Commented for testing '''
 
+                '''Volume data came from kalman of lungpressure'''
                 ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
                 self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
+                self.voldata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
+                self.volpeakdata.append(500.0)
 
                 dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
                 self.flowdata.append(dflow)
@@ -1061,7 +1079,12 @@ class MainWindow(QMainWindow):
             self.curve2.setData(self.lungpressurepeakdata)
             #self.curve3.setData(self.kalmandata)
             self.dvcurve.setData(self.dvdata)
-            self.volcurve.setData(self.kalmandata) # self.voldata)
+            
+            '''Assign volume data to plotter curve'''
+            #(originally kalman data) self.volcurve.setData(self.kalmandata)
+            self.volcurve.setData(self.voldata)
+            self.volpeakcurve.setData(self.volpeakdata)
+
             self.flowcurve.setData(self.flowdata)
             
             try:

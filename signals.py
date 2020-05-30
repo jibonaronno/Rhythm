@@ -10,7 +10,8 @@ from qtpy.QtCore import Slot, QTimer, QThread, Signal, QObject, Qt, QMutex
 from collections import deque
 
 class SignalDetector(object):
-    def __init__(self):
+    def __init__(self, func=None):
+        self.func = func
         self.maxLen = 300
         self.dque = deque()
         self.deriv_points = deque()
@@ -36,5 +37,7 @@ class SignalDetector(object):
             if self.edge < -1:
                 self.peak_value = self.deriv_points[2] # element
                 self.first_negative = True
+                if self.func:
+                    func()
         elif self.edge > 1:
             self.first_negative = False
