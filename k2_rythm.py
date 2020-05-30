@@ -89,6 +89,7 @@ class MainWindow(QMainWindow):
         self.peeppressurepeakdata = deque()
         self.kalmandata = deque()
         self.voldata = deque()
+        self.volpeakdata = deque()
         self.sumofvolume = 0.0
 
         self.dvdata = deque()
@@ -891,8 +892,59 @@ class MainWindow(QMainWindow):
         self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
         self.generator.GenerateCMV()
 
+    def parseSensorData(self, data_stream):
+        res = [0.0, 0.0, 0.0]
+        lst = data_stream.split(',')
+        pressure = 0.0
+        if len(lst) >= 3:
+            try:
+                pressure = float(lst[0])
+                res[0] = pressure
+                pressure = float(lst[1])
+                res[1] = pressure
+                pressure = float(lst[2])
+                res[2] = pressure
+            except Exception as e:
+                print('Exception Section (Parse Sensor Data):' + str(e))
+                return None
+        else:
+            return None
+        return res
+
+    def processSensorData(self, data_stream):
+        pressure_data = self.parseSensorData(data_stream)
+        if(pressure_data == None):
+            return
+        elif len(pressure_data) < 3:
+            return
+
+        self.maxLen = 300
+        if len(self.lungpressuredata) > self.maxLen:
+            self.lungpressuredata.popleft()  # remove oldest
+        if len(self.lungpressurepeakdata) > self.maxLen:
+            self.lungpressurepeakdata.popleft()
+        if len(self.dvdata) > self.maxLen:
+            self.dvdata.popleft()
+        if len(self.kalmandata) > self.maxLen:
+            self.kalmandata.popleft()
+        if len(self.voldata) > self.maxLen:
+            self.voldata.popleft()
+        if len(self.flowdata) > self.maxLen:
+            self.flowdata.popleft()
+        self.lungpressurepeakdata.append(float(self.peakdial.value()))
+        self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
+        self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
+        dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
+        self.flowdata.append(dflow)
+        self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+        if len(self.deriv_points) > 3:
+            self.deriv_points.popleft()
+            self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
+        else:
+            self.dvdata.append(0.0)
+
+
     def LungSensorData(self, data_stream):
-        #print(data_stream.split(','))
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
         self.maxLen = 300  # max number of data points to show on graph
@@ -930,25 +982,6 @@ class MainWindow(QMainWindow):
                 self.log_interval_count = 0
                 self.datalogger.writeBlock(self.lungpressuredata)
             '''
-            # #In Bipapmode 
-            # if self.runMode == MachineRunModes.BiPAP:
-            #     #print("Bipap")
-            #     try:
-            #         #if self.bipapLookup.lookUp(float(self.lst[0]) + float(self.peepdial.value())):
-            #         #print(str(float(self.lst[0]) + float(self.peepdial.value())))
-            #         if self.ipap < float(float(self.lst[0]) + float(self.peepdial.value())):
-            #             print("lookup returns stop....")
-            #             if self.bipap.serialmutex.tryLock():
-            #                 self.bipap.StopMoving()
-            #                 self.bipap.codegen.GenerateBiPAP()
-            #                 self.bipap.serl.write(self.bipap.codegen.gcodebipap_back.encode("utf-8"))
-            #                 #time.sleep(1)
-            #                 #self.bipap.serl.flash
-            #                 self.bipap.codegen.bipapstep = 0
-            #                 self.bipap.StartMovingAfter(2.7)
-            #                 self.bipap.serialmutex.unlock()
-            #     except:
-            #         print("ERROR bipapLookup")
 
             if len(self.deriv_points) == 0:
                 self.timesnap = 0.0
