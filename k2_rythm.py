@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
         self.derivative_pen_out = pg.mkPen(10, 200, 200)
         #self.dvcurve = self.plotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
 
-        self.flowpen = pg.mkPen(30,60,100, 10)
+        self.flowpen = pg.mkPen(30,60,100, 100)
 
         self.inhale_t_count = 0
         self.inhale_t = 0
