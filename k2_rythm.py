@@ -230,7 +230,8 @@ class MainWindow(QMainWindow):
         self.datalogger = DataLogger()
         self.log_interval_count = 0
 
-        self.flag_sensorlimit_tx = True
+        self.strtx = "<D,10," + str(self.peepdial.value()) + ".0>\r\n"
+        self.flag_sensorlimit_tx = False
         self.sensorLimitTimer = QTimer(self)
         self.sensorLimitTimer.timeout.connect(self.checkSensorLimitChanged)
 
@@ -793,7 +794,7 @@ class MainWindow(QMainWindow):
         #self.strtx = "<peak,12," + str(self.peakdial.value()) + "> "
         if self.sensorThreadCreated:
             if self.flag_sensorlimit_tx:
-                self.strtx = "<go," + str(self.peepdial.value()) + ".0,111>\r\n" # + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value())
+                #self.strtx = "<D,10," + str(self.peepdial.value()) + ".0>\r\n" # + "," + str(self.lowpdial.value()) + "," + str(self.peepdial.value()) + "," + str(self.himinitdial.value()) + "," + str(self.lowminitdial.value())
                 self.sensor.txsensordata(self.strtx)
                 print(self.strtx)
                 self.flag_sensorlimit_tx = False
@@ -830,27 +831,28 @@ class MainWindow(QMainWindow):
 
     def peepDialChanged(self):
         self.peeplcd.display(self.peepdial.value())
+        self.strtx = "<E,10," + str(self.peepdial.value()) + ".0>\r\n"
         self.flag_sensorlimit_tx = True
 
     def peakDialChanged(self):
         self.peaklcd.display(self.peakdial.value())
-        self.flag_sensorlimit_tx = True
+        self.flag_sensorlimit_tx = False
 
     def lowpDialChanged(self):
         self.lowplcd.display(self.lowpdial.value())
-        self.flag_sensorlimit_tx = True
+        self.flag_sensorlimit_tx = False
 
     def himinitDialChanged(self):
         self.himinitlcd.display(self.himinitdial.value())
-        self.flag_sensorlimit_tx = True
+        self.flag_sensorlimit_tx = False
 
     def lowminitDialChanged(self):
         self.lowminitlcd.display(self.lowminitdial.value())
-        self.flag_sensorlimit_tx = True
+        self.flag_sensorlimit_tx = False
 
     def ipapDialChanged(self):
         self.ipaplcd.display(self.ipapdial.value())
-        self.flag_sensorlimit_tx = True
+        self.flag_sensorlimit_tx = False
         if self.workerThreadCreated:
             self.generator.GenerateBiPAP(self.pparr, self.ipapdial.value())
             self.worker.updateGcode(self.generator)
@@ -1094,7 +1096,7 @@ class MainWindow(QMainWindow):
             '''Assign Flowdata to flow plotter curve '''
             self.flowcurve.setData(self.flowdata)
             #self.dvcurve.setData(self.dvdata)
-            self.flowpeakcurve.setData(self.flowpeakdata)
+            #self.flowpeakcurve.setData(self.flowpeakdata)
             
             try:
                 if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
