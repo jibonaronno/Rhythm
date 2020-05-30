@@ -996,7 +996,7 @@ class MainWindow(QMainWindow):
 
                 dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
                 self.flowdata.append(dflow)
-                self.flowpeakdata.append(20)
+                self.flowpeakdata.append(3)
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e))
 
@@ -1093,7 +1093,7 @@ class MainWindow(QMainWindow):
 
             '''Assign Flowdata to flow plotter curve '''
             self.flowcurve.setData(self.flowdata)
-            self.dvcurve.setData(self.dvdata)
+            #self.dvcurve.setData(self.dvdata)
             self.flowpeakcurve.setData(self.flowpeakdata)
             
             try:
