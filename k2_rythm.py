@@ -202,6 +202,10 @@ class MainWindow(QMainWindow):
         self.portsList.hide()
         self.monitoringPort.hide()
         self.scanPorts.hide()
+        self.connect.hide()
+        self.disconnect.hide()
+        self.alarm.hide()
+        self.btnstream.hide()
 
         self.kalman = kalman(1.2)
 
@@ -498,6 +502,12 @@ class MainWindow(QMainWindow):
                 self.setCmvParams()
             else:
                 self.changeCmvParams()
+
+    @Slot()
+    def on_peepdisable_clicked(self):
+        self.strtx = "<D,1," + str(self.peepdial.value()) + ".0>\r\n"
+        self.flag_sensorlimit_tx = True
+
 
     @Slot()
     def on_btnchangeset_clicked(self):
