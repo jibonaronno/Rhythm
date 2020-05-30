@@ -352,7 +352,7 @@ class SensorThread(QObject):
     plst = []
     def __init__(self, serialPort, que):
         self.pressureque = que
-        self.serialPort = serialPort
+        self.serialport = serialPort
         self.flagStop = False
         self.jMessage = ""
         self._beep = False
