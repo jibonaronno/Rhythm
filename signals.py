@@ -38,6 +38,6 @@ class SignalDetector(object):
                 self.peak_value = self.deriv_points[2] # element
                 self.first_negative = True
                 if self.func:
-                    func()
+                    self.func()
         elif self.edge > 1:
             self.first_negative = False

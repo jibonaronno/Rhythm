@@ -100,7 +100,7 @@ class MainWindow(QMainWindow):
         self.lungpressure_line_pen = pg.mkPen(200, 100, 0)
         self.plotter = PlotWidget()
         self.plotter.showGrid(x=True, y=True, alpha=None)
-        self.plotter.setTitle("Pressure")
+        self.plotter.setTitle("Pressure : mb")
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
         self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
         self.kalmanpen = pg.mkPen(20, 100, 20)
@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
         self.derivative_pen_out = pg.mkPen(10, 200, 200)
         #self.dvcurve = self.plotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
 
-        self.flowpen = pg.mkPen(30,60,100, 50)
+        self.flowpen = pg.mkPen(30,60,100, 10)
 
         self.inhale_t_count = 0
         self.inhale_t = 0
@@ -912,8 +912,8 @@ class MainWindow(QMainWindow):
             return None
         return res
 
+    '''Peak detector for Lung Pressure'''
     from signals import SignalDetector
-
     lung_detector = SignalDetector()
 
     def processSensorData(self, data_stream):
@@ -980,6 +980,8 @@ class MainWindow(QMainWindow):
             try:
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
+                self.lung_detector.Cycle(float(self.lst[0]))
+                self.peak_lung.setText('Lung Peak: ' + str(self.lung_detector.peak_value))
                 ''' Commented for testing '''
 
                 '''Volume data came from kalman of lungpressure'''
@@ -1078,13 +1080,16 @@ class MainWindow(QMainWindow):
             self.curve1.setData(self.lungpressuredata)
             self.curve2.setData(self.lungpressurepeakdata)
             #self.curve3.setData(self.kalmandata)
+
+
             self.dvcurve.setData(self.dvdata)
             
-            '''Assign volume data to plotter curve'''
+            '''Assign volume data to volume plotter curve'''
             #(originally kalman data) self.volcurve.setData(self.kalmandata)
             self.volcurve.setData(self.voldata)
             self.volpeakcurve.setData(self.volpeakdata)
 
+            '''Assign Flowdata to flow plotter curve '''
             self.flowcurve.setData(self.flowdata)
             
             try:
