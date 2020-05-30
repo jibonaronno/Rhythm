@@ -128,8 +128,10 @@ class MainWindow(QMainWindow):
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
         self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
+        self.flowpeakcurve = self.flowplotter.plot(0,0,"flowpeakcurve", pen = self.derivative_pen)
 
         self.flowdata = deque()
+        self.flowpeakdata = deque()
 
         self.volplotter_pen = pg.mkPen(200, 20, 10)
         self.volplotter = PlotWidget()
@@ -976,6 +978,8 @@ class MainWindow(QMainWindow):
                 self.voldata.popleft()
             if len(self.flowdata) > self.maxLen:
                 self.flowdata.popleft()
+            if len(self.flowpeakdata) > self.maxLen:
+                self.flowpeakdata.popleft()
 
             try:
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
@@ -992,6 +996,7 @@ class MainWindow(QMainWindow):
 
                 dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
                 self.flowdata.append(dflow)
+                self.flowpeakdata.append(20)
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e))
 
@@ -1089,6 +1094,7 @@ class MainWindow(QMainWindow):
             '''Assign Flowdata to flow plotter curve '''
             self.flowcurve.setData(self.flowdata)
             self.dvcurve.setData(self.dvdata)
+            self.flowpeakcurve.setData(self.flowpeakdata)
             
             try:
                 if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
