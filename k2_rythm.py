@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
         self.derivative_pen_out = pg.mkPen(10, 200, 200)
         #self.dvcurve = self.plotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
 
-        self.flowpen = pg.mkPen(30,60,100, 100)
+        self.flowpen = pg.mkPen(10,90,100, 100)
 
         self.inhale_t_count = 0
         self.inhale_t = 0
@@ -1080,9 +1080,6 @@ class MainWindow(QMainWindow):
             self.curve1.setData(self.lungpressuredata)
             self.curve2.setData(self.lungpressurepeakdata)
             #self.curve3.setData(self.kalmandata)
-
-
-            self.dvcurve.setData(self.dvdata)
             
             '''Assign volume data to volume plotter curve'''
             #(originally kalman data) self.volcurve.setData(self.kalmandata)
@@ -1091,6 +1088,7 @@ class MainWindow(QMainWindow):
 
             '''Assign Flowdata to flow plotter curve '''
             self.flowcurve.setData(self.flowdata)
+            ##self.dvcurve.setData(self.dvdata)
             
             try:
                 if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
