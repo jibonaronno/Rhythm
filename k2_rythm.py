@@ -238,6 +238,9 @@ class MainWindow(QMainWindow):
         self.sensorwatchtimer = QTimer(self)
         self.sensorwatchtimer.timeout.connect(self.reconnectSensor)
 
+        self.lungtimer = QTimer(self)
+        self.lungtimer.timeout.connect(self.lungtimeout)
+
         self.modecombobox.addItem("CMV")
         self.modecombobox.addItem("BiPAP")
         self.modecombobox.addItem("PS")
@@ -295,6 +298,9 @@ class MainWindow(QMainWindow):
         self.enc_elements = []
         self.addEncoderElements()
 
+    def lungtimeout(self):
+        self.label_alarm.setText("Alarm: Low Lung Pressure")
+    
     def reconnectSensor(self):
         pass
         '''
@@ -636,14 +642,17 @@ class MainWindow(QMainWindow):
                 self.worker.moveToThread(self.workerThread)
                 self.workerThread.start()
                 self.workerThreadCreated = True
+                self.lungtimer.start(3000)
                 print("Starting Worker Thread")
 
             elif self.workerThreadCreated:
                 self.worker.Resume()
+                self.lungtimer.start(3000)
 
     @Slot()
     def on_btnstopcmv_clicked(self):
         self.pauseVentilator()
+        self.lungtimer.stop()
 
     @Slot()
     def on_disconnect_clicked(self):
@@ -920,6 +929,10 @@ class MainWindow(QMainWindow):
     from signals import SignalDetector
     lung_detector = SignalDetector()
 
+    vol_detector = SignalDetector()
+
+    flow_detector = SignalDetector()
+
     def processSensorData(self, data_stream):
         pressure_data = self.parseSensorData(data_stream)
         if(pressure_data == None):
@@ -952,7 +965,7 @@ class MainWindow(QMainWindow):
         
         '''Flow'''
         dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
-        self.flowdata.append(dflow)
+        self.flowdata.append(dflow * 1000)
         self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
         if len(self.deriv_points) > 3:
             self.deriv_points.popleft()
@@ -988,16 +1001,22 @@ class MainWindow(QMainWindow):
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
                 self.lung_detector.Cycle(float(self.lst[0]))
                 self.peak_lung.setText('Lung Peak: ' + str(self.lung_detector.peak_value))
+                if self.lung_detector.peak_value > 5:
+                    self.lungtimer.setInterval(3000)
                 ''' Commented for testing '''
 
                 '''Volume data came from kalman of lungpressure'''
                 ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
                 self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
                 self.voldata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
+                self.vol_detector.Cycle(self.kalman.Estimate(float(self.lst[0]) * 22))
                 self.volpeakdata.append(500.0)
+                self.peak_vol.setText("Vol Peak: " + str(self.vol_detector.peak_value))
 
                 dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
-                self.flowdata.append(dflow)
+                self.flowdata.append(dflow * 1000)
+                self.flow_detector.Cycle(dflow * 1000)
+                self.peak_flow.setText("Flow Peak: " + str(self.flow_detector.peak_value))
                 self.flowpeakdata.append(3)
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e))
@@ -1096,12 +1115,15 @@ class MainWindow(QMainWindow):
             '''Assign Flowdata to flow plotter curve '''
             self.flowcurve.setData(self.flowdata)
             #self.dvcurve.setData(self.dvdata)
-            #self.flowpeakcurve.setData(self.flowpeakdata)
+            self.flowpeakcurve.setData(self.flowpeakdata)
             
             try:
                 if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
                     if self.sensorThreadCreated:
                         self.wave.playfile()
+                        self.label_alarm.setText("Alarm: Over Pressure")
+                elif self.lung_detector.peak_value > 5:
+                    self.label_alarm.setText("Alarm: ")
                         #self.sensor.beep()
             except Exception as e:
                 print("Exception section 0x06 : " + str(e))
