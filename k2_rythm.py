@@ -54,7 +54,6 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
 
         #startdlg = StartDialog(None)
-
         
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
@@ -1017,7 +1016,7 @@ class MainWindow(QMainWindow):
                 self.flowdata.append(dflow * 1000)
                 self.flow_detector.Cycle(dflow * 1000)
                 self.peak_flow.setText("Flow Peak: " + str(self.flow_detector.peak_value))
-                self.flowpeakdata.append(3)
+                self.flowpeakdata.append(2)
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e))
 
