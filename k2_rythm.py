@@ -1098,6 +1098,9 @@ class MainWindow(QMainWindow):
                         self.sumofvolume = 0.0
                         if self.breath_in_tick:
                             self.breath_in_tick = False
+                            '''Reset the over pressure alarm when next peak is detcted'''
+                            if self.lung_detector.peak_value > 5:
+                                self.label_alarm.setText("Alarm: ")
                     else:
                         if not self.flag_idle:
                             self.idle_count += 1
@@ -1131,8 +1134,7 @@ class MainWindow(QMainWindow):
                     if self.sensorThreadCreated:
                         self.wave.playfile()
                         self.label_alarm.setText("Alarm: Over Pressure")
-                elif self.lung_detector.peak_value > 5:
-                    self.label_alarm.setText("Alarm: ")
+                
                         #self.sensor.beep()
             except Exception as e:
                 print("Exception section 0x06 : " + str(e))
