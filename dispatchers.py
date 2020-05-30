@@ -390,7 +390,7 @@ class SensorThread(QObject):
                     self.pressureque.put(self.plst[0])
             if self.flag_sensorlimit_tx:
                 self.flag_sensorlimit_tx = False
-                self.serialPort.write(self.strdata.encode('utf-8'))
+                self.serialport.write(self.strdata.encode('utf-8'))
                 time.sleep(0.5)
             # try:
             '''
