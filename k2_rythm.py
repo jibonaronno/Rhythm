@@ -204,7 +204,6 @@ class MainWindow(QMainWindow):
         self.scanPorts.hide()
         self.connect.hide()
         self.disconnect.hide()
-        self.alarm.hide()
         self.btnstream.hide()
 
         self.kalman = kalman(1.2)
@@ -302,6 +301,8 @@ class MainWindow(QMainWindow):
 
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
+        self.wave.playBeep()
+        self.lungtimer.setInterval(700)
     
     def reconnectSensor(self):
         pass
@@ -782,9 +783,8 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_alarm_clicked(self):
-        #self.wave.playstart()
+        #self.wave.playin()
         self.wave.playfile()
-        #self.wave.BeepBeep()
 
     def autoConnect(self):
         try:

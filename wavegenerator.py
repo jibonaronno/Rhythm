@@ -31,7 +31,11 @@ class WaveMapper(QObject):
         # self.melodylist = [[800, 100],[1200, 100],[500, 100]]
 
         self.qsnd = QSound("beep.wav")
-        self.qsndin = QSound("beepin.wav")
+        self.qsndin = QSound("bin.wav")
+        self.qbeep = QSound('beep-beep.wav')
+
+    def playBeep(self):
+        self.qbeep.play()
 
     def playstart(self):
         pass
