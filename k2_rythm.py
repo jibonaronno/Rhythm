@@ -413,7 +413,8 @@ class MainWindow(QMainWindow):
                             else:
                                 self.on_btnstopcmv_clicked()
                         else:
-                            self.on_runloop_clicked()
+                            if self.runloop.isEnabled():
+                                self.on_runloop_clicked()
                 if parts[0] == '2':
                     value = int(parts[1])
                     if value < 3:
