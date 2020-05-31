@@ -376,10 +376,13 @@ class SensorThread(QObject):
             if self.flagStop:
                 break
             jMessage = ""
-            in_waiting = self.serialport.in_waiting
-            while in_waiting == 0:
-                time.sleep(0.1)
+            try:
                 in_waiting = self.serialport.in_waiting
+                while in_waiting == 0:
+                    time.sleep(0.2)
+                    in_waiting = self.serialport.in_waiting
+            except Exception as e:
+                print('Exception Serial > Sensor Thread : ' + str(e))
             
             lst = self.serialport.readlines()
             for itm in lst:
