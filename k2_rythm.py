@@ -269,7 +269,6 @@ class MainWindow(QMainWindow):
             self.autoConnect()
         '''
 
-        
         self.devices = DetectDevices()
         # print("All Ports: ")
         #self.devices.printPorts()
@@ -405,7 +404,16 @@ class MainWindow(QMainWindow):
             if len(parts) > 1:
                 if parts[0] == '1':
                     value = int(parts[1])
-                    self.changeVTdial(value)
+                    if value < 3:
+                        self.changeVTdial(value)
+                    elif value == 3:
+                        if self.workerThreadCreated:
+                            if self.worker.flagStop:
+                                self.on_runloop_clicked()
+                            else:
+                                self.on_btnstopcmv_clicked()
+                        else:
+                            self.on_runloop_clicked()
                 if parts[0] == '2':
                     value = int(parts[1])
                     if value < 3:

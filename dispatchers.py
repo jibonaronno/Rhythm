@@ -263,7 +263,7 @@ class EncoderThread(QObject):
                 jMessage = ""
                 in_waiting = self.serialport.in_waiting
                 while in_waiting == 0:
-                    time.sleep(0.5)
+                    time.sleep(0.05)
                     in_waiting = self.serialport.in_waiting
                 
                 lst = self.serialport.readlines()
