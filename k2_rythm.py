@@ -123,7 +123,7 @@ class MainWindow(QMainWindow):
 
         self.flowplotter = PlotWidget()
         self.flowplotter.showGrid(x=True, y=True, alpha=None)
-        self.flowplotter.setTitle("Flow")
+        self.flowplotter.setTitle("Flow ml/ms")
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
         self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
         self.volplotter_pen = pg.mkPen(200, 20, 10)
         self.volplotter = PlotWidget()
         self.volplotter.showGrid(x=True, y=True, alpha=None)
-        self.volplotter.setTitle("Volume")
+        self.volplotter.setTitle("Volume ml")
         self.volcurve = self.volplotter.plot(0,0,"volcurve", self.volplotter_pen)
         self.volpeakcurve = self.volplotter.plot(0,0,"volpeakcurve", self.volplotter_pen)
         
@@ -196,7 +196,7 @@ class MainWindow(QMainWindow):
         self.himinitlcd.display(self.himinitdial.value())
         self.lowminitdial.valueChanged.connect(self.lowminitDialChanged)
         self.lowminitlcd.display(self.lowminitdial.value())
-        #self.alarm.hide()
+        self.alarm.hide()
         self.startpush.hide()
         self.btnhault.hide()
         self.portsList.hide()
@@ -301,7 +301,7 @@ class MainWindow(QMainWindow):
 
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
-        self.wave.playBeep()
+        self.wave.playBeep  ()
         self.lungtimer.setInterval(700)
     
     def reconnectSensor(self):
@@ -784,7 +784,8 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_alarm_clicked(self):
         #self.wave.playin()
-        self.wave.playfile()
+        #self.wave.playfile()
+        self.wave.playBeep()
 
     def autoConnect(self):
         try:
@@ -1018,7 +1019,7 @@ class MainWindow(QMainWindow):
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
                 self.lung_detector.Cycle(float(self.lst[0]))
-                self.peak_lung.setText('Lung Peak: ' + str(self.lung_detector.peak_value))
+                self.peak_lung.setText('Lung Peak: ' + str(self.lung_detector.peak_value) + 'mb')
                 if self.lung_detector.peak_value > 5:
                     self.lungtimer.setInterval(3000)
                 ''' Commented for testing '''
@@ -1029,12 +1030,12 @@ class MainWindow(QMainWindow):
                 self.voldata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
                 self.vol_detector.Cycle(self.kalman.Estimate(float(self.lst[0]) * 22))
                 self.volpeakdata.append(500.0)
-                self.peak_vol.setText("Vol Peak: " + str(self.vol_detector.peak_value))
+                self.peak_vol.setText("Vol Peak: " + str(self.vol_detector.peak_value) + 'ml')
 
                 dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
                 self.flowdata.append(dflow * 1000)
                 self.flow_detector.Cycle(dflow * 1000)
-                self.peak_flow.setText("Flow Peak: " + str(self.flow_detector.peak_value))
+                self.peak_flow.setText("Flow Peak: " + str(self.flow_detector.peak_value) + 'ml/ms')
                 self.flowpeakdata.append(2)
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e))

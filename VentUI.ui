@@ -965,7 +965,7 @@
                <rect>
                 <x>410</x>
                 <y>30</y>
-                <width>231</width>
+                <width>261</width>
                 <height>31</height>
                </rect>
               </property>
@@ -984,7 +984,7 @@
              <widget class="QLabel" name="peak_lung">
               <property name="geometry">
                <rect>
-                <x>660</x>
+                <x>680</x>
                 <y>5</y>
                 <width>161</width>
                 <height>20</height>
@@ -1005,7 +1005,7 @@
              <widget class="QLabel" name="peak_flow">
               <property name="geometry">
                <rect>
-                <x>660</x>
+                <x>680</x>
                 <y>32</y>
                 <width>161</width>
                 <height>20</height>
@@ -1026,7 +1026,7 @@
              <widget class="QLabel" name="peak_vol">
               <property name="geometry">
                <rect>
-                <x>660</x>
+                <x>680</x>
                 <y>60</y>
                 <width>161</width>
                 <height>20</height>
