@@ -372,17 +372,22 @@ class SensorThread(QObject):
 
     @Slot()
     def run(self):
+        in_waiting = ''
+        jMessage = ""
         while 1:
             if self.flagStop:
                 break
-            jMessage = ""
             try:
                 in_waiting = self.serialport.in_waiting
+            except Exception as e:
+                print('Ex:0X07 : ' + str(e))
+                
                 while in_waiting == 0:
                     time.sleep(0.2)
+                try:
                     in_waiting = self.serialport.in_waiting
-            except Exception as e:
-                print('Exception Serial > Sensor Thread : ' + str(e))
+                except Exception as e:
+                    print('Ex:0x08 : ' + str(e))
             
             lst = self.serialport.readlines()
             for itm in lst:
@@ -395,21 +400,3 @@ class SensorThread(QObject):
                 self.flag_sensorlimit_tx = False
                 self.serialport.write(self.strdata.encode('utf-8'))
                 time.sleep(0.5)
-            # try:
-            '''
-            jMessage = self.serialPort.readline().decode('ascii')
-            self.plst = jMessage.split(",")
-            self.signal.emit(jMessage)
-            if self.pressureque.qsize() <= 0:
-                self.pressureque.put(self.plst[0])
-            if self._beep:
-                self._beep = False
-            if self.flag_sensorlimit_tx:
-                self.flag_sensorlimit_tx = False
-                self.serialPort.write(self.strdata.encode('utf-8'))
-                time.sleep(0.5)
-            '''
-            # except serial.SerialException as ex:
-            #     print("Exception In SensorThread SerialException: " + str(ex))
-            # except Exception as e:
-            #     print("Exception In Sensor Thread: " + str(e))

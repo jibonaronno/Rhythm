@@ -174,13 +174,17 @@ class MainWindow(QMainWindow):
         self.bipap_init_threadcreated = False
         self.bipapthreadcreated = False
 
+        self.ipapdial.valueChanged.connect(self.ipapDialChanged)
+        self.ipaplcd.display(self.ipapdial.value())
+        self.epapdial.valueChanged.connect(self.epapDialChanged)
+        self.epaplcd.display(self.epapdial.value())
+
+
         self.modecombobox.currentIndexChanged.connect(self.modeselectionchanged)
         self.peepdial.valueChanged.connect(self.peepDialChanged)
         self.peeplcd.display(self.peepdial.value())
         self.peakdial.valueChanged.connect(self.peakDialChanged)
         self.peaklcd.display(self.peakdial.value())
-        self.ipapdial.valueChanged.connect(self.ipapDialChanged)
-        self.ipaplcd.display(self.ipapdial.value())
         self.vtdial.valueChanged.connect(self.vtDialChanged)
         self.vtlcd.display(self.vtdial.value())
         self.iedial.valueChanged.connect(self.ieDialChanged)
@@ -845,6 +849,15 @@ class MainWindow(QMainWindow):
         self.lowminitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.himinitlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.ipaplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.labelipap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.labelepap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.ipaplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.epeplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.label_18.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.label_19.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.ilcd_bp.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.elcd_bp.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.rrlcd_bp.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 
     def modeselectionchanged(self):
         if "CMV" in self.modecombobox.currentText():
@@ -877,6 +890,9 @@ class MainWindow(QMainWindow):
     def lowminitDialChanged(self):
         self.lowminitlcd.display(self.lowminitdial.value())
         self.flag_sensorlimit_tx = False
+
+    def epapDialChanged(self):
+        self.epaplcd.display(self.epapdial.value())
 
     def ipapDialChanged(self):
         self.ipaplcd.display(self.ipapdial.value())
@@ -1134,9 +1150,9 @@ class MainWindow(QMainWindow):
             self.volcurve.setData(self.voldata)
             self.volpeakcurve.setData(self.volpeakdata)
 
-            '''Assign Flowdata to flow plotter curve '''
+            '''Assign Flowdata to flow plotter curve & dvdata to dvcurve'''
             self.flowcurve.setData(self.flowdata)
-            #self.dvcurve.setData(self.dvdata)
+            self.dvcurve.setData(self.dvdata)
             self.flowpeakcurve.setData(self.flowpeakdata)
             
             try:
