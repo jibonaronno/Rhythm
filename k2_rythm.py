@@ -1010,6 +1010,7 @@ class MainWindow(QMainWindow):
 
 
     def LungSensorData(self, data_stream):
+        print(data_stream)
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
         self.maxLen = 300  # max number of data points to show on graph
