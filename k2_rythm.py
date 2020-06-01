@@ -1009,8 +1009,22 @@ class MainWindow(QMainWindow):
             self.dvdata.append(0.0)
 
 
+    dataList = []
+
     def LungSensorData(self, data_stream):
-        print(data_stream)
+        #print(data_stream)
+        
+        #Logging the data @ 100 data received
+        try:
+            self.dataList.append(data_stream)
+            self.log_interval_count += 1
+            if self.log_interval_count >= 100:
+                self.log_interval_count = 0
+                self.datalogger.writeBlock(self.dataList)
+                self.dataList.clear()
+        except Exception as e:
+            print('Ex in Log: ' + str(e))
+
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
         self.maxLen = 300  # max number of data points to show on graph
@@ -1056,14 +1070,6 @@ class MainWindow(QMainWindow):
                 self.flowpeakdata.append(2)
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e))
-
-            #Logging the data @ 100 data received
-            '''
-            self.log_interval_count += 1
-            if self.log_interval_count >= 100:
-                self.log_interval_count = 0
-                self.datalogger.writeBlock(self.lungpressuredata)
-            '''
 
             if len(self.deriv_points) == 0:
                 self.timesnap = 0.0
