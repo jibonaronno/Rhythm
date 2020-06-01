@@ -803,7 +803,7 @@ class MainWindow(QMainWindow):
                         self.serialMarlin.readline()
             if self.ComPorts['Sensor'] != 'NA':
                 if not self.sensorPortOpen:
-                    self.serialSensor = serial.Serial(self.ComPorts['Sensor'], baudrate=115200, timeout=1)
+                    self.serialSensor = serial.Serial(self.ComPorts['Sensor'], baudrate=115200, timeout=0)
                     self.sensorPortOpen = True
 
             if self.ComPorts['Encoder'] != 'NA':

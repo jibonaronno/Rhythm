@@ -383,12 +383,22 @@ class SensorThread(QObject):
                 print('Ex:0X07 : ' + str(e))
                 
                 while in_waiting == 0:
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                 try:
                     in_waiting = self.serialport.in_waiting
                 except Exception as e:
                     print('Ex:0x08 : ' + str(e))
-            
+            try:
+                itm = self.serialport.readline()
+            except Exception as e:
+                print('Ex in sensor Thread readline() 392 : ' + str(e))
+            jMessage = itm.decode('ascii')
+            self.plst = jMessage.split(",")
+            self.signal.emit(jMessage)
+            if self.pressureque.qsize() <= 0:
+                self.pressureque.put(self.plst[0])
+
+            '''
             lst = self.serialport.readlines()
             for itm in lst:
                 jMessage = itm.decode('ascii')
@@ -396,6 +406,7 @@ class SensorThread(QObject):
                 self.signal.emit(jMessage)
                 if self.pressureque.qsize() <= 0:
                     self.pressureque.put(self.plst[0])
+            '''
             if self.flag_sensorlimit_tx:
                 self.flag_sensorlimit_tx = False
                 self.serialport.write(self.strdata.encode('utf-8'))
