@@ -399,7 +399,7 @@ class SensorThread(QObject):
                 itm += unit.decode('ascii')
 
             if unit == b'\n':
-                jMessage = itm.decode('ascii')
+                jMessage = itm #.decode('ascii')
                 itm = ''
                 self.plst = jMessage.split(",")
                 self.signal.emit(jMessage)
