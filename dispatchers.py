@@ -383,7 +383,7 @@ class SensorThread(QObject):
                 print('Ex:0X07 : ' + str(e))
                 
                 while in_waiting == 0:
-                    time.sleep(0.2)
+                    time.sleep(0.5)
                 try:
                     in_waiting = self.serialport.in_waiting
                 except Exception as e:
