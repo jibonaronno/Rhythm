@@ -1102,12 +1102,16 @@ class MainWindow(QMainWindow):
             self.dvdata.append(0.0)
 
 
+    over_pressure_detection_delay = 0
     dataList = []
 
     def LungSensorData(self, data_stream):
         #print(data_stream)
         
         #Logging the data @ 100 data received
+        if self.over_pressure_detection_delay > 0:
+            self.over_pressure_detection_delay -= 1
+
         try:
             self.dataList.append(data_stream)
             self.log_interval_count += 1
@@ -1232,8 +1236,9 @@ class MainWindow(QMainWindow):
                         if self.breath_in_tick:
                             self.breath_in_tick = False
                             '''Reset the over pressure alarm when next peak is detcted'''
-                            if self.lung_detector.peak_value > 5:
-                                self.label_alarm.setText("Alarm: ")
+                            if self.over_pressure_detection_delay == 0:
+                                if self.lung_detector.peak_value > 5:
+                                    self.label_alarm.setText("Alarm: ")
                     else:
                         if not self.flag_idle:
                             self.idle_count += 1
@@ -1267,6 +1272,7 @@ class MainWindow(QMainWindow):
                     if self.sensorThreadCreated:
                         self.wave.playfile()
                         self.label_alarm.setText("Alarm: Over Pressure")
+                        self.over_pressure_detection_delay = 10
                 
                         #self.sensor.beep()
             except Exception as e:

@@ -524,7 +524,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page">
              <widget class="QDial" name="vtdial">
@@ -984,9 +984,9 @@
              <widget class="QLabel" name="peak_lung">
               <property name="geometry">
                <rect>
-                <x>640</x>
+                <x>530</x>
                 <y>5</y>
-                <width>211</width>
+                <width>321</width>
                 <height>20</height>
                </rect>
               </property>
@@ -1005,9 +1005,9 @@
              <widget class="QLabel" name="peak_flow">
               <property name="geometry">
                <rect>
-                <x>640</x>
+                <x>530</x>
                 <y>32</y>
-                <width>211</width>
+                <width>321</width>
                 <height>20</height>
                </rect>
               </property>
@@ -1026,9 +1026,9 @@
              <widget class="QLabel" name="peak_vol">
               <property name="geometry">
                <rect>
-                <x>640</x>
+                <x>530</x>
                 <y>60</y>
-                <width>211</width>
+                <width>311</width>
                 <height>20</height>
                </rect>
               </property>
