@@ -1507,6 +1507,9 @@
                 <height>14</height>
                </rect>
               </property>
+              <property name="styleSheet">
+               <string notr="true">color:black</string>
+              </property>
               <property name="text">
                <string>IPAP</string>
               </property>
@@ -1546,6 +1549,9 @@
               </property>
              </widget>
              <widget class="QDial" name="ipapdial">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="geometry">
                <rect>
                 <x>10</x>
@@ -1609,7 +1615,7 @@
              </widget>
              <widget class="QDial" name="rrdial_bipap">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="geometry">
                <rect>
@@ -1740,7 +1746,7 @@
              </widget>
              <widget class="QDial" name="iedial_bipap">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="geometry">
                <rect>
@@ -1770,6 +1776,9 @@
               </property>
              </widget>
              <widget class="QDial" name="epapdial">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="geometry">
                <rect>
                 <x>110</x>
@@ -1833,6 +1842,9 @@
                 <width>31</width>
                 <height>14</height>
                </rect>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color:black</string>
               </property>
               <property name="text">
                <string>EPAP</string>

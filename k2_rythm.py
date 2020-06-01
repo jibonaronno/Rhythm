@@ -462,6 +462,30 @@ class MainWindow(QMainWindow):
                             self.changeBipapdial(value)
                         elif value == 3:
                             pass #VT Button Pressed
+                    if parts[0] == '2':
+                        value = int(parts[1])
+                        if value < 3:
+                            self.changeEpapDial(value)
+                        elif value == 3:
+                            pass
+                    if parts[0] == '3':
+                        value = int(parts[1])
+                        if value < 3:
+                            self.changeIEdialBipap(value)
+                        elif value == 3:
+                            pass
+                    if parts[0] == '4':
+                        value = int(parts[1])
+                        if value < 3:
+                            self.changeRRdialBipap(value)
+                        elif value == 3:
+                            self.show_hide_LeftPanel()
+                    if parts[0] == '5':
+                        value = int(parts[1])
+                        if value < 3:
+                            self.encrFocus(value)
+                        elif value == 3:
+                            self.change_set_bipap(parts[1])
 
     def emulateEnter(self):
         pyautogui.press('enter')
@@ -542,6 +566,30 @@ class MainWindow(QMainWindow):
         self.fiodial.setEnabled(False)
         self.btnchangeset.setText("Change")
         self.flagEditCmv = False
+
+    flagEditBipap = False
+
+    def changeBipapParams(self):
+        self.ipapdial.setEnabled(True)
+        self.epapdial.setEnabled(True)
+        self.iedial_bipap.setEnabled(True)
+        self.rrdial_bipap.setEnabled(True)
+        self.flagEditBipap = True
+
+    def setBipapParams(self):
+        self.ipapdial.setEnabled(False)
+        self.epapdial.setEnabled(False)
+        self.iedial_bipap.setEnabled(False)
+        self.rrdial_bipap.setEnabled(False)
+        self.flagEditBipap = False
+
+    def change_set_bipap(self, cmd):
+        print(cmd)
+        if '3' in cmd:
+            if self.flagEditBipap:
+                self.setBipapParams()
+            else:
+                self.changeBipapParams()
 
     def change_set(self, cmd):
         print(cmd)
