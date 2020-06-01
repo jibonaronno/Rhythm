@@ -347,6 +347,62 @@ class WorkerThread(QObject):
             except serial.SerialException as ex:
                 print("Error In SerialException" + str(ex))
 
+class BipapWorkerThread(QObject):
+    signal = Signal(str)
+    def __init__(self, serialPort, codegen, commandque:Queue):
+        self.serialPort = serialPort
+        self.codegen = codegen
+        self.commandque = commandque
+        self.codelist = self.codegen.gcodestr.splitlines()
+        self.linecount = len(self.codelist)
+        self.flagexit = False
+        self.flagStop = False
+        super().__init__()
+        self.respondQue = Queue()
+
+    def Stop(self):
+        self.flagStop = True
+
+    def Resume(self):
+        self.flagStop = False
+
+    def updateGcode(self, codegen):
+        self.codegen = codegen
+        self.codelist = self.codegen.gcodestr.splitlines()
+
+    @Slot()
+    def run(self):
+        lst = []
+        while 1:
+            if self.flagStop:
+                time.sleep(1)
+                if self.respondQue.qsize() <= 0:
+                    self.respondQue.put("stopped")
+                continue
+            if self.commandque.qsize() > 0:
+                if self.commandque.get() == "exit":
+                    self.flagexit = True
+                    break
+            try:
+                for line in self.codelist:
+                    self.serialPort.write((str(line)+"\r\n").encode('utf-8'))
+                    time.sleep(0.1)
+                    in_waiting = self.serialPort.in_waiting
+                    while in_waiting == 0:
+                        time.sleep(0.5) #1
+                        in_waiting = self.serialPort.in_waiting
+
+                    jMessage = ""
+                    while "ok" not in jMessage:
+                        while self.serialPort.in_waiting:
+                            lst = self.serialPort.readlines()
+                            for itm in lst:
+                                jMessage += itm.decode('ascii')
+                    self.signal.emit(str(line) + " - " + jMessage)
+                    
+            except serial.SerialException as ex:
+                print("Error In SerialException" + str(ex))
+
 class SensorThread(QObject):
     signal = Signal(str)
     plst = []

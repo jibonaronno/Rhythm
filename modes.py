@@ -5,6 +5,7 @@ class MachineRunModes(enum.Enum):
     CMV = 1
     BiPAP = 2
     CPAP = 3
+    PS = 4
 
 class BipapReturns(enum.Enum):
     Continue = 1

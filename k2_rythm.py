@@ -179,6 +179,10 @@ class MainWindow(QMainWindow):
         self.ipaplcd.display(self.ipapdial.value())
         self.epapdial.valueChanged.connect(self.epapDialChanged)
         self.epaplcd.display(self.epapdial.value())
+        self.iedial_bipap.valueChanged.connect(self.iedial_bipapChanged)
+        self.elcd_bp.display(self.iedial_bipap.value())
+        self.rrdial_bipap.valueChanged.connect(self.rrdial_bipapChanged)
+        self.rrlcd_bp.display(self.rrdial_bipap.value())
 
 
         self.modecombobox.currentIndexChanged.connect(self.modeselectionchanged)
@@ -307,7 +311,7 @@ class MainWindow(QMainWindow):
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
         self.wave.playBeep  ()
-        self.lungtimer.setInterval(700)
+        self.lungtimer.setInterval(3000)
     
     def reconnectSensor(self):
         pass
@@ -403,54 +407,83 @@ class MainWindow(QMainWindow):
             self.stackedWidget_2.show()
 
     def onEncoderValue(self, msg):
-        parts = None
-        value = 2
-        if len(msg) <= 7:
-            parts = msg.split(':')
-            if len(parts) > 1:
-                if parts[0] == '1':
-                    value = int(parts[1])
-                    if value < 3:
-                        self.changeVTdial(value)
-                    elif value == 3:
-                        if self.workerThreadCreated:
-                            if self.worker.flagStop:
-                                self.on_runloop_clicked()
+        if self.runMode == MachineRunModes.CMV:
+            parts = None
+            value = 2
+            if len(msg) <= 7:
+                parts = msg.split(':')
+                if len(parts) > 1:
+                    if parts[0] == '1':
+                        value = int(parts[1])
+                        if value < 3:
+                            self.changeVTdial(value)
+                        elif value == 3:
+                            if self.workerThreadCreated:
+                                if self.worker.flagStop:
+                                    self.on_runloop_clicked()
+                                else:
+                                    self.on_btnstopcmv_clicked()
                             else:
-                                self.on_btnstopcmv_clicked()
-                        else:
-                            if self.runloop.isEnabled():
-                                self.on_runloop_clicked()
-                if parts[0] == '2':
-                    value = int(parts[1])
-                    if value < 3:
-                        self.changeIEdial(value)
-                    elif value == 3:
-                        self.on_btninit_clicked()
-                if parts[0] == '3':
-                    value = int(parts[1])
-                    if value < 3:
-                        self.changeRRdial(value)
-                    elif value == 3:
-                        self.emulateSpace()
-                if parts[0] == '4':
-                    value = int(parts[1])
-                    if value < 3:
-                        self.changeFIOdial(value)
-                    elif value == 3:
-                        self.show_hide_LeftPanel()
-                if parts[0] == '5':
-                    value = int(parts[1])
-                    if value < 3:
-                        self.encrFocus(value)
-                    elif value == 3:
-                        self.change_set(parts[1])
+                                if self.runloop.isEnabled():
+                                    self.on_runloop_clicked()
+                    if parts[0] == '2':
+                        value = int(parts[1])
+                        if value < 3:
+                            self.changeIEdial(value)
+                        elif value == 3:
+                            self.on_btninit_clicked()
+                    if parts[0] == '3':
+                        value = int(parts[1])
+                        if value < 3:
+                            self.changeRRdial(value)
+                        elif value == 3:
+                            self.emulateSpace()
+                    if parts[0] == '4':
+                        value = int(parts[1])
+                        if value < 3:
+                            self.changeFIOdial(value)
+                        elif value == 3:
+                            self.show_hide_LeftPanel()
+                    if parts[0] == '5':
+                        value = int(parts[1])
+                        if value < 3:
+                            self.encrFocus(value)
+                        elif value == 3:
+                            self.change_set(parts[1])
+        elif self.runMode == MachineRunModes.BiPAP:
+            parts = None
+            value = 2
+            if len(msg) <= 7:
+                parts = msg.split(':')
+                if len(parts) > 1:
+                    if parts[0] == '1':
+                        value = int(parts[1])
+                        if value < 3:
+                            self.changeBipapdial(value)
+                        elif value == 3:
+                            pass #VT Button Pressed
 
     def emulateEnter(self):
         pyautogui.press('enter')
 
     def emulateSpace(self):
         pyautogui.press(' ')
+
+    def changeBipapDial(self, incr=1):
+        if self.ipapdial.isEnabled():
+            self.changedial(incr, self.ipapdial)
+
+    def changeEpapDial(self, incr=1):
+        if self.epapdial.isEnabled():
+            self.changedial(incr, self.epapdial)
+
+    def changeIEdialBipap(self, incr=1):
+        if self.iedial_bipap.isEnabled():
+            self.changedial(incr, self.iedial_bipap)
+
+    def changeRRdialBipap(self, incr=1):
+        if self.rrdial_bipap.isEnabled():
+            self.changedial(incr, self.rrdial_bipap)
 
     def changeVTdial(self, incr = 1):
         if self.vtdial.isEnabled():
@@ -867,11 +900,20 @@ class MainWindow(QMainWindow):
             self.buttonstack.setCurrentIndex(0)
             self.stackedWidget.setCurrentIndex(0)
             self.label.setText("Mode : CMV")
+            self.runMode = MachineRunModes.CMV
         elif "BiPAP" in self.modecombobox.currentText():
             self.buttonstack.setCurrentIndex(2)
             self.stackedWidget.setCurrentIndex(2)
+            self.runMode = MachineRunModes.BiPAP
         elif "PS" in self.modecombobox.currentText():
             self.label.setText("Mode : PS")
+            self.runMode = MachineRunModes.PS
+
+    def iedial_bipapChanged(self):
+        self.elcd_bp.display(self.iedial_bipap.value())
+
+    def rrdial_bipapChanged(self):
+        self.rrlcd_bp.display(self.rrdial_bipap.value())
 
     def peepDialChanged(self):
         self.peeplcd.display(self.peepdial.value())
