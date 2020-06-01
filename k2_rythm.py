@@ -636,6 +636,8 @@ class MainWindow(QMainWindow):
         self.onEncoderValue(data_stream)
 
     
+    pparr = []
+
     @Slot()
     def on_btnrunbploop_clicked(self):
         pprint.pprint(self.pparr)
@@ -1060,9 +1062,12 @@ class MainWindow(QMainWindow):
 
                 '''Volume data came from kalman of lungpressure'''
                 ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
-                self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
-                self.voldata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
-                self.vol_detector.Cycle(abs(self.kalman.Estimate(float(self.lst[0])) * 22))
+                vol_base = self.kalman.Estimate(float(self.lst[0]))
+                self.kalmandata.append(vol_base * 22)
+                self.voldata.append(vol_base * 22)
+                if vol_base < 0:
+                    vol_base = 0
+                self.vol_detector.Cycle(vol_base * 22)
                 self.volpeakdata.append(500.0)
                 self.peak_vol.setText("Vol Peak: " + str(self.vol_detector.peak_value) + 'ml')
 
@@ -1092,7 +1097,7 @@ class MainWindow(QMainWindow):
                     Working code for derivative data from lung pressure data.
                     '''
                     self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
-                    self.dvdata_compressed.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (50)))
+                    self.dvdata_compressed.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (5)))
 
                     '''
                     Following instruction will derive the data from the kalman of lung pressure.
@@ -1120,7 +1125,7 @@ class MainWindow(QMainWindow):
 
             try:
                 if(len(self.deriv_points) >= 3):
-                    if self.dvdata[-1] > 1:
+                    if self.dvdata[-1] > 10:
                         self.curve1.setPen(self.derivative_pen_in)
                         self.inhale_t_count += 1
                         self.flag_idle = False
@@ -1128,7 +1133,7 @@ class MainWindow(QMainWindow):
                         if not self.breath_in_tick:
                             self.breath_in_tick = True
                             self.wave.playin()
-                    elif self.dvdata[-1] < -1:
+                    elif self.dvdata[-1] < -10:
                         self.curve1.setPen(self.derivative_pen_out)
                         self.exhale_t_count += 1
                         self.flag_idle = False
