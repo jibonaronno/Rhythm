@@ -469,7 +469,7 @@ class MainWindow(QMainWindow):
     def emulateSpace(self):
         pyautogui.press(' ')
 
-    def changeBipapDial(self, incr=1):
+    def changeBipapdial(self, incr=1):
         if self.ipapdial.isEnabled():
             self.changedial(incr, self.ipapdial)
 
