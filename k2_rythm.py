@@ -852,7 +852,7 @@ class MainWindow(QMainWindow):
         self.labelipap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.labelepap.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.ipaplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.epeplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.epaplcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.label_18.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.label_19.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.ilcd_bp.setAttribute(Qt.WA_TransparentForMouseEvents, True)
