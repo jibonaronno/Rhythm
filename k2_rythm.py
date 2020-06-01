@@ -91,6 +91,7 @@ class MainWindow(QMainWindow):
         self.volpeakdata = deque()
         self.sumofvolume = 0.0
 
+        self.dvdata_compressed = deque()
         self.dvdata = deque()
         self.deriv_points = deque()
         self.timesnap = 0.0
@@ -1035,6 +1036,8 @@ class MainWindow(QMainWindow):
                 self.lungpressurepeakdata.popleft()
             if len(self.dvdata) > self.maxLen:
                 self.dvdata.popleft()
+            if len(self.dvdata_compressed) > self.maxLen:
+                self.dvdata_compressed.popleft()
             if len(self.kalmandata) > self.maxLen:
                 self.kalmandata.popleft()
             if len(self.volpeakdata) > self.maxLen:
@@ -1059,7 +1062,7 @@ class MainWindow(QMainWindow):
                 ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
                 self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
                 self.voldata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
-                self.vol_detector.Cycle(self.kalman.Estimate(float(self.lst[0]) * 22))
+                self.vol_detector.Cycle(abs(self.kalman.Estimate(float(self.lst[0])) * 22))
                 self.volpeakdata.append(500.0)
                 self.peak_vol.setText("Vol Peak: " + str(self.vol_detector.peak_value) + 'ml')
 
@@ -1089,6 +1092,7 @@ class MainWindow(QMainWindow):
                     Working code for derivative data from lung pressure data.
                     '''
                     self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
+                    self.dvdata_compressed.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (50)))
 
                     '''
                     Following instruction will derive the data from the kalman of lung pressure.
@@ -1110,6 +1114,7 @@ class MainWindow(QMainWindow):
                     #self.voldata.append(self.sumofvolume)
                 else:
                     self.dvdata.append(0.0)
+                    self.dvdata_compressed.append(0.0)
             except Exception as e:
                 print("Exception Section 0x05" + str(e))
 
@@ -1159,7 +1164,7 @@ class MainWindow(QMainWindow):
 
             '''Assign Flowdata to flow plotter curve & dvdata to dvcurve'''
             self.flowcurve.setData(self.flowdata)
-            self.dvcurve.setData(self.dvdata)
+            self.dvcurve.setData(self.dvdata_compressed)
             self.flowpeakcurve.setData(self.flowpeakdata)
             
             try:
