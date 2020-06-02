@@ -310,7 +310,7 @@ class MainWindow(QMainWindow):
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
         self.wave.playBeep  ()
-        self.lungtimer.setInterval(5000)
+        self.lungtimer.setInterval(8000)
     
     def reconnectSensor(self):
         pass
@@ -748,12 +748,12 @@ class MainWindow(QMainWindow):
                 self.worker.moveToThread(self.workerThread)
                 self.workerThread.start()
                 self.workerThreadCreated = True
-                self.lungtimer.start(5000)
+                self.lungtimer.start(8000)
                 print("Starting Worker Thread")
 
             elif self.workerThreadCreated:
                 self.worker.Resume()
-                self.lungtimer.start(5000)
+                self.lungtimer.start(8000)
 
     @Slot()
     def on_btnstopcmv_clicked(self):
@@ -1100,6 +1100,9 @@ class MainWindow(QMainWindow):
         else:
             self.dvdata.append(0.0)
 
+    
+    ttick = 0
+    tsnap = 0
 
     from signals import WaveShape
     over_pressure_detection_delay = 0
@@ -1238,8 +1241,11 @@ class MainWindow(QMainWindow):
                         if not self.breath_in_tick:
                             self.breath_in_tick = True
                             self.wave.playin()
-                            self.lungtimer.setInterval(5000)
+                            self.lungtimer.setInterval(8000)
                             self.lung_wave.StartWave()
+                            self.tsnap = time.perf_counter() - self.ttick
+                            self.lbl_rr.setText('RR: ' + '{:4d}'.format(self.tsnap))
+                            self.ttick = time.perf_counter()
                     elif self.dvdata[-1] < -10:
                         self.curve1.setPen(self.derivative_pen_out)
                         self.exhale_t_count += 1

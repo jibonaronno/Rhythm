@@ -1041,7 +1041,20 @@
                </font>
               </property>
               <property name="text">
-               <string>Vol Peak:</string>
+               <string>Vol Peak :</string>
+              </property>
+             </widget>
+             <widget class="QLabel" name="lbl_rr">
+              <property name="geometry">
+               <rect>
+                <x>530</x>
+                <y>60</y>
+                <width>131</width>
+                <height>16</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>RR:</string>
               </property>
              </widget>
             </widget>

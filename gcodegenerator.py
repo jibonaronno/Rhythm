@@ -122,7 +122,7 @@ class GcodeGenerator(object):
         self.TDMS = 0.1
 
         self.Kie =  1/self.ie
-        self.BCT = 60*(1-0.275) / self.rr
+        self.BCT = 60*(1-0.29) / self.rr
         self.Ti = self.BCT / (1 + (1 / self.Kie))
         self.Th = self.BCT - self.Ti
         
