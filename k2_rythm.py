@@ -1152,7 +1152,8 @@ class MainWindow(QMainWindow):
                 self.lung_detector.Cycle(float(self.lst[0]))
                 self.lung_wave.Cycle(float(self.lst[0]))
                 if self.lung_wave.wave_in_buffer:
-                    pprint.pprint(self.lung_wave.wvdata)
+                    #pprint.pprint(self.lung_wave.wvdata)
+                    print(str(max(self.lung_wave.wvdata)))
                 try:
                     self.peak_lung.setText('Lung Peak: ' + '{:03.2f}'.format(self.lung_detector.peak_value) + 'mb')
                 except:
