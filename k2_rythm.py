@@ -184,14 +184,13 @@ class MainWindow(QMainWindow):
         self.rrdial_bipap.valueChanged.connect(self.rrdial_bipapChanged)
         self.rrlcd_bp.display(self.rrdial_bipap.value())
 
-
         self.modecombobox.currentIndexChanged.connect(self.modeselectionchanged)
         self.peepdial.valueChanged.connect(self.peepDialChanged)
         self.peeplcd.display(self.peepdial.value())
         self.peakdial.valueChanged.connect(self.peakDialChanged)
         self.peaklcd.display(self.peakdial.value())
         self.vtdial.valueChanged.connect(self.vtDialChanged)
-        self.vtlcd.display(self.vtdial.value())
+        self.vtlcd.display((self.vtdial.value() * 50) + 200)
         self.iedial.valueChanged.connect(self.ieDialChanged)
         self.ielcd.display(self.iedial.value())
         self.rrdial.valueChanged.connect(self.rrDialChanged)
@@ -996,8 +995,8 @@ class MainWindow(QMainWindow):
 
 
     def vtDialChanged(self):
-        self.vtlcd.display(self.vtdial.value())
-        self.vt = self.vtdial.value()
+        self.vt = (self.vtdial.value() * 50) + 200
+        self.vtlcd.display(self.vt)
         self.settings_dict[r"vt"] = str(self.vt)
         self.SaveSettings()
 
