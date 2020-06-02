@@ -1057,6 +1057,19 @@
                <string>RR:</string>
               </property>
              </widget>
+             <widget class="QLabel" name="lbl_ep">
+              <property name="geometry">
+               <rect>
+                <x>530</x>
+                <y>80</y>
+                <width>47</width>
+                <height>14</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>E-&gt;P:</string>
+              </property>
+             </widget>
             </widget>
             <widget class="QWidget" name="page_2">
              <widget class="QDial" name="peakdial">

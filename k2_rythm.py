@@ -1104,6 +1104,9 @@ class MainWindow(QMainWindow):
     ttick = 0
     tsnap = 0
 
+    eptick = 0
+    epsnap = 0
+
     from signals import WaveShape
     over_pressure_detection_delay = 0
     dataList = []
@@ -1245,8 +1248,9 @@ class MainWindow(QMainWindow):
                             self.lungtimer.setInterval(8000)
                             self.lung_wave.StartWave()
                             self.tsnap = time.perf_counter() - self.ttick
-                            self.lbl_rr.setText('RR: ' + '{:4d}'.format(self.tsnap))
+                            self.lbl_rr.setText('RR  : ' + '{:d}'.format(self.tsnap))
                             self.ttick = time.perf_counter()
+                            self.eptick = self.ttick
                     elif self.dvdata[-1] < -10:
                         self.curve1.setPen(self.derivative_pen_out)
                         self.exhale_t_count += 1
@@ -1255,6 +1259,8 @@ class MainWindow(QMainWindow):
                         self.sumofvolume = 0.0
                         if self.breath_in_tick:
                             self.breath_in_tick = False
+                            self.epsnap = time.perf_counter() - self.eptick
+                            self.lbl_ep.setText('E->P: ' + '{:f}'.format(self.epsnap))
                             '''Reset the over pressure alarm when next peak is detcted'''
                             if self.over_pressure_detection_delay == 0:
                                 if self.lung_detector.peak_value > 5:
