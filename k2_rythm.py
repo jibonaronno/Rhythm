@@ -311,7 +311,7 @@ class MainWindow(QMainWindow):
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
         self.wave.playBeep  ()
-        self.lungtimer.setInterval(3000)
+        self.lungtimer.setInterval(2000)
     
     def reconnectSensor(self):
         pass
@@ -1102,8 +1102,10 @@ class MainWindow(QMainWindow):
             self.dvdata.append(0.0)
 
 
+    from signals import WaveShape
     over_pressure_detection_delay = 0
     dataList = []
+    lung_wave = WaveShape()
 
     def LungSensorData(self, data_stream):
         #print(data_stream)
@@ -1149,9 +1151,13 @@ class MainWindow(QMainWindow):
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
                 self.lung_detector.Cycle(float(self.lst[0]))
-                self.peak_lung.setText('Lung Peak: ' + str(self.lung_detector.peak_value) + 'mb')
-                if self.lung_detector.peak_value > 5:
-                    self.lungtimer.setInterval(3000)
+                self.lung_wave.Cycle(float(self.lst[0]))
+                try:
+                    self.peak_lung.setText('Lung Peak: ' + '{:03.2f}'.format(self.lung_detector.peak_value) + 'mb')
+                except:
+                    pass
+                #if self.lung_detector.peak_value > 5:
+                    #self.lungtimer.setInterval(3000)
                 ''' Commented for testing '''
 
                 '''Volume data came from kalman of lungpressure'''
@@ -1163,12 +1169,15 @@ class MainWindow(QMainWindow):
                     vol_base = 0
                 self.vol_detector.Cycle(vol_base * 22)
                 self.volpeakdata.append(500.0)
-                self.peak_vol.setText("Vol Peak: " + str(self.vol_detector.peak_value) + 'ml')
+                self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
 
                 dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
                 self.flowdata.append(dflow * 1000)
                 self.flow_detector.Cycle(dflow * 1000)
-                self.peak_flow.setText("Flow Peak: " + str(self.flow_detector.peak_value) + 'ml/ms')
+                try:
+                    self.peak_flow.setText("Flow Peak: " + '{:03.2f}'.format(self.flow_detector.peak_value) + 'ml/ms')
+                except:
+                    pass
                 self.flowpeakdata.append(2)
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e))
@@ -1227,6 +1236,8 @@ class MainWindow(QMainWindow):
                         if not self.breath_in_tick:
                             self.breath_in_tick = True
                             self.wave.playin()
+                            self.lungtimer.setInterval(3000)
+                            self.lung_wave.StartWave()
                     elif self.dvdata[-1] < -10:
                         self.curve1.setPen(self.derivative_pen_out)
                         self.exhale_t_count += 1

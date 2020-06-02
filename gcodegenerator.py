@@ -114,7 +114,7 @@ class GcodeGenerator(object):
         self.Dt = self.xmax - self.xrect
         self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
         self.Dp = self.Dt + self.xav
-        self.TDMS = 0
+        self.TDMS = 0.1
 
         self.Kie =  1/self.ie
         self.BCT = 60*(1-0.24) / self.rr
@@ -168,7 +168,7 @@ class GcodeGenerator(object):
         self.gcodeprimary = "G21\r\nG80\r\nG90\r\nM92 X"+ str(self.presmm) +" Y"+ str(self.presmm) + "\r\nM914 X" + str(self.home_sense) + " Y" + str(self.home_sense) +"\r\nG28 X0Y0 F500\r\nM92 X"+ str(self.postsmm) +" Y"+ str(self.postsmm) + "\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC) + "\r\nM906 X"+ str(self.motor_i_min) + " Y" + str(self.motor_i_min) + "\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
         #self.gcodeprimary = "G21\r\nG80\r\nG90\r\nM92 X"+ str(self.presmm) +" Y"+ str(self.presmm) +"\r\nG28 X0Y0 F500\r\nM92 X"+ str(self.postsmm) +" Y"+ str(self.postsmm) + "\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC) + "\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
         
-        self.gcodestr =  "M107\r\nG01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+"\r\nM106 S255\r\nG04 P0.5\r\n" +"G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
+        self.gcodestr =  "M107\r\nG01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+"\r\nM106 S255\r\nG04 P"+ str(self.TDMS) +"\r\n" +"G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
 
         #print(self.gcodeinit)
         #print("\r\n")

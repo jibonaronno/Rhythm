@@ -41,3 +41,26 @@ class SignalDetector(object):
                     self.func()
         elif self.edge > 1:
             self.first_negative = False
+
+class WaveShape(object):
+    def __init__(self):
+        self.wvdata = []
+        self.zero_count = 0
+        self.wave_in_buffer = False
+
+    def StartWave(self):
+        self.zero_count = 0
+        self.wave_in_buffer = False
+        self.wvdata.clear()
+
+    def Cycle(self, element:float):
+        if self.zero_count < 5:
+            self.wvdata.append(element)
+            if element <= 4:
+                self.zero_count += 1
+            if self.zero_count > 0 and element > 5:
+                self.zero_count = 0
+        else:
+            self.wave_in_buffer = True
+
+
