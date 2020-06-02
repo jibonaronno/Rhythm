@@ -310,7 +310,7 @@ class MainWindow(QMainWindow):
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
         self.wave.playBeep  ()
-        self.lungtimer.setInterval(2000)
+        self.lungtimer.setInterval(3000)
     
     def reconnectSensor(self):
         pass
