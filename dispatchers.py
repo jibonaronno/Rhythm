@@ -382,6 +382,8 @@ class WorkerThread(QObject):
                 for line in self.codelist:
                     self.serialport.write((str(line)+"\r\n").encode('utf-8'))
                     time.sleep(0.3)
+
+                    jMessage = ''
                     
                     while 'ok' not in jMessage:
                         try:
