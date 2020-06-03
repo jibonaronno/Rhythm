@@ -281,21 +281,15 @@ class EncoderThread(QObject):
                         #print(self.rec_data)
 '''
 
+'''
 class WorkerThread(QObject):
     signal = Signal(str)
     def __init__(self, serialPort, codegen, commandque:Queue):
         self.serialPort = serialPort
         self.codegen = codegen
         self.commandque = commandque
-        ###self.codegen.GenerateCMV()
         self.codelist = self.codegen.gcodestr.splitlines()
-        #pprint.pprint(self.codelist)
-        ##self.codegen.GenerateBiPAP()
-        ##self.codelist = self.codegen.gcodebipap.splitlines()
         self.linecount = len(self.codelist)
-        #for idxx in range(self.linecount):
-        #    print(self.codelist[idxx])
-        #self.idx = 0
         self.flagexit = False
         self.flagStop = False
         super().__init__()
@@ -309,10 +303,7 @@ class WorkerThread(QObject):
 
     def updateGcode(self, codegen):
         self.codegen = codegen
-        ###self.codegen.GenerateCMV()
         self.codelist = self.codegen.gcodestr.splitlines()
-        ##self.codegen.GenerateBipap()
-        ##self.codelist = self.codegen.gcodebipap.splitlines()
 
     @Slot()
     def run(self):
@@ -346,6 +337,78 @@ class WorkerThread(QObject):
                     
             except serial.SerialException as ex:
                 print("Error In SerialException" + str(ex))
+'''
+
+class WorkerThread(QObject):
+    signal = Signal(str)
+    def __init__(self, serialPort, codegen, commandque:Queue):
+        self.serialPort = serialPort
+        self.codegen = codegen
+        self.commandque = commandque
+        self.codelist = self.codegen.gcodestr.splitlines()
+        self.linecount = len(self.codelist)
+        self.flagexit = False
+        self.flagStop = False
+        super().__init__()
+        self.respondQue = Queue()
+
+    def Stop(self):
+        self.flagStop = True
+
+    def Resume(self):
+        self.flagStop = False
+
+    def updateGcode(self, codegen):
+        self.codegen = codegen
+        self.codelist = self.codegen.gcodestr.splitlines()
+
+    @Slot()
+    def run(self):
+        jMessage = ""
+        unit = b''
+        itm = ''
+        while 1:
+            if self.flagStop:
+                time.sleep(1)
+                if self.respondQue.qsize() <= 0:
+                    self.respondQue.put("stopped")
+                continue
+            if self.commandque.qsize() > 0:
+                if self.commandque.get() == "exit":
+                    self.flagexit = True
+                    break
+            try:
+                for line in self.codelist:
+                    self.serialPort.write((str(line)+"\r\n").encode('utf-8'))
+                    time.sleep(0.01)
+                    try:
+                        in_waiting = self.serialport.in_waiting
+                    except Exception as e:
+                        print('Ex:0X17 : ' + str(e))
+                    
+                    while in_waiting == 0:
+                        time.sleep(0.01)
+                        try:
+                            in_waiting = self.serialport.in_waiting
+                        except Exception as e:
+                            print('Ex:0x18 : ' + str(e))
+                    try:
+                        unit = self.serialport.read()
+                    except Exception as e:
+                        print('Ex in sensor Thread readline() 392 : ' + str(e))
+            
+                    if len(unit) > 0:
+                        itm += unit.decode('ascii')
+
+                    if unit == b'\n':
+                        jMessage = itm #.decode('ascii')
+                        itm = ''
+
+                    self.signal.emit(str(line) + " - " + jMessage)
+                    
+            except serial.SerialException as ex:
+                print("Error In SerialException WorkerThread L- 410 : " + str(ex))
+
 
 class BipapWorkerThread(QObject):
     signal = Signal(str)
