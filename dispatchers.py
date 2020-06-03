@@ -399,6 +399,8 @@ class WorkerThread(QObject):
             
                     if len(unit) > 0:
                         itm += unit.decode('ascii')
+                    else:
+                        time.sleep(0.05)
 
                     if unit == b'\n':
                         jMessage = itm #.decode('ascii')
