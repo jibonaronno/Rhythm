@@ -391,12 +391,14 @@ class WorkerThread(QObject):
                         except Exception as e:
                             print('Ex:0X17 : ' + str(e))
                         
+                        '''
                         while in_waiting == 0:
-                            time.sleep(0.5)
+                            time.sleep(0.05)
                             try:
                                 in_waiting = self.serialport.in_waiting
                             except Exception as e:
                                 print('Ex:0x18 : ' + str(e))
+                        '''
                         try:
                             unit = self.serialport.read()
                         except Exception as e:
@@ -405,7 +407,7 @@ class WorkerThread(QObject):
                         if len(unit) > 0:
                             itm += unit.decode('ascii')
                         else:
-                            time.sleep(0.3)
+                            time.sleep(0.1)
 
                         if unit == b'\n':
                             jMessage = itm #.decode('ascii')
