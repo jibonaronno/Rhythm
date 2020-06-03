@@ -119,7 +119,7 @@ class GcodeGenerator(object):
         self.Dt = self.xmax - self.xrect
         self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
         self.Dp = self.Dt + self.xav
-        self.TDMS = 0.2
+        self.TDMS = 0.3
 
         self.Kie =  1/self.ie
         self.BCT = 60*(1-0.29) / self.rr

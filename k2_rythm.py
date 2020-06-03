@@ -1248,7 +1248,7 @@ class MainWindow(QMainWindow):
                             self.lungtimer.setInterval(8000)
                             self.lung_wave.StartWave()
                             self.tsnap = time.perf_counter() - self.ttick
-                            self.lbl_rr.setText('RR  : ' + '{:f}'.format(self.tsnap))
+                            self.lbl_rr.setText('RR  : ' + '{:02f}'.format(60 / self.tsnap) + ' E->E : {:f}'.format(self.tsnap))
                             self.ttick = time.perf_counter()
                             self.eptick = self.ttick
                     elif self.dvdata[-1] < -10:
