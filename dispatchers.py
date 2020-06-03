@@ -367,6 +367,7 @@ class WorkerThread(QObject):
         jMessage = ""
         unit = b''
         itm = ''
+        in_waiting = None
         while 1:
             if self.flagStop:
                 time.sleep(1)
@@ -381,32 +382,34 @@ class WorkerThread(QObject):
                 for line in self.codelist:
                     self.serialport.write((str(line)+"\r\n").encode('utf-8'))
                     time.sleep(0.3)
-                    try:
-                        in_waiting = self.serialport.in_waiting
-                    except Exception as e:
-                        print('Ex:0X17 : ' + str(e))
                     
-                    while in_waiting == 0:
-                        time.sleep(0.3)
+                    while 'ok' not in jMessage:
                         try:
                             in_waiting = self.serialport.in_waiting
                         except Exception as e:
-                            print('Ex:0x18 : ' + str(e))
-                    try:
-                        unit = self.serialport.read()
-                    except Exception as e:
-                        print('Ex in sensor Thread readline() 392 : ' + str(e))
-            
-                    if len(unit) > 0:
-                        itm += unit.decode('ascii')
-                    else:
-                        time.sleep(0.3)
+                            print('Ex:0X17 : ' + str(e))
+                        
+                        while in_waiting == 0:
+                            time.sleep(0.3)
+                            try:
+                                in_waiting = self.serialport.in_waiting
+                            except Exception as e:
+                                print('Ex:0x18 : ' + str(e))
+                        try:
+                            unit = self.serialport.read()
+                        except Exception as e:
+                            print('Ex in sensor Thread readline() 392 : ' + str(e))
+                
+                        if len(unit) > 0:
+                            itm += unit.decode('ascii')
+                        else:
+                            time.sleep(0.3)
 
-                    if unit == b'\n':
-                        jMessage = itm #.decode('ascii')
-                        itm = ''
+                        if unit == b'\n':
+                            jMessage = itm #.decode('ascii')
+                            itm = ''
 
-                    self.signal.emit(str(line) + " - " + jMessage)
+                        self.signal.emit(str(line) + " - " + jMessage)
                     
             except serial.SerialException as ex:
                 print("Error In SerialException WorkerThread L- 410 : " + str(ex))
