@@ -367,7 +367,7 @@ class WorkerThread(QObject):
         jMessage = ""
         unit = b''
         itm = ''
-        in_waiting = None
+        in_waiting = 0
         while 1:
             if self.flagStop:
                 time.sleep(1)
@@ -392,7 +392,7 @@ class WorkerThread(QObject):
                             print('Ex:0X17 : ' + str(e))
                         
                         while in_waiting == 0:
-                            time.sleep(0.3)
+                            time.sleep(0.5)
                             try:
                                 in_waiting = self.serialport.in_waiting
                             except Exception as e:
@@ -410,8 +410,7 @@ class WorkerThread(QObject):
                         if unit == b'\n':
                             jMessage = itm #.decode('ascii')
                             itm = ''
-
-                        self.signal.emit(str(line) + " - " + jMessage)
+                            self.signal.emit(str(line) + " - " + jMessage)
                     
             except serial.SerialException as ex:
                 print("Error In SerialException WorkerThread L- 410 : " + str(ex))
