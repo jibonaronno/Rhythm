@@ -342,7 +342,7 @@ class WorkerThread(QObject):
 class WorkerThread(QObject):
     signal = Signal(str)
     def __init__(self, serialPort, codegen, commandque:Queue):
-        self.serialPort = serialPort
+        self.serialport = serialPort
         self.codegen = codegen
         self.commandque = commandque
         self.codelist = self.codegen.gcodestr.splitlines()
@@ -379,7 +379,7 @@ class WorkerThread(QObject):
                     break
             try:
                 for line in self.codelist:
-                    self.serialPort.write((str(line)+"\r\n").encode('utf-8'))
+                    self.serialport.write((str(line)+"\r\n").encode('utf-8'))
                     time.sleep(0.01)
                     try:
                         in_waiting = self.serialport.in_waiting
