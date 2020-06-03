@@ -413,7 +413,7 @@ class WorkerThread(QObject):
                             self.signal.emit(str(line) + " - " + jMessage)
 
                             if 'ok' not in jMessage:
-                                time.sleep(0.3)
+                                time.sleep(0.1)
                     
             except serial.SerialException as ex:
                 print("Error In SerialException WorkerThread L- 410 : " + str(ex))
