@@ -380,14 +380,14 @@ class WorkerThread(QObject):
             try:
                 for line in self.codelist:
                     self.serialport.write((str(line)+"\r\n").encode('utf-8'))
-                    time.sleep(0.05)
+                    time.sleep(0.3)
                     try:
                         in_waiting = self.serialport.in_waiting
                     except Exception as e:
                         print('Ex:0X17 : ' + str(e))
                     
                     while in_waiting == 0:
-                        time.sleep(0.05)
+                        time.sleep(0.3)
                         try:
                             in_waiting = self.serialport.in_waiting
                         except Exception as e:
