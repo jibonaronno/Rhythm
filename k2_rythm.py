@@ -879,7 +879,7 @@ class MainWindow(QMainWindow):
             if not self.marlinPortOpen:
                 if self.ComPorts['Marlin'] != 'NA':
                     print("Serial Port Name : " + self.ComPorts['Marlin'])
-                    self.serialMarlin = serial.Serial(self.ComPorts['Marlin'], baudrate=115200, timeout=1)
+                    self.serialMarlin = serial.Serial(self.ComPorts['Marlin'], baudrate=115200, timeout=0)
                     time.sleep(1)
                     self.marlinPortOpen = True
                     while self.serialMarlin.in_waiting:
