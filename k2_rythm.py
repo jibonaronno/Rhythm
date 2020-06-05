@@ -1097,7 +1097,7 @@ class MainWindow(QMainWindow):
 
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
-        self.maxLen = 4  # max number of data points to show on graph
+        self.maxLen = 50  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
                 self.lungpressuredata.popleft()  # remove oldest
@@ -1123,13 +1123,13 @@ class MainWindow(QMainWindow):
                 if len(self.tfdata) > self.maxLen:
                     pass #self.tfdata.popleft()
                 else:
-                    if self.vtsnap == 0:
-                        self.tf = 0
-                        self.vtsnap = time.perf_counter()
-                    else:
-                        self.vtsnap = time.perf_counter() - self.vtsnap
-                        self.tf = self.vtsnap
-                    self.tfdata.append(time.perf_counter() / 10)
+                    #if self.vtsnap == 0:
+                    #    self.tf = 1
+                    #    self.vtsnap = time.perf_counter()
+                    #else:
+                    self.vtsnap = time.perf_counter() - self.vtsnap
+                    self.tf = self.vtsnap
+                    self.tfdata.append(time.perf_counter()) #self.tf * 100)
                     self.vtsnap = time.perf_counter()
 
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
