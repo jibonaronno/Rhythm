@@ -102,7 +102,7 @@ class MainWindow(QMainWindow):
         self.plotter.showGrid(x=True, y=True, alpha=None)
         self.plotter.setTitle("Pressure : mb")
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
-        self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
+        #self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
         self.kalmanpen = pg.mkPen(20, 100, 20)
         self.curve3 = self.plotter.plot(0,0, "kalman", pen = self.kalmanpen)
 
@@ -1127,7 +1127,7 @@ class MainWindow(QMainWindow):
                     self.vtsnap = time.perf_counter()
                 else:
                     self.vtsnap = time.perf_counter() - self.vtsnap
-                    self.tf = self.vtsnap
+                    self.tf = self.vtsnap / 1000
                 self.tfdata.append(self.tf)
 
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
@@ -1260,7 +1260,7 @@ class MainWindow(QMainWindow):
 
             self.tic = time.perf_counter()
 
-            self.curve1.setData(self.tfdata, self.lungpressuredata)
+            self.curve1.setData(self.lungpressuredata, self.tfdata)
             #self.curve2.setData(self.lungpressurepeakdata)
             #self.curve3.setData(self.kalmandata)
             
