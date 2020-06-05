@@ -400,7 +400,10 @@ class WorkerThread(QObject):
                                 print('Ex:0x18 : ' + str(e))
                         '''
                         try:
-                            unit = self.serialport.read()
+                            while in_waiting == 0:
+                                time.sleep(0.01)
+                                in_waiting = self.serialport.in_waiting
+                            unit = self.serialport.read(in_waiting)
                         except Exception as e:
                             print('Ex in sensor Thread readline() 392 : ' + str(e))
                 
@@ -409,13 +412,13 @@ class WorkerThread(QObject):
                         else:
                             time.sleep(0.1)
 
-                        if unit == b'\n':
+                        if b'\n' in unit:
                             jMessage = itm #.decode('ascii')
                             itm = ''
                             self.signal.emit(str(line) + " - " + jMessage)
 
                             if 'ok' not in jMessage:
-                                time.sleep(0.5)
+                                time.sleep(0.05)
                     
             except serial.SerialException as ex:
                 print("Error In SerialException WorkerThread L- 410 : " + str(ex))
