@@ -517,37 +517,30 @@ class SensorThread(QObject):
             except Exception as e:
                 print('Ex:0X07 : ' + str(e))
                 
-                while in_waiting == 0:
-                    time.sleep(0.2)
+            while in_waiting == 0:
+                time.sleep(0.01)
                 try:
                     in_waiting = self.serialport.in_waiting
                 except Exception as e:
                     print('Ex:0x08 : ' + str(e))
             try:
-                unit = self.serialport.read()
+                unit = self.serialport.read(in_waiting)
             except Exception as e:
-                print('Ex in sensor Thread readline() 392 : ' + str(e))
+                print('Ex in sensor Thread readline() 527 : ' + str(e))
             
             if len(unit) > 0:
                 itm += unit.decode('ascii')
 
-            if unit == b'\n':
+            if b'\n' in unit:
                 jMessage = itm #.decode('ascii')
                 itm = ''
+                jMessage = jMessage.replace('\n', '', 1)
+                jMessage += ',' + str(time.perf_counter())
                 self.plst = jMessage.split(",")
                 self.signal.emit(jMessage)
                 if self.pressureque.qsize() <= 0:
                     self.pressureque.put(self.plst[0])
 
-            '''
-            lst = self.serialport.readlines()
-            for itm in lst:
-                jMessage = itm.decode('ascii')
-                self.plst = jMessage.split(",")
-                self.signal.emit(jMessage)
-                if self.pressureque.qsize() <= 0:
-                    self.pressureque.put(self.plst[0])
-            '''
             if self.flag_sensorlimit_tx:
                 self.flag_sensorlimit_tx = False
                 self.serialport.write(self.strdata.encode('utf-8'))
