@@ -1073,9 +1073,9 @@ class MainWindow(QMainWindow):
     dataList = []
     lung_wave = WaveShape()
 
-    vtsnap = 0
-    vtpick = 0
-    tf = 0
+    vtsnap = 0.0
+    vtpick = 0.0
+    tf = 0.0
     tfdata = deque()
 
     def LungSensorData(self, data_stream):
@@ -1097,7 +1097,7 @@ class MainWindow(QMainWindow):
 
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
-        self.maxLen = 100  # max number of data points to show on graph
+        self.maxLen = 4  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
                 self.lungpressuredata.popleft()  # remove oldest
@@ -1117,19 +1117,20 @@ class MainWindow(QMainWindow):
                 self.flowdata.popleft()
             if len(self.flowpeakdata) > self.maxLen:
                 self.flowpeakdata.popleft()
-            if len(self.tfdata) > self.maxLen:
-                self.tfdata.popleft()
 
             try:
-
-                if self.vtsnap == 0:
-                    self.tf = 0
-                    self.vtsnap = time.perf_counter()
+                
+                if len(self.tfdata) > self.maxLen:
+                    pass #self.tfdata.popleft()
                 else:
-                    self.vtsnap = time.perf_counter() - self.vtsnap
-                    self.tf = self.vtsnap / 1000
+                    if self.vtsnap == 0:
+                        self.tf = 0
+                        self.vtsnap = time.perf_counter()
+                    else:
+                        self.vtsnap = time.perf_counter() - self.vtsnap
+                        self.tf = self.vtsnap
+                    self.tfdata.append(time.perf_counter() / 10)
                     self.vtsnap = time.perf_counter()
-                self.tfdata.append(self.tf)
 
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
