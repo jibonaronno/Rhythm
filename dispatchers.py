@@ -534,8 +534,7 @@ class SensorThread(QObject):
             if b'\n' in unit:
                 jMessage = itm #.decode('ascii')
                 itm = ''
-                #jMessage = jMessage.replace('\n', '', 1)
-                jMessage += ',' + str(time.perf_counter())
+                #jMessage += ',' + str(time.perf_counter())
                 self.plst = jMessage.split(",")
                 self.signal.emit(jMessage)
                 if self.pressureque.qsize() <= 0:

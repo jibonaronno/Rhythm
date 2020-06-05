@@ -1078,8 +1078,10 @@ class MainWindow(QMainWindow):
     tf = 0.0
     tfdata = deque()
 
+    ttm = 0.0
+
     def LungSensorData(self, data_stream):
-        print(data_stream)
+        #print(data_stream)
         #Logging the data @ 100 data received
 
         if self.over_pressure_detection_delay > 0:
@@ -1129,7 +1131,9 @@ class MainWindow(QMainWindow):
                     #else:
                     self.vtsnap = time.perf_counter() - self.vtsnap
                     self.tf = self.vtsnap
-                    self.tfdata.append(time.perf_counter()) #self.tf * 100)
+                    #self.tfdata.append(time.perf_counter()) #self.tf * 100)
+                    self.ttm += 0.1
+                    self.tfdata.append(self.ttm)
                     self.vtsnap = time.perf_counter()
 
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
