@@ -1089,6 +1089,8 @@ class MainWindow(QMainWindow):
             self.vtsnap = time.perf_counter() - self.vtsnap
             self.tf = self.vtsnap
 
+        self.tfdata.append(self.tf)
+
         if self.over_pressure_detection_delay > 0:
             self.over_pressure_detection_delay -= 1
 
@@ -1124,6 +1126,8 @@ class MainWindow(QMainWindow):
                 self.flowdata.popleft()
             if len(self.flowpeakdata) > self.maxLen:
                 self.flowpeakdata.popleft()
+            if len(self.tfdata) > self.maxLen:
+                self.tfdata.popleft()
 
             try:
                 self.lungpressurepeakdata.append([float(self.peakdial.value()), self.tf])
@@ -1256,8 +1260,8 @@ class MainWindow(QMainWindow):
 
             self.tic = time.perf_counter()
 
-            self.curve1.setData(self.lungpressuredata)
-            self.curve2.setData(self.lungpressurepeakdata)
+            self.curve1.setData(self.lungpressuredata, self.tfdata)
+            self.curve2.setData(self.lungpressurepeakdata, self.tfdata)
             #self.curve3.setData(self.kalmandata)
             
             '''Assign volume data to volume plotter curve'''
