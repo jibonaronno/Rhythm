@@ -1061,48 +1061,6 @@ class MainWindow(QMainWindow):
     vol_detector = SignalDetector()
 
     flow_detector = SignalDetector()
-
-    def processSensorData(self, data_stream):
-        pressure_data = self.parseSensorData(data_stream)
-        if(pressure_data == None):
-            return
-        elif len(pressure_data) < 3:
-            return
-
-        self.maxLen = 300
-        if len(self.lungpressuredata) > self.maxLen:
-            self.lungpressuredata.popleft()  # remove oldest
-        if len(self.lungpressurepeakdata) > self.maxLen:
-            self.lungpressurepeakdata.popleft()
-        if len(self.dvdata) > self.maxLen:
-            self.dvdata.popleft()
-        if len(self.kalmandata) > self.maxLen:
-            self.kalmandata.popleft()
-        if len(self.volpeakdata) > self.maxLen:
-            self.volpeakdata.popleft()
-        if len(self.voldata) > self.maxLen:
-            self.voldata.popleft()
-        if len(self.flowdata) > self.maxLen:
-            self.flowdata.popleft()
-        
-        '''Lung Pressure'''
-        self.lungpressurepeakdata.append(float(self.peakdial.value()))
-        self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
-        
-        '''Volume'''
-        self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
-        
-        '''Flow'''
-        ###dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
-        dflow = float(self.lst[1])
-        self.flowdata.append(dflow) # * 1000)
-        self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
-        if len(self.deriv_points) > 3:
-            self.deriv_points.popleft()
-            self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
-        else:
-            self.dvdata.append(0.0)
-
     
     ttick = 0
     tsnap = 0
@@ -1115,10 +1073,22 @@ class MainWindow(QMainWindow):
     dataList = []
     lung_wave = WaveShape()
 
+    vtsnap = 0
+    vtpick = 0
+    tf = 0
+    tfdata = deque()
+
     def LungSensorData(self, data_stream):
         #print(data_stream)
-        
         #Logging the data @ 100 data received
+
+        if self.vtsnap == 0:
+            self.tf = 0
+            self.vtsnap = time.perf_counter()
+        else:
+            self.vtsnap = time.perf_counter() - self.vtsnap
+            self.tf = self.vtsnap
+
         if self.over_pressure_detection_delay > 0:
             self.over_pressure_detection_delay -= 1
 
@@ -1156,8 +1126,8 @@ class MainWindow(QMainWindow):
                 self.flowpeakdata.popleft()
 
             try:
-                self.lungpressurepeakdata.append(float(self.peakdial.value()))
-                self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
+                self.lungpressurepeakdata.append([float(self.peakdial.value()), self.tf])
+                self.lungpressuredata.append([float(self.lst[0]) + float(self.peepdial.value()), self.tf])
                 self.lung_detector.Cycle(float(self.lst[0]))
                 self.lung_wave.Cycle(float(self.lst[0]))
                 if self.lung_wave.wave_in_buffer:
