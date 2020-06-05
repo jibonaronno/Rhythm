@@ -1128,6 +1128,7 @@ class MainWindow(QMainWindow):
                 else:
                     self.vtsnap = time.perf_counter() - self.vtsnap
                     self.tf = self.vtsnap / 1000
+                    self.vtsnap = time.perf_counter()
                 self.tfdata.append(self.tf)
 
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
@@ -1260,7 +1261,7 @@ class MainWindow(QMainWindow):
 
             self.tic = time.perf_counter()
 
-            self.curve1.setData(self.lungpressuredata, self.tfdata)
+            self.curve1.setData(self.tfdata, self.lungpressuredata)
             #self.curve2.setData(self.lungpressurepeakdata)
             #self.curve3.setData(self.kalmandata)
             
