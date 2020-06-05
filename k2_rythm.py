@@ -1079,7 +1079,7 @@ class MainWindow(QMainWindow):
     tfdata = deque()
 
     def LungSensorData(self, data_stream):
-        #print(data_stream)
+        print(data_stream)
         #Logging the data @ 100 data received
 
         if self.over_pressure_detection_delay > 0:
