@@ -1277,7 +1277,7 @@ class MainWindow(QMainWindow):
                 self.volpeakcurve.setData(self.volpeakdata)
 
                 '''Assign Flowdata to flow plotter curve & dvdata to dvcurve'''
-                self.flowcurve.setData(self.tfdataself.flowdata)
+                self.flowcurve.setData(self.tfdata, self.flowdata)
                 self.dvcurve.setData(self.dvdata_compressed)
                 self.flowpeakcurve.setData(self.flowpeakdata)
             except:
