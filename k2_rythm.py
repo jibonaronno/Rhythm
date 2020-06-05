@@ -1273,11 +1273,11 @@ class MainWindow(QMainWindow):
                 
                 '''Assign volume data to volume plotter curve'''
                 #(originally kalman data) self.volcurve.setData(self.kalmandata)
-                self.volcurve.setData(self.voldata)
+                self.volcurve.setData(self.tfdata, self.voldata)
                 self.volpeakcurve.setData(self.volpeakdata)
 
                 '''Assign Flowdata to flow plotter curve & dvdata to dvcurve'''
-                self.flowcurve.setData(self.flowdata)
+                self.flowcurve.setData(self.tfdataself.flowdata)
                 self.dvcurve.setData(self.dvdata_compressed)
                 self.flowpeakcurve.setData(self.flowpeakdata)
             except:
