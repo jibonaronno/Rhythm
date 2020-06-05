@@ -1130,8 +1130,8 @@ class MainWindow(QMainWindow):
                 self.tfdata.popleft()
 
             try:
-                self.lungpressurepeakdata.append([float(self.peakdial.value()), self.tf])
-                self.lungpressuredata.append([float(self.lst[0]) + float(self.peepdial.value()), self.tf])
+                self.lungpressurepeakdata.append(float(self.peakdial.value()))
+                self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
                 self.lung_detector.Cycle(float(self.lst[0]))
                 self.lung_wave.Cycle(float(self.lst[0]))
                 if self.lung_wave.wave_in_buffer:
