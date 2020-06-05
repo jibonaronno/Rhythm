@@ -34,7 +34,7 @@ class GcodeGenerator(object):
         self.postsmm = self.machinesetup.postsmm
         self.home_sense = self.machinesetup.home_sense
         print(str(self.ACC) + "," + str(self.xmax) + "," + str(self.xamb) + "," + str(self.xrect) + "," + str(self.xcon_offset) + "," + str(self.vtmax))
-        self.calib_dict = {250:62.2, 300:67.6, 350:76, 400:80, 450:87, 500:92.9, 550:100}
+        self.calib_dict = {250:63.0, 300:68.0, 350:71.0, 400:73.0, 450:77.0, 500:86.0, 550:100.0}
 
     def getAxisdistanceFromIpap(self, pparr, ipap):
         try:
@@ -117,12 +117,17 @@ class GcodeGenerator(object):
     
     def ComputeCMV(self):
         self.Dt = self.xmax - self.xrect
-        self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
+        #self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
+        try:
+                self.xav = self.calib_dict[self.vt]
+                print('Dict : ' + str(self.calib_dict[self.vt]))
+        except Exception as e:
+                print('ComputeCMV - ' + str(e))
         self.Dp = self.Dt + self.xav
-        self.TDMS = 0.3
+        self.TDMS = 0.5
 
         self.Kie =  1/self.ie
-        self.BCT = 60*(1-0.29) / self.rr
+        self.BCT = 60*(1-0.32) / self.rr
         self.Ti = self.BCT / (1 + (1 / self.Kie))
         self.Th = self.BCT - self.Ti
         

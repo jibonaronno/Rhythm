@@ -124,7 +124,7 @@ class MainWindow(QMainWindow):
 
         self.flowplotter = PlotWidget()
         self.flowplotter.showGrid(x=True, y=True, alpha=None)
-        self.flowplotter.setTitle("Flow ml/ms")
+        self.flowplotter.setTitle("Flow L/M")
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
         self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
@@ -169,6 +169,7 @@ class MainWindow(QMainWindow):
         print("orifice area : " + str(self.flowprocess.orifice_area))
         print("inlet area : " + str(self.flowprocess.inlet_area))
         print("Korifice : " + str(self.flowprocess.Korifice))
+        print('CDD : ' + str(self.flowprocess.CDD))
 
         #self.bipap = BipapThread("", self.generator)
         self.pressureque = queue.Queue()
@@ -885,6 +886,7 @@ class MainWindow(QMainWindow):
                     while self.serialMarlin.in_waiting:
                         self.serialMarlin.readline()
             if self.ComPorts['Sensor'] != 'NA':
+                
                 if not self.sensorPortOpen:
                     self.serialSensor = serial.Serial(self.ComPorts['Sensor'], baudrate=115200, timeout=0)
                     self.sensorPortOpen = True
@@ -1091,8 +1093,9 @@ class MainWindow(QMainWindow):
         self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) * 22))
         
         '''Flow'''
-        dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
-        self.flowdata.append(dflow * 1000)
+        ###dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
+        dflow = float(self.lst[1])
+        self.flowdata.append(dflow) # * 1000)
         self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
         if len(self.deriv_points) > 3:
             self.deriv_points.popleft()
@@ -1131,7 +1134,7 @@ class MainWindow(QMainWindow):
 
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
-        self.maxLen = 300  # max number of data points to show on graph
+        self.maxLen = 100  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
                 self.lungpressuredata.popleft()  # remove oldest
@@ -1180,11 +1183,15 @@ class MainWindow(QMainWindow):
                 self.volpeakdata.append(500.0)
                 self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
 
-                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) + 1)
-                self.flowdata.append(dflow * 1000)
-                self.flow_detector.Cycle(dflow * 1000)
+                ##dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
+                dflow = float(self.lst[1])
+                self.flowdata.append(dflow * 100) # * 1000 * 60)
+                if dflow > 0:
+                    self.flow_detector.Cycle(dflow * 1000 * 60)
+                else:
+                    self.flow_detector.Cycle(0)
                 try:
-                    self.peak_flow.setText("Flow Peak: " + '{:03.2f}'.format(self.flow_detector.peak_value) + 'ml/ms')
+                    self.peak_flow.setText("Flow Peak: " + '{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
                 except:
                     pass
                 self.flowpeakdata.append(2)
