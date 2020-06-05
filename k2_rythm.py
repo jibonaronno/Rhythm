@@ -1260,8 +1260,8 @@ class MainWindow(QMainWindow):
 
             self.tic = time.perf_counter()
 
-            self.curve1.setData(self.lungpressuredata, self.tfdata)
-            self.curve2.setData(self.lungpressurepeakdata, self.tfdata)
+            self.curve1.setData(self.tfdata, self.lungpressuredata)
+            #self.curve2.setData(self.lungpressurepeakdata)
             #self.curve3.setData(self.kalmandata)
             
             '''Assign volume data to volume plotter curve'''
