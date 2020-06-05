@@ -1266,19 +1266,22 @@ class MainWindow(QMainWindow):
 
             self.tic = time.perf_counter()
 
-            self.curve1.setData(self.tfdata, self.lungpressuredata)
-            #self.curve2.setData(self.lungpressurepeakdata)
-            #self.curve3.setData(self.kalmandata)
-            
-            '''Assign volume data to volume plotter curve'''
-            #(originally kalman data) self.volcurve.setData(self.kalmandata)
-            self.volcurve.setData(self.voldata)
-            self.volpeakcurve.setData(self.volpeakdata)
+            try:
+                self.curve1.setData(self.tfdata, self.lungpressuredata)
+                #self.curve2.setData(self.lungpressurepeakdata)
+                #self.curve3.setData(self.kalmandata)
+                
+                '''Assign volume data to volume plotter curve'''
+                #(originally kalman data) self.volcurve.setData(self.kalmandata)
+                self.volcurve.setData(self.voldata)
+                self.volpeakcurve.setData(self.volpeakdata)
 
-            '''Assign Flowdata to flow plotter curve & dvdata to dvcurve'''
-            self.flowcurve.setData(self.flowdata)
-            self.dvcurve.setData(self.dvdata_compressed)
-            self.flowpeakcurve.setData(self.flowpeakdata)
+                '''Assign Flowdata to flow plotter curve & dvdata to dvcurve'''
+                self.flowcurve.setData(self.flowdata)
+                self.dvcurve.setData(self.dvdata_compressed)
+                self.flowpeakcurve.setData(self.flowpeakdata)
+            except:
+                pass
             
             try:
                 if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
