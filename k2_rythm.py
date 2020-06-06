@@ -308,6 +308,9 @@ class MainWindow(QMainWindow):
         self.enc_elements = []
         self.addEncoderElements()
 
+        self.flow_average:float = 0.0
+        self.flowavgcount:int = 0
+
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
         self.wave.playBeep  ()
@@ -1095,10 +1098,12 @@ class MainWindow(QMainWindow):
                 self.datalogger.writeBlock(self.dataList)
                 self.dataList.clear()
         except Exception as e:
-            print('Ex in Log: ' + str(e))
+            print('Exception in Log: ' + str(e))
 
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
+        if len(self.lst) < 3:
+            return
         self.maxLen = 50  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
@@ -1268,7 +1273,7 @@ class MainWindow(QMainWindow):
 
             try:
                 self.curve1.setData(self.tfdata, self.lungpressuredata)
-                #self.curve2.setData(self.lungpressurepeakdata)
+                self.curve2.setData(self.tfdata, self.lungpressurepeakdata)
                 #self.curve3.setData(self.kalmandata)
                 
                 '''Assign volume data to volume plotter curve'''
