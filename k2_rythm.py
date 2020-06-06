@@ -1086,10 +1086,15 @@ class MainWindow(QMainWindow):
     flow_average:float = 0.0
     flowavgcount:int = 0
     flowoffset:float = 0
+    flow_offseted:float = 0.0
+    
+    zero_flow_count:int = 0
+    flow_for_volume:int = 0
 
     def LungSensorData(self, data_stream):
         #print(data_stream)
         #Logging the data @ 100 data received
+        vol_base = 0.0
 
         if self.over_pressure_detection_delay > 0:
             self.over_pressure_detection_delay -= 1
@@ -1108,15 +1113,6 @@ class MainWindow(QMainWindow):
         self.lst = data_stream.split(",")
         if len(self.lst) < 3:
             return
-
-        if self.flowavgcount < 100:
-            try:
-                self.flow_sum += float(self.lst[1])
-                self.flowavgcount += 1
-            except:
-                pass
-        else:
-            self.flow_average = self.flow_sum / self.flowavgcount
 
         self.maxLen = 50  # max number of data points to show on graph
         if(len(self.lst) > 2):
@@ -1171,13 +1167,34 @@ class MainWindow(QMainWindow):
                     #self.lungtimer.setInterval(3000)
                 ''' Commented for testing '''
 
-                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) - self.flow_average)
+                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
                 ##dflow = float(self.lst[1]) - self.flow_average
-                self.flowdata.append(dflow * 100 * 60) # * 1000 * 60)
-                if dflow > 0:
-                    self.flow_detector.Cycle(dflow * 1000 * 60)
+                
+                if self.flowavgcount < 100:                    
+                    self.flow_sum += dflow
+                    self.flowavgcount += 1
+                    vol_base = 0
+                else:
+                    self.flow_average = self.flow_sum / self.flowavgcount
+                    self.flow_offseted = dflow - self.flow_average
+                    self.flow_for_volume = self.flow_offseted
+                
+                    
+                if self.flow_offseted < 0.7 and self.flow_offseted > -0.7:
+                    if self.zero_flow_count < 3:
+                        self.zero_flow_count += 1
+                    else:
+                        self.flow_for_volume = 0
+                else:
+                    self.zero_flow_count = 0
+                
+                self.flowdata.append(self.flow_offseted * 100 * 60) # * 1000 * 60)
+                
+                if self.flow_offseted > 0:
+                    self.flow_detector.Cycle(self.flow_offseted * 1000 * 60)
                 else:
                     self.flow_detector.Cycle(0)
+                
                 try:
                     self.peak_flow.setText("Flow Peak: " + '{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
                 except:
@@ -1188,13 +1205,19 @@ class MainWindow(QMainWindow):
                 '''Now volume caming from flowprocess.Volume'''
                 ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
                 ####vol_base = self.kalman.Estimate(float(self.lst[0]))
-                vol_base = self.flowprocess.Volume(dflow * 100 * 60)
+                if self.flow_for_volume != 0:
+                    vol_base = self.flowprocess.Volume(self.flow_offseted * 100 * 60)
+                else:
+                    if vol_base > 10:
+                        vol_base -= 10
+                    else:
+                        vol_base = 0
                 self.kalmandata.append(vol_base)
                 self.voldata.append(vol_base)
-                if vol_base < 0:
-                    vol_base = 0
+                #if vol_base < 0:
+                #    vol_base = 0
                 self.vol_detector.Cycle(vol_base)
-                self.volpeakdata.append(500.0)
+                ####self.volpeakdata.append(500.0)
                 self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
 
             except Exception as e:
@@ -1296,7 +1319,7 @@ class MainWindow(QMainWindow):
                 '''Assign volume data to volume plotter curve'''
                 #(originally kalman data) self.volcurve.setData(self.kalmandata)
                 self.volcurve.setData(self.tfdata, self.voldata)
-                self.volpeakcurve.setData(self.tfdata, self.volpeakdata)
+                ###self.volpeakcurve.setData(self.tfdata, self.volpeakdata)
 
                 '''Assign Flowdata to flow plotter curve & dvdata to dvcurve'''
                 self.flowcurve.setData(self.tfdata, self.flowdata)
