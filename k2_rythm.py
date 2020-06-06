@@ -1080,8 +1080,12 @@ class MainWindow(QMainWindow):
     vtpick = 0.0
     tf = 0.0
     tfdata = deque()
-
     ttm = 0.0
+
+    flow_sum:float = 0.0
+    flow_average:float = 0.0
+    flowavgcount:int = 0
+    flowoffset:float = 0
 
     def LungSensorData(self, data_stream):
         #print(data_stream)
@@ -1100,11 +1104,20 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print('Exception in Log: ' + str(e))
         
-        
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
-        #if len(self.lst) < 3:
-        #    return
+        if len(self.lst) < 3:
+            return
+
+        if self.flowavgcount < 100:
+            try:
+                self.flow_sum += float(self.lst[1])
+                self.flowavgcount += 1
+            except:
+                pass
+        else:
+            self.flow_average = self.flow_sum / self.flowavgcount
+
         self.maxLen = 50  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
@@ -1170,7 +1183,7 @@ class MainWindow(QMainWindow):
                 self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
 
                 ##dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
-                dflow = float(self.lst[1])
+                dflow = float(self.lst[1]) + self.flow_average
                 self.flowdata.append(dflow * 100) # * 1000 * 60)
                 if dflow > 0:
                     self.flow_detector.Cycle(dflow * 1000 * 60)
