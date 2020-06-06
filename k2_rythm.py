@@ -1171,17 +1171,6 @@ class MainWindow(QMainWindow):
                     #self.lungtimer.setInterval(3000)
                 ''' Commented for testing '''
 
-                '''Volume data came from kalman of lungpressure'''
-                ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
-                vol_base = self.kalman.Estimate(float(self.lst[0]))
-                self.kalmandata.append(vol_base * 22)
-                self.voldata.append(vol_base * 22)
-                if vol_base < 0:
-                    vol_base = 0
-                self.vol_detector.Cycle(vol_base * 22)
-                self.volpeakdata.append(500.0)
-                self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
-
                 dflow = self.flowprocess.CalculateFlow(float(self.lst[1]) - self.flow_average)
                 ##dflow = float(self.lst[1]) - self.flow_average
                 self.flowdata.append(dflow * 100 * 60) # * 1000 * 60)
@@ -1194,6 +1183,20 @@ class MainWindow(QMainWindow):
                 except:
                     pass
                 self.flowpeakdata.append(2)
+
+                '''Volume data came from kalman of lungpressure'''
+                '''Now volume caming from flowprocess.Volume'''
+                ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
+                ####vol_base = self.kalman.Estimate(float(self.lst[0]))
+                vol_base = self.flowprocess.Volume(dflow * 100 * 60)
+                self.kalmandata.append(vol_base)
+                self.voldata.append(vol_base)
+                if vol_base < 0:
+                    vol_base = 0
+                self.vol_detector.Cycle(vol_base)
+                self.volpeakdata.append(500.0)
+                self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
+
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e) + ' - ' + data_stream)
 
