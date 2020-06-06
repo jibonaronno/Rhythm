@@ -1182,8 +1182,8 @@ class MainWindow(QMainWindow):
                 self.volpeakdata.append(500.0)
                 self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
 
-                ##dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
-                dflow = float(self.lst[1]) - self.flow_average
+                dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
+                ##dflow = float(self.lst[1]) - self.flow_average
                 self.flowdata.append(dflow * 100) # * 1000 * 60)
                 if dflow > 0:
                     self.flow_detector.Cycle(dflow * 1000 * 60)
