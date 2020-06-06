@@ -1089,7 +1089,7 @@ class MainWindow(QMainWindow):
 
         if self.over_pressure_detection_delay > 0:
             self.over_pressure_detection_delay -= 1
-
+        
         try:
             self.dataList.append(data_stream)
             self.log_interval_count += 1
@@ -1099,11 +1099,12 @@ class MainWindow(QMainWindow):
                 self.dataList.clear()
         except Exception as e:
             print('Exception in Log: ' + str(e))
-
+        
+        
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
-        if len(self.lst) < 3:
-            return
+        #if len(self.lst) < 3:
+        #    return
         self.maxLen = 50  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
@@ -1181,7 +1182,7 @@ class MainWindow(QMainWindow):
                     pass
                 self.flowpeakdata.append(2)
             except Exception as e:
-                print("Exception in LungSensorData(...) : " + str(e))
+                print("Exception in LungSensorData(...) : " + str(e) + ' - ' + data_stream)
 
             if len(self.deriv_points) == 0:
                 self.timesnap = 0.0
@@ -1225,7 +1226,7 @@ class MainWindow(QMainWindow):
                     self.dvdata.append(0.0)
                     self.dvdata_compressed.append(0.0)
             except Exception as e:
-                print("Exception Section 0x05" + str(e))
+                print("Exception Section 0x05" + str(e) + ' - ' + data_stream)
 
             try:
                 if(len(self.deriv_points) >= 3):
@@ -1267,13 +1268,13 @@ class MainWindow(QMainWindow):
                                 self.inhale_t_count = 0
                                 self.exhale_t_count = 0
             except Exception as e:
-                print("Exception Section:0X02 : " + str(e))
+                print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
 
             self.tic = time.perf_counter()
 
             try:
                 self.curve1.setData(self.tfdata, self.lungpressuredata)
-                self.curve2.setData(self.tfdata, self.lungpressurepeakdata)
+                #self.curve2.setData(self.tfdata, self.lungpressurepeakdata)
                 #self.curve3.setData(self.kalmandata)
                 
                 '''Assign volume data to volume plotter curve'''
@@ -1285,8 +1286,8 @@ class MainWindow(QMainWindow):
                 self.flowcurve.setData(self.tfdata, self.flowdata)
                 self.dvcurve.setData(self.tfdata, self.dvdata_compressed)
                 self.flowpeakcurve.setData(self.tfdata, self.flowpeakdata)
-            except:
-                pass
+            except Exception as e:
+                print('Exception Curve SetData' + str(e) + ' - ' + data_stream)
             
             try:
                 if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
@@ -1297,24 +1298,8 @@ class MainWindow(QMainWindow):
                 
                         #self.sensor.beep()
             except Exception as e:
-                print("Exception section 0x06 : " + str(e))
+                print("Exception section 0x06 : " + str(e) + ' - ' + data_stream)
 
-    def peepSensorData(self, data_stream):
-        #print(data_stream.split(','))
-        self.lst = data_stream.split(",")
-        self.maxLen = 100  # max number of data points to show on graph
-        if(len(self.lst) > 1):
-            try:
-                if len(self.peeppressuredata) > self.maxLen:
-                    self.peeppressuredata.popleft()  # remove oldest
-                self.peeppressuredata.append(float(self.lst[1]) + float(self.peepdial.value()))
-                self.curve1.setData(self.peeppressuredata)
-            except:
-                pass
-            else:
-                if (float(self.lst[1]) + float(self.peepdial.value())) > self.peakdial.value():
-                    if self.sensorThreadCreated:
-                        self.wave.playfile()
 
     def write_info(self, data_stream):
         rcount = self.txrxtable.rowCount()

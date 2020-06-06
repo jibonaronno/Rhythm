@@ -381,7 +381,7 @@ class WorkerThread(QObject):
             try:
                 for line in self.codelist:
                     self.serialport.write((str(line)+"\r\n").encode('utf-8'))
-                    time.sleep(0.3)
+                    time.sleep(0.5)
 
                     jMessage = ''
                     
@@ -418,7 +418,8 @@ class WorkerThread(QObject):
                             self.signal.emit(str(line) + " - " + jMessage)
 
                             if 'ok' not in jMessage:
-                                time.sleep(0.01)
+                                pass
+                                #time.sleep(0.01)
                     
             except serial.SerialException as ex:
                 print("Error In SerialException WorkerThread L- 410 : " + str(ex))
