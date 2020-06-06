@@ -1184,7 +1184,7 @@ class MainWindow(QMainWindow):
 
                 dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
                 ##dflow = float(self.lst[1]) - self.flow_average
-                self.flowdata.append(dflow * 100) # * 1000 * 60)
+                self.flowdata.append(dflow * 100 * 60) # * 1000 * 60)
                 if dflow > 0:
                     self.flow_detector.Cycle(dflow * 1000 * 60)
                 else:
