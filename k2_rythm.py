@@ -894,6 +894,7 @@ class MainWindow(QMainWindow):
 
     def autoConnect(self):
         try:
+            '''
             if not self.marlinPortOpen:
                 if self.ComPorts['Marlin'] != 'NA':
                     print("Serial Port Name : " + self.ComPorts['Marlin'])
@@ -902,6 +903,7 @@ class MainWindow(QMainWindow):
                     self.marlinPortOpen = True
                     while self.serialMarlin.in_waiting:
                         self.serialMarlin.readline()
+            '''
             if self.ComPorts['Sensor'] != 'NA':
                 
                 if not self.sensorPortOpen:
@@ -1108,7 +1110,7 @@ class MainWindow(QMainWindow):
     deltaflowsum:float = 0.0
 
     def LungSensorData(self, data_stream):
-        #print(data_stream)
+        print(data_stream)
         #Logging the data @ 100 data received
         vol_base = 0.0
         deltaflow:float = 0.0
