@@ -1092,10 +1092,14 @@ class MainWindow(QMainWindow):
     zero_flow_count:int = 0
     flow_for_volume:int = 0
 
+    deltaflowsum:float = 0.0
+
     def LungSensorData(self, data_stream):
         #print(data_stream)
         #Logging the data @ 100 data received
         vol_base = 0.0
+        deltaflow:float = 0.0
+        deltaflowoffset:float = 0.0
 
         if self.over_pressure_detection_delay > 0:
             self.over_pressure_detection_delay -= 1
@@ -1168,6 +1172,8 @@ class MainWindow(QMainWindow):
                     #self.lungtimer.setInterval(3000)
                 ''' Commented for testing '''
 
+                deltaflow = float(self.lst[1])
+
                 dflow = self.flowprocess.CalculateFlow(float(self.lst[1]))
                 ##dflow = float(self.lst[1]) - self.flow_average
                 
@@ -1175,10 +1181,15 @@ class MainWindow(QMainWindow):
                     self.flow_sum += dflow
                     self.flowavgcount += 1
                     vol_base = 0
+
+                    self.deltaflowsum += deltaflow
+
                 else:
                     self.flow_average = self.flow_sum / self.flowavgcount
                     self.flow_offseted = dflow - self.flow_average
                     self.flow_for_volume = self.flow_offseted
+
+                    deltaflowoffset = self.deltaflowsum / self.flowavgcount
                 
                     
                 if self.flow_offseted < 0.7 and self.flow_offseted > -0.7:
@@ -1190,7 +1201,7 @@ class MainWindow(QMainWindow):
                     self.zero_flow_count = 0
                 
                 #self.flowdata.append(self.flow_offseted * 100 * 60) # * 1000 * 60)
-                self.flowdata.append(float(self.lst[1]))
+                self.flowdata.append(deltaflow - deltaflowoffset)
                 
                 if self.flow_offseted > 0:
                     self.flow_detector.Cycle(self.flow_offseted * 1000 * 60)
