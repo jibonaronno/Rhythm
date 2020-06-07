@@ -1189,7 +1189,8 @@ class MainWindow(QMainWindow):
                 else:
                     self.zero_flow_count = 0
                 
-                self.flowdata.append(self.flow_offseted * 100 * 60) # * 1000 * 60)
+                #self.flowdata.append(self.flow_offseted * 100 * 60) # * 1000 * 60)
+                self.flowdata.append(float(self.lst[1]))
                 
                 if self.flow_offseted > 0:
                     self.flow_detector.Cycle(self.flow_offseted * 1000 * 60)
