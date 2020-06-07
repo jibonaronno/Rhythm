@@ -1204,7 +1204,7 @@ class MainWindow(QMainWindow):
                 #self.flowdata.append(deltaflow - deltaflowoffset)
                 
                 if self.flow_offseted > 0:
-                    self.flow_detector.Cycle(self.flow_offseted * 1000 * 60)
+                    self.flow_detector.Cycle(self.flow_offseted)
                 else:
                     self.flow_detector.Cycle(0)
                 
