@@ -1341,12 +1341,12 @@ class MainWindow(QMainWindow):
 
 
     def write_info(self, data_stream):
-        rcount = self.txrxtable.rowCount()
-        self.txrxtable.insertRow(rcount)
-        self.txrxtable.setItem(rcount,0, QTableWidgetItem(data_stream))
-        self.txrxtable.scrollToBottom()
-        self.txrxtable.resizeColumnsToContents()
-        self.txrxtable.resizeRowsToContents()
+        #rcount = self.txrxtable.rowCount()
+        #self.txrxtable.insertRow(rcount)
+        #self.txrxtable.setItem(rcount,0, QTableWidgetItem(data_stream))
+        #self.txrxtable.scrollToBottom()
+        #self.txrxtable.resizeColumnsToContents()
+        #self.txrxtable.resizeRowsToContents()
         if data_stream == "StoppedOK":
             if self.primaryThreadCreated:
                 self.primaryThread.exit()
