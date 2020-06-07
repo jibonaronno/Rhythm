@@ -144,8 +144,9 @@ class MainWindow(QMainWindow):
         self.verticalLayout_2.addWidget(self.plotter)
         self.verticalLayout_2.addWidget(self.flowplotter)
         self.verticalLayout_2.addWidget(self.volplotter)
+        self.plotter.hide()
         #self.flowplotter.hide()
-        #self.volplotter.hide()
+        self.volplotter.hide()
 
         self.gcodetable = QTableWidget(self)
         self.gcodetable.setRowCount(1)
