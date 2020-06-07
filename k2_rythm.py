@@ -1302,9 +1302,9 @@ class MainWindow(QMainWindow):
                 print("Exception Section 0x05" + str(e) + ' - ' + data_stream)
 
             try:
-                #if(len(self.deriv_points) >= 3):
-                if lungpressure > 0.8:
-                    if self.dvdata[-1] > 1: #10
+                if(len(self.deriv_points) >= 3):
+                    #if self.dvdata[-1] > 10:
+                    if lungpressure > 0.8:
                         self.curve1.setPen(self.derivative_pen_in)
                         self.inhale_t_count += 1
                         self.flag_idle = False
