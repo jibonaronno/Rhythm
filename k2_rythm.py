@@ -894,7 +894,7 @@ class MainWindow(QMainWindow):
 
     def autoConnect(self):
         try:
-            '''
+            
             if not self.marlinPortOpen:
                 if self.ComPorts['Marlin'] != 'NA':
                     print("Serial Port Name : " + self.ComPorts['Marlin'])
@@ -903,7 +903,7 @@ class MainWindow(QMainWindow):
                     self.marlinPortOpen = True
                     while self.serialMarlin.in_waiting:
                         self.serialMarlin.readline()
-            '''
+            
             if self.ComPorts['Sensor'] != 'NA':
                 
                 if not self.sensorPortOpen:
