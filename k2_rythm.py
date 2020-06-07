@@ -106,6 +106,8 @@ class MainWindow(QMainWindow):
         self.kalmanpen = pg.mkPen(20, 100, 20)
         self.curve3 = self.plotter.plot(0,0, "kalman", pen = self.kalmanpen)
 
+        self.pulsepen = pg.mkpen(255, 0, 0)
+
         self.derivative_pen = pg.mkPen(70,90,100, 100)
         self.derivative_pen_in = pg.mkPen(10, 200, 10)
         self.derivative_pen_out = pg.mkPen(10, 200, 200)
@@ -246,6 +248,8 @@ class MainWindow(QMainWindow):
         self.flag_sensorlimit_tx = False
         self.sensorLimitTimer = QTimer(self)
         self.sensorLimitTimer.timeout.connect(self.checkSensorLimitChanged)
+
+        
 
         self.sensorwatchtimer = QTimer(self)
         self.sensorwatchtimer.timeout.connect(self.reconnectSensor)
