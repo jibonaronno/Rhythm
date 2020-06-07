@@ -257,6 +257,9 @@ class MainWindow(QMainWindow):
         self.lungtimer = QTimer(self)
         self.lungtimer.timeout.connect(self.lungtimeout)
 
+        self.secTimer = QTimer(self)
+        self.msecTimer = QTimer(self)
+
         self.modecombobox.addItem("CMV")
         self.modecombobox.addItem("BiPAP")
         self.modecombobox.addItem("PS")
@@ -1111,6 +1114,8 @@ class MainWindow(QMainWindow):
         deltaflow:float = 0.0
         deltaflowoffset:float = 0.0
 
+        lungpressure:float = 0.0
+
         if not self.plot_run:
             return
 
@@ -1173,6 +1178,9 @@ class MainWindow(QMainWindow):
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
                 self.lung_detector.Cycle(float(self.lst[0]))
                 self.lung_wave.Cycle(float(self.lst[0]))
+
+                lungpressure = float(self.lst[0])
+
                 if self.lung_wave.wave_in_buffer:
                     pass
                     #pprint.pprint(self.lung_wave.wvdata)
@@ -1294,8 +1302,9 @@ class MainWindow(QMainWindow):
                 print("Exception Section 0x05" + str(e) + ' - ' + data_stream)
 
             try:
-                if(len(self.deriv_points) >= 3):
-                    if self.dvdata[-1] > 10:
+                #if(len(self.deriv_points) >= 3):
+                if lungpressure > 0.8:
+                    if self.dvdata[-1] > 1: #10
                         self.curve1.setPen(self.derivative_pen_in)
                         self.inhale_t_count += 1
                         self.flag_idle = False
