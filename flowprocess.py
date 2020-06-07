@@ -29,6 +29,9 @@ class FlowProcess(object):
 
         self.flow = 0.0        
 
+    def CalculateFlowConst(self, deltap):
+        return deltap * 50
+
     def CalculateFlow(self, deltap):
         result = 0.0
         d_result = 0.0
