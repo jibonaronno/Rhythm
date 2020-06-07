@@ -316,6 +316,8 @@ class MainWindow(QMainWindow):
         self.flow_average:float = 0.0
         self.flowavgcount:int = 0
 
+        self.plot_run = True
+
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
         self.wave.playBeep  ()
@@ -445,7 +447,11 @@ class MainWindow(QMainWindow):
                         if value < 3:
                             self.changeRRdial(value)
                         elif value == 3:
-                            self.emulateSpace()
+                            if self.plot_run:
+                                self.plot_run = False
+                            else:
+                                self.plot_run = True
+                            #self.emulateSpace()
                     if parts[0] == '4':
                         value = int(parts[1])
                         if value < 3:
@@ -1104,6 +1110,9 @@ class MainWindow(QMainWindow):
         vol_base = 0.0
         deltaflow:float = 0.0
         deltaflowoffset:float = 0.0
+
+        if not self.plot_run:
+            return
 
         if self.over_pressure_detection_delay > 0:
             self.over_pressure_detection_delay -= 1
