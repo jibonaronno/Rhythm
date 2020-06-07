@@ -1305,8 +1305,35 @@ class MainWindow(QMainWindow):
                 print("Exception Section 0x05" + str(e) + ' - ' + data_stream)
 
             try:
+                if len(self.deriv_points) >= 3:
+                    if lungpressure > 0.8:
+                        if not self.breath_in_tick:
+                            self.breath_in_tick = True
+                            self.wave.playin()
+                            self.lungtimer.setInterval(8000)
+                            self.lung_wave.StartWave()
+                            self.tsnap = time.perf_counter() - self.ttick
+                            self.lbl_rr.setText('RR  : ' + '{:02f}'.format(60 / self.tsnap) + ' E->E : {:f}'.format(self.tsnap))
+                            self.ttick = time.perf_counter()
+                            self.eptick = self.ttick
+                        elif self.dvdata[-1] < -10:
+                            self.curve1.setPen(self.derivative_pen_out)
+                            self.exhale_t_count += 1
+                            if self.breath_in_tick:
+                                self.breath_in_tick = False
+                                self.epsnap = time.perf_counter() - self.eptick
+                                self.lbl_ep.setText('E->P: ' + '{:f}'.format(self.epsnap))
+                                '''Reset the over pressure alarm when next peak is detcted'''
+                                if self.over_pressure_detection_delay == 0:
+                                    if self.lung_detector.peak_value > 5:
+                                        self.label_alarm.setText("Alarm: ")
+            except Exception as e:
+                print('Exception In Breath in / Breath out detection L-1319')
+
+            '''
+            try:
                 if(len(self.deriv_points) >= 3):
-                    if self.dvdata[-1] > 1 and lungpressure > 0.8:
+                    if self.dvdata[-1] > 10:
                         self.curve1.setPen(self.derivative_pen_in)
                         self.inhale_t_count += 1
                         self.flag_idle = False
@@ -1330,7 +1357,7 @@ class MainWindow(QMainWindow):
                             self.breath_in_tick = False
                             self.epsnap = time.perf_counter() - self.eptick
                             self.lbl_ep.setText('E->P: ' + '{:f}'.format(self.epsnap))
-                            '''Reset the over pressure alarm when next peak is detcted'''
+                            ### Reset the over pressure alarm when next peak is detcted ###
                             if self.over_pressure_detection_delay == 0:
                                 if self.lung_detector.peak_value > 5:
                                     self.label_alarm.setText("Alarm: ")
@@ -1345,6 +1372,7 @@ class MainWindow(QMainWindow):
                                 self.exhale_t_count = 0
             except Exception as e:
                 print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
+            '''
 
             self.tic = time.perf_counter()
 
