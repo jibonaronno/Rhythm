@@ -1195,9 +1195,9 @@ class MainWindow(QMainWindow):
                     #self.lungtimer.setInterval(3000)
                 ''' Commented for testing '''
 
-                deltaflow = float(self.lst[1])
+                deltaflow = float(self.lst[2])
 
-                dflow = self.flowprocess.CalculateFlowConst(float(self.lst[1]))
+                dflow = self.flowprocess.CalculateFlowConst(deltaflow)
                 ##dflow = float(self.lst[1]) - self.flow_average
                 
                 if self.flowavgcount < 100:                    
@@ -1318,17 +1318,17 @@ class MainWindow(QMainWindow):
                             self.lbl_rr.setText('RR  : ' + '{:02f}'.format(60 / self.tsnap) + ' E->E : {:f}'.format(self.tsnap))
                             self.ttick = time.perf_counter()
                             self.eptick = self.ttick
-                        elif self.dvdata[-1] < -10:
-                            self.curve1.setPen(self.derivative_pen_out)
-                            self.exhale_t_count += 1
-                            if self.breath_in_tick:
-                                self.breath_in_tick = False
-                                self.epsnap = time.perf_counter() - self.eptick
-                                self.lbl_ep.setText('E->P: ' + '{:f}'.format(self.epsnap))
-                                '''Reset the over pressure alarm when next peak is detcted'''
-                                if self.over_pressure_detection_delay == 0:
-                                    if self.lung_detector.peak_value > 5:
-                                        self.label_alarm.setText("Alarm: ")
+                    elif self.dvdata[-1] < -10:
+                        self.curve1.setPen(self.derivative_pen_out)
+                        self.exhale_t_count += 1
+                        if self.breath_in_tick:
+                            self.breath_in_tick = False
+                            self.epsnap = time.perf_counter() - self.eptick
+                            self.lbl_ep.setText('E->P: ' + '{:f}'.format(self.epsnap))
+                            '''Reset the over pressure alarm when next peak is detcted'''
+                            if self.over_pressure_detection_delay == 0:
+                                if self.lung_detector.peak_value > 5:
+                                    self.label_alarm.setText("Alarm: ")
             except Exception as e:
                 print('Exception In Breath in / Breath out detection L-1319')
 
