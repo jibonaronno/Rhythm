@@ -1109,8 +1109,11 @@ class MainWindow(QMainWindow):
 
     deltaflowsum:float = 0.0
 
+    flag_breath_in_ready = True
+    lpzerocount = 0
+
     def LungSensorData(self, data_stream):
-        print(data_stream)
+        #print(data_stream)
         #Logging the data @ 100 data received
         vol_base = 0.0
         deltaflow:float = 0.0
@@ -1308,7 +1311,9 @@ class MainWindow(QMainWindow):
 
             try:
                 if len(self.deriv_points) >= 3:
-                    if lungpressure > 0.8:
+                    if lungpressure > 0.8 and self.flag_breath_in_ready:
+                        self.flag_breath_in_ready = False
+                        self.lpzerocount = 0
                         if not self.breath_in_tick:
                             self.breath_in_tick = True
                             self.wave.playin()
@@ -1329,6 +1334,13 @@ class MainWindow(QMainWindow):
                             if self.over_pressure_detection_delay == 0:
                                 if self.lung_detector.peak_value > 5:
                                     self.label_alarm.setText("Alarm: ")
+
+                    if lungpressure < 0.8:
+                        if self.lpzerocount < 3:
+                            self.lpzerocount += 1
+                        else:
+                            self.flag_breath_in_ready = True
+
             except Exception as e:
                 print('Exception In Breath in / Breath out detection L-1319')
 
