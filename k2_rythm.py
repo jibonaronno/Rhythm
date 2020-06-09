@@ -151,7 +151,7 @@ class MainWindow(QMainWindow):
         self.verticalLayout_2.addWidget(self.volplotter)
         #self.plotter.hide()
         #self.flowplotter.hide()
-        self.volplotter.hide()
+        #self.volplotter.hide()
 
         self.gcodetable = QTableWidget(self)
         self.gcodetable.setRowCount(1)
@@ -1181,30 +1181,32 @@ class MainWindow(QMainWindow):
                 self.pulseData.popleft()
 
             try:
-                
-                if len(self.tfdata) > self.maxLen:
-                    pass #self.tfdata.popleft()
-                else:
-                    #if self.vtsnap == 0:
-                    #    self.tf = 1
-                    #    self.vtsnap = time.perf_counter()
-                    #else:
-                    self.vtsnap = time.perf_counter() - self.vtsnap
-                    self.tf = self.vtsnap
-                    #self.tfdata.append(time.perf_counter()) #self.tf * 100)
-                    self.ttm += 0.1
-                    self.tfdata.append(self.ttm)
-                    self.vtsnap = time.perf_counter()
 
                 try:
-                    self.pulseData.append(self.pulse_state * 20)
+                    self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
                 except Exception as e:
-                    print('Exception : pulseData.append()')
+                    print('Exception : deriv_points.append()')
 
-                self.lungpressurepeakdata.append(float(self.peakdial.value()))
-                self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
-                self.lung_detector.Cycle(float(self.lst[0]))
-                self.lung_wave.Cycle(float(self.lst[0]))
+                if len(self.deriv_points) >= 0:
+                    self.lungpressurepeakdata.append(float(self.peakdial.value()))
+                    self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
+                    self.lung_detector.Cycle(float(self.lst[0]))
+                    self.lung_wave.Cycle(float(self.lst[0]))
+
+                    try:
+                        self.pulseData.append(self.pulse_state * 20)
+                    except Exception as e:
+                        print('Exception : pulseData.append()')
+
+                    if len(self.tfdata) > self.maxLen:
+                        pass #self.tfdata.popleft()
+                    else:
+                        self.vtsnap = time.perf_counter() - self.vtsnap
+                        self.tf = self.vtsnap
+                        #self.tfdata.append(time.perf_counter()) #self.tf * 100)
+                        self.ttm += 0.1
+                        self.tfdata.append(self.ttm)
+                        self.vtsnap = time.perf_counter()
 
                 lungpressure = float(self.lst[0])
 
@@ -1239,8 +1241,8 @@ class MainWindow(QMainWindow):
 
                     deltaflowoffset = self.deltaflowsum / self.flowavgcount
                 
-                    
-                if self.flow_offseted < 0.7 and self.flow_offseted > -0.7:
+                #print('Flow : ' + str(self.flow_offseted))
+                if self.flow_offseted < 3 and self.flow_offseted > -3:
                     if self.zero_flow_count < 3:
                         self.zero_flow_count += 1
                     else:
@@ -1248,38 +1250,41 @@ class MainWindow(QMainWindow):
                 else:
                     self.zero_flow_count = 0
                 
-                self.flowdata.append(self.flow_offseted) # * 1000 * 60)
-                #self.flowdata.append(deltaflow - deltaflowoffset)
-                
-                if self.flow_offseted > 0:
-                    self.flow_detector.Cycle(self.flow_offseted)
-                else:
-                    self.flow_detector.Cycle(0)
-                
-                try:
-                    self.peak_flow.setText("Flow Peak: " + '{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
-                except:
-                    pass
-                self.flowpeakdata.append(40)
-
-                '''Volume data came from kalman of lungpressure'''
-                '''Now volume caming from flowprocess.Volume'''
-                ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
-                ####vol_base = self.kalman.Estimate(float(self.lst[0]))
-                if self.flow_for_volume != 0:
-                    vol_base = self.flowprocess.Volume(self.flow_offseted * 100 * 60)
-                else:
-                    if vol_base > 10:
-                        vol_base -= 10
+                if len(self.deriv_points) >= 0: #useless logic
+                    self.flowdata.append(self.flow_offseted) # * 1000 * 60)
+                    #self.flowdata.append(deltaflow - deltaflowoffset)
+                    
+                    if self.flow_offseted > 0:
+                        self.flow_detector.Cycle(self.flow_offseted)
                     else:
-                        vol_base = 0
-                self.kalmandata.append(vol_base)
-                self.voldata.append(vol_base)
-                #if vol_base < 0:
-                #    vol_base = 0
-                self.vol_detector.Cycle(vol_base)
-                ####self.volpeakdata.append(500.0)
-                self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
+                        self.flow_detector.Cycle(0)
+                    
+                    try:
+                        self.peak_flow.setText("Flow Peak: " + '{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
+                    except:
+                        pass
+                    self.flowpeakdata.append(40)
+
+                    '''Volume data came from kalman of lungpressure'''
+                    '''Now volume caming from flowprocess.Volume'''
+                    ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
+                    ####vol_base = self.kalman.Estimate(float(self.lst[0]))
+                    if self.flow_for_volume != 0:
+                        vol_base = self.flowprocess.Volume(self.flow_offseted)
+                    else:
+                        if vol_base > 50:
+                            vol_base -= 50
+                        else:
+                            vol_base = 0
+                        self.flowprocess.sum_of_volume = vol_base
+
+                    self.kalmandata.append(vol_base)
+                    self.voldata.append(vol_base)
+                    #if vol_base < 0:
+                    #    vol_base = 0
+                    self.vol_detector.Cycle(vol_base)
+                    ####self.volpeakdata.append(500.0)
+                    self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
 
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e) + ' - ' + data_stream)
@@ -1290,7 +1295,7 @@ class MainWindow(QMainWindow):
                 self.timesnap = time.perf_counter() - self.tic
 
             try:
-                self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+                #self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
                 #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
 
                 lungpressure = float(self.lst[0])
@@ -1417,23 +1422,39 @@ class MainWindow(QMainWindow):
                 self.curve1.setData(self.tfdata, self.lungpressuredata)
                 #self.curve2.setData(self.tfdata, self.lungpressurepeakdata)
                 #self.curve3.setData(self.kalmandata)
+            except Exception as e:
+                print('Exception SetData curve1 : ' + str(e))
                 
+            try:
                 '''Assign volume data to volume plotter curve'''
                 #(originally kalman data) self.volcurve.setData(self.kalmandata)
                 self.volcurve.setData(self.tfdata, self.voldata)
                 ###self.volpeakcurve.setData(self.tfdata, self.volpeakdata)
+            except Exception as e:
+                print('Exception SetData volcurve : ' + str(e))
 
+            try:
                 '''Assign Flowdata to flow plotter curve & dvdata to dvcurve'''
                 self.flowcurve.setData(self.tfdata, self.flowdata)
+            except Exception as e:
+                print('Exception SetData flowcurve : ' + str(e))
+
+            try:
                 self.dvcurve.setData(self.tfdata, self.dvdata_compressed)
+            except Exception as e:
+                print('Exception SetData dvcurve : ' + str(e))
+
+            try:
                 self.flowpeakcurve.setData(self.tfdata, self.flowpeakdata)
+            except Exception as e:
+                print('Exception SetData flowpeakcurve : ' + str(e))
 
 
+            try:
                 '''Assign pulsedata to pulse curve'''
                 self.pulseCurve.setData(self.tfdata, self.pulseData)
-
             except Exception as e:
-                print('Exception Curve SetData' + str(e) + ' - ' + data_stream)
+                print('Exception SetData pulseCurve')
             
             try:
                 if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
