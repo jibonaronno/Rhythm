@@ -1260,7 +1260,7 @@ class MainWindow(QMainWindow):
                     self.peak_flow.setText("Flow Peak: " + '{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
                 except:
                     pass
-                self.flowpeakdata.append(2)
+                self.flowpeakdata.append(40)
 
                 '''Volume data came from kalman of lungpressure'''
                 '''Now volume caming from flowprocess.Volume'''
