@@ -82,6 +82,8 @@ class MainWindow(QMainWindow):
 
         self.loadMachineSetup(self.generator)
 
+        self.pulseData = deque()
+
         self.lungpressuredata = deque()
         self.lungpressurepeakdata = deque()
         self.peeppressuredata = deque()
@@ -106,7 +108,8 @@ class MainWindow(QMainWindow):
         self.kalmanpen = pg.mkPen(20, 100, 20)
         self.curve3 = self.plotter.plot(0,0, "kalman", pen = self.kalmanpen)
 
-        self.pulsepen = pg.mkPen(255, 0, 0)
+        self.pulsepen = pg.mkPen(255, 70, 70, 70)
+        self.pulseCurve = self.plotter.plot(0,0, "pulsecurve", pen=self.pulsepen)
 
         self.derivative_pen = pg.mkPen(70,90,100, 100)
         self.derivative_pen_in = pg.mkPen(10, 200, 10)
@@ -216,7 +219,7 @@ class MainWindow(QMainWindow):
         self.scanPorts.hide()
         self.connect.hide()
         self.disconnect.hide()
-        self.btnstream.hide()
+        #self.btnstream.hide()
 
         self.kalman = kalman(1.2)
 
@@ -249,16 +252,13 @@ class MainWindow(QMainWindow):
         self.sensorLimitTimer = QTimer(self)
         self.sensorLimitTimer.timeout.connect(self.checkSensorLimitChanged)
 
-
-
         self.sensorwatchtimer = QTimer(self)
         self.sensorwatchtimer.timeout.connect(self.reconnectSensor)
 
         self.lungtimer = QTimer(self)
         self.lungtimer.timeout.connect(self.lungtimeout)
 
-        self.secTimer = QTimer(self)
-        self.msecTimer = QTimer(self)
+        self.pulseTimer = QTimer(self)
 
         self.modecombobox.addItem("CMV")
         self.modecombobox.addItem("BiPAP")
@@ -320,6 +320,19 @@ class MainWindow(QMainWindow):
         self.flowavgcount:int = 0
 
         self.plot_run = True
+
+        self.pulseTimer.timeout.connect(self.pulseGen)
+        self.pulse_state = 0
+        self.pulseTimer.setSingleShot(True)
+        self.pulseTimer.start(0.95)
+
+    def pulseGen(self):
+        if self.pulse_state == 0:
+            self.pulse_state = 1
+            self.pulseTimer.start(0.05)
+        else:
+            self.pulse_state = 0
+            self.pulseTimer.start(0.95)
 
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
@@ -562,6 +575,8 @@ class MainWindow(QMainWindow):
 
 
     def getStreamData(self, line):
+        #print(line)
+        self.LungSensorData(line)
         elements = line.split('\t')
         if len(elements) > 2:
             print(str(elements[1]))
@@ -631,9 +646,9 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_btnstream_clicked(self):
-        self.streamer = Backfeed('prolog.log')
+        self.streamer = Backfeed('log2.txt')
         self.streamer.setCallback(self.getStreamData)
-        self.streamer.Start(50)
+        self.streamer.Start(25)
 
     @Slot()
     def on_btninitbipap_clicked(self):
@@ -1162,6 +1177,8 @@ class MainWindow(QMainWindow):
                 self.flowdata.popleft()
             if len(self.flowpeakdata) > self.maxLen:
                 self.flowpeakdata.popleft()
+            if len(self.pulseData) > self.maxLen:
+                self.pulseData.popleft()
 
             try:
                 
@@ -1178,6 +1195,11 @@ class MainWindow(QMainWindow):
                     self.ttm += 0.1
                     self.tfdata.append(self.ttm)
                     self.vtsnap = time.perf_counter()
+
+                try:
+                    self.pulseData.append(self.pulse_state * 20)
+                except Exception as e:
+                    print('Exception : pulseData.append()')
 
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
@@ -1311,7 +1333,8 @@ class MainWindow(QMainWindow):
 
             try:
                 if len(self.deriv_points) >= 3:
-                    if lungpressure > 0.8 and self.flag_breath_in_ready:
+                    if lungpressure > 0.3 and self.flag_breath_in_ready:
+                        self.curve1.setPen(self.derivative_pen_in)
                         self.flag_breath_in_ready = False
                         self.lpzerocount = 0
                         if not self.breath_in_tick:
@@ -1330,12 +1353,12 @@ class MainWindow(QMainWindow):
                             self.breath_in_tick = False
                             self.epsnap = time.perf_counter() - self.eptick
                             self.lbl_ep.setText('E->P: ' + '{:f}'.format(self.epsnap))
-                            '''Reset the over pressure alarm when next peak is detcted'''
+                            ###Reset the over pressure alarm when next peak is detcted###
                             if self.over_pressure_detection_delay == 0:
                                 if self.lung_detector.peak_value > 5:
                                     self.label_alarm.setText("Alarm: ")
 
-                    if lungpressure < 0.8:
+                    if lungpressure < 0.3:
                         if self.lpzerocount < 3:
                             self.lpzerocount += 1
                         else:
@@ -1404,6 +1427,11 @@ class MainWindow(QMainWindow):
                 self.flowcurve.setData(self.tfdata, self.flowdata)
                 self.dvcurve.setData(self.tfdata, self.dvdata_compressed)
                 self.flowpeakcurve.setData(self.tfdata, self.flowpeakdata)
+
+
+                '''Assign pulsedata to pulse curve'''
+                self.pulseCurve.setData(self.tfdata, self.pulseData)
+
             except Exception as e:
                 print('Exception Curve SetData' + str(e) + ' - ' + data_stream)
             
