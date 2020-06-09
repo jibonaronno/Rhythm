@@ -516,7 +516,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayoutSettings">
           <item>
-           <widget class="QStackedWidget" name="stackedWidget">
+           <widget class="QStackedWidget" name="controlStack">
             <property name="minimumSize">
              <size>
               <width>300</width>
@@ -576,8 +576,8 @@
               </property>
               <property name="geometry">
                <rect>
-                <x>51</x>
-                <y>37</y>
+                <x>50</x>
+                <y>40</y>
                 <width>41</width>
                 <height>30</height>
                </rect>
@@ -964,7 +964,7 @@
               <property name="geometry">
                <rect>
                 <x>410</x>
-                <y>100</y>
+                <y>90</y>
                 <width>431</width>
                 <height>31</height>
                </rect>

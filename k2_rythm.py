@@ -134,9 +134,11 @@ class MainWindow(QMainWindow):
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
         self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
         self.flowpeakcurve = self.flowplotter.plot(0,0,"flowpeakcurve", pen = self.derivative_pen)
+        
 
         self.flowdata = deque()
         self.flowpeakdata = deque()
+        self.flowmindata = deque()
 
         self.volplotter_pen = pg.mkPen(200, 20, 10)
         self.volplotter = PlotWidget()
@@ -676,8 +678,8 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_btnmachinesetup_clicked(self):
-        self.stackedWidget.setMinimumHeight(230)
-        self.stackedWidget.setCurrentIndex(3)
+        self.controlStack.setMinimumHeight(230)
+        self.controlStack.setCurrentIndex(3)
 
     @Slot()
     def on_btnsavemachinesetup_clicked(self):
@@ -831,11 +833,11 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_btnalarmpage_clicked(self):
         #self.stackedWidget = QStackerWidget()
-        self.stackedWidget.setMinimumHeight(110)
+        self.controlStack.setMinimumHeight(110)
         if self.btnalarmpage.isChecked():
-            self.stackedWidget.setCurrentIndex(1)
+            self.controlStack.setCurrentIndex(1)
         else:
-            self.stackedWidget.setCurrentIndex(0)
+            self.controlStack.setCurrentIndex(0)
 
     @Slot()
     def on_startpush_clicked(self):
@@ -981,12 +983,12 @@ class MainWindow(QMainWindow):
     def modeselectionchanged(self):
         if "CMV" in self.modecombobox.currentText():
             self.buttonstack.setCurrentIndex(0)
-            self.stackedWidget.setCurrentIndex(0)
+            self.controlStack.setCurrentIndex(0)
             self.label.setText("Mode : CMV")
             self.runMode = MachineRunModes.CMV
         elif "BiPAP" in self.modecombobox.currentText():
             self.buttonstack.setCurrentIndex(2)
-            self.stackedWidget.setCurrentIndex(2)
+            self.controlStack.setCurrentIndex(2)
             self.runMode = MachineRunModes.BiPAP
         elif "PS" in self.modecombobox.currentText():
             self.label.setText("Mode : PS")
@@ -1157,7 +1159,7 @@ class MainWindow(QMainWindow):
         if len(self.lst) < 3:
             return
 
-        self.maxLen = 50  # max number of data points to show on graph
+        self.maxLen = 150  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
                 self.lungpressuredata.popleft()  # remove oldest
@@ -1263,7 +1265,8 @@ class MainWindow(QMainWindow):
                         self.peak_flow.setText("Flow Peak: " + '{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
                     except:
                         pass
-                    self.flowpeakdata.append(40)
+
+                    self.flowpeakdata.append(1)
 
                     '''Volume data came from kalman of lungpressure'''
                     '''Now volume caming from flowprocess.Volume'''
