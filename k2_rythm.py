@@ -1159,7 +1159,7 @@ class MainWindow(QMainWindow):
         if len(self.lst) < 3:
             return
 
-        self.maxLen = 150  # max number of data points to show on graph
+        self.maxLen = 50  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
                 self.lungpressuredata.popleft()  # remove oldest
@@ -1229,7 +1229,7 @@ class MainWindow(QMainWindow):
                 dflow = self.flowprocess.CalculateFlowConst(deltaflow)
                 ##dflow = float(self.lst[1]) - self.flow_average
                 
-                if self.flowavgcount < 100:                    
+                if self.flowavgcount < 100:
                     self.flow_sum += dflow
                     self.flowavgcount += 1
                     vol_base = 0
