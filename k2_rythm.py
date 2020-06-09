@@ -1333,7 +1333,7 @@ class MainWindow(QMainWindow):
 
             try:
                 if len(self.deriv_points) >= 3:
-                    if lungpressure > 0.3 and self.flag_breath_in_ready:
+                    if lungpressure > 0.2 and self.flag_breath_in_ready:
                         self.curve1.setPen(self.derivative_pen_in)
                         self.flag_breath_in_ready = False
                         self.lpzerocount = 0
@@ -1358,7 +1358,7 @@ class MainWindow(QMainWindow):
                                 if self.lung_detector.peak_value > 5:
                                     self.label_alarm.setText("Alarm: ")
 
-                    if lungpressure < 0.3:
+                    if lungpressure < 0.2:
                         if self.lpzerocount < 3:
                             self.lpzerocount += 1
                         else:
