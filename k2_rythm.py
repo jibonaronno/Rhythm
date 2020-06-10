@@ -103,6 +103,9 @@ class MainWindow(QMainWindow):
         self.plotter = PlotWidget()
         self.plotter.showGrid(x=True, y=True, alpha=None)
         self.plotter.setTitle("Pressure : mb")
+        self.plotter.getViewBox().enableAutoRange(axis='y', enable=True)
+        #self.flowplotter.getViewBox().setMinimumHeight(45)
+        self.plotter.getViewBox().setYRange(-0.3, 1)
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
         #self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
         self.kalmanpen = pg.mkPen(20, 100, 20)
@@ -337,10 +340,10 @@ class MainWindow(QMainWindow):
     def pulseGen(self):
         if self.pulse_state == 0:
             self.pulse_state = 1
-            self.pulseTimer.start(0.05)
+            self.pulseTimer.start(0.1)
         else:
             self.pulse_state = 0
-            self.pulseTimer.start(0.95)
+            self.pulseTimer.start(0.1)
 
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
