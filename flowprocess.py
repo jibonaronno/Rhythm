@@ -69,6 +69,7 @@ class FlowProcess(object):
 
     flow_arr = deque()
     sum_of_rmsVolume = 0.0
+    
     def rootVolume(self, flow):
         rmsVolume = 0.0
 
