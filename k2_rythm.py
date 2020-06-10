@@ -339,7 +339,7 @@ class MainWindow(QMainWindow):
 
         self.plottingBaseTimer = QTimer()
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
-        #self.plottingBaseTimer.start(0.025)
+        self.plottingBaseTimer.start(0.025)
 
     flagStartPulse = False
 
@@ -473,8 +473,14 @@ class MainWindow(QMainWindow):
                             if self.workerThreadCreated:
                                 if self.worker.flagStop:
                                     self.on_runloop_clicked()
+                                    #self.plottingBaseTimer.start(0.025)
+                                    #self.pulse_state = True
+                                    #self.flagStartPulse = True
                                 else:
                                     self.on_btnstopcmv_clicked()
+                                    #self.plottingBaseTimer.stop()
+                                    #self.pulse_state = False
+                                    #self.flagStartPulse = False
                             else:
                                 if self.runloop.isEnabled():
                                     self.on_runloop_clicked()
@@ -491,9 +497,6 @@ class MainWindow(QMainWindow):
                         elif value == 3:
                             if self.plot_run:
                                 self.plot_run = False
-                                self.plottingBaseTimer.stop()
-                                self.flagStartPulse = False
-                                self.pulse_state = False
                             else:
                                 self.plot_run = True
                             #self.emulateSpace()
@@ -1384,10 +1387,11 @@ class MainWindow(QMainWindow):
                         self.lpzerocount = 0
                         if not self.breath_in_tick:
                             
-                            if self.flagStartPulse:
-                                self.plottingBaseTimer.start(0.025)
+                            if not self.flagStartPulse:
+                                ##self.plottingBaseTimer.start(0.025)
+                                self.pulse_state = 1
+                                self.flagStartPulse = True
 
-                            self.flagStartPulse = True
                             self.breath_in_tick = True
                             self.wave.playin()
                             self.lungtimer.setInterval(8000)
