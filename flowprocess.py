@@ -31,7 +31,11 @@ class FlowProcess(object):
         self.flow = 0.0        
 
     def CalculateFlowConst(self, deltap):
-        return deltap * 50
+        if deltap < 0:
+            deltap = -deltap
+            return -math.sqrt((math.pi ** 2) * ((12 / 1000) ** 4) / 1.225 * 100 * deltap) * 1000
+        else:
+            return math.sqrt((math.pi ** 2) * ((12 / 1000) ** 4) / 1.225 * 100 * deltap) * 1000
 
     def CalculateFlow(self, deltap):
         result = 0.0

@@ -131,9 +131,9 @@ class MainWindow(QMainWindow):
         self.flowplotter.showGrid(x=True, y=True, alpha=None)
         #self.flowplotter.setTitle("Flow L/M")
         #self.flowplotter
-        self.flowplotter.getViewBox().enableAutoRange(axis='y', enable=False)
+        #self.flowplotter.getViewBox().enableAutoRange(axis='y', enable=True)
         #self.flowplotter.getViewBox().setMinimumHeight(45)
-        self.flowplotter.getViewBox().setYRange(-90, 45)
+        #self.flowplotter.getViewBox().setYRange(-90, 45)
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
         self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
@@ -148,8 +148,8 @@ class MainWindow(QMainWindow):
         self.volplotter = PlotWidget()
         self.volplotter.showGrid(x=True, y=True, alpha=None)
         self.volplotter.setTitle("Volume ml")
-        self.volplotter.getViewBox().enableAutoRange(axis='y', enable=False)
-        self.volplotter.getViewBox().setYRange(-10, 500)
+        ##self.volplotter.getViewBox().enableAutoRange(axis='y', enable=False)
+        ##self.volplotter.getViewBox().setYRange(-10, 500)
         self.volcurve = self.volplotter.plot(0,0,"volcurve", self.volplotter_pen)
         self.volpeakcurve = self.volplotter.plot(0,0,"volpeakcurve", self.volplotter_pen)
         
@@ -1232,11 +1232,12 @@ class MainWindow(QMainWindow):
 
                 deltaflow = float(self.lst[2])
 
-                dflow = self.flowprocess.CalculateFlowConst(deltaflow)
+                dflow = self.flowprocess.CalculateFlowConst(deltaflow - deltaflowoffset)
+                self.flow_offseted = dflow
                 ##dflow = float(self.lst[1]) - self.flow_average
                 
                 if self.flowavgcount < 100:
-                    self.flow_sum += dflow
+                    self.flow_sum += deltaflow #dflow
                     self.flowavgcount += 1
                     vol_base = 0
 
@@ -1244,7 +1245,8 @@ class MainWindow(QMainWindow):
 
                 else:
                     self.flow_average = self.flow_sum / self.flowavgcount
-                    self.flow_offseted = dflow - self.flow_average
+                    #self.flow_offseted = dflow ##- self.flow_average
+                    deltaflowoffset = self.flow_average
                     self.flow_for_volume = self.flow_offseted
 
                     deltaflowoffset = self.deltaflowsum / self.flowavgcount
@@ -1272,7 +1274,7 @@ class MainWindow(QMainWindow):
                     except:
                         pass
 
-                    self.flowpeakdata.append(45)
+                    self.flowpeakdata.append(1)
 
                     '''Volume data came from kalman of lungpressure'''
                     '''Now volume caming from flowprocess.Volume'''
