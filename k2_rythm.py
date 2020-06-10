@@ -102,7 +102,8 @@ class MainWindow(QMainWindow):
         self.lungpressure_line_pen = pg.mkPen(200, 100, 0)
         self.plotter = PlotWidget()
         self.plotter.showGrid(x=True, y=True, alpha=None)
-        self.plotter.setTitle("Pressure : mb")
+        #self.plotter.setTitle("Pressure : mb")
+        self.plotter.setLabel('left','Pressure : mb')
         #self.plotter.getViewBox().enableAutoRange(axis='y', enable=True)
         #self.plotter.getViewBox().setYRange(-0.3, 1)
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
@@ -132,6 +133,7 @@ class MainWindow(QMainWindow):
         self.flowplotter = PlotWidget()
         self.flowplotter.showGrid(x=True, y=True, alpha=None)
         #self.flowplotter.setTitle("Flow L/M")
+        self.flowplotter.setLabel('left', 'Flow L/M')
         #self.flowplotter
         #self.flowplotter.getViewBox().enableAutoRange(axis='y', enable=True)
         #self.flowplotter.getViewBox().setMinimumHeight(45)
@@ -149,7 +151,8 @@ class MainWindow(QMainWindow):
         self.volplotter_pen = pg.mkPen(200, 20, 10)
         self.volplotter = PlotWidget()
         self.volplotter.showGrid(x=True, y=True, alpha=None)
-        self.volplotter.setTitle("Volume ml")
+        #self.volplotter.setTitle("Volume ml")
+        self.volplotter.setLabel('left', 'Volume ml')
         ##self.volplotter.getViewBox().enableAutoRange(axis='y', enable=False)
         ##self.volplotter.getViewBox().setYRange(-10, 500)
         self.volcurve = self.volplotter.plot(0,0,"volcurve", self.volplotter_pen)
@@ -1218,6 +1221,8 @@ class MainWindow(QMainWindow):
                 self.flowpeakdata.popleft()
             if len(self.pulseData) > self.maxLen:
                 self.pulseData.popleft()
+            if len(self.tfdata) > self.maxLen:
+                self.tfdata.popleft()                
 
             try:
 
@@ -1238,15 +1243,12 @@ class MainWindow(QMainWindow):
                     except Exception as e:
                         print('Exception : pulseData.append()')
 
-                    if len(self.tfdata) > self.maxLen:
-                        pass #self.tfdata.popleft()
-                    else:
-                        self.vtsnap = time.perf_counter() - self.vtsnap
-                        self.tf = self.vtsnap
-                        #self.tfdata.append(time.perf_counter()) #self.tf * 100)
-                        self.ttm += incr
-                        self.tfdata.append(self.ttm)
-                        self.vtsnap = time.perf_counter()
+                    self.vtsnap = time.perf_counter() - self.vtsnap
+                    self.tf = self.vtsnap
+                    #self.tfdata.append(time.perf_counter()) #self.tf * 100)
+                    self.ttm += incr
+                    self.tfdata.append(self.ttm)
+                    self.vtsnap = time.perf_counter()
 
                 lungpressure = float(self.lst[0])
 
@@ -1393,6 +1395,7 @@ class MainWindow(QMainWindow):
                                 self.flagStartPulse = True
 
                             self.breath_in_tick = True
+                            #self.plotter.addXMarker(self.ttm)
                             self.wave.playin()
                             self.lungtimer.setInterval(8000)
                             self.lung_wave.StartWave()
@@ -1419,7 +1422,7 @@ class MainWindow(QMainWindow):
                             self.flag_breath_in_ready = True
 
             except Exception as e:
-                print('Exception In Breath in / Breath out detection L-1319')
+                print('Exception In Breath in / Breath out detection L-1319 : ' + str(e))
 
             '''
             try:
