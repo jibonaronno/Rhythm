@@ -1375,7 +1375,7 @@ class MainWindow(QMainWindow):
 
             try:
                 if len(self.deriv_points) >= 3:
-                    if lungpressure > 0.2 and self.flag_breath_in_ready:
+                    if lungpressure > 0.5 and self.flag_breath_in_ready:
                         self.curve1.setPen(self.derivative_pen_in)
                         self.flag_breath_in_ready = False
                         self.lpzerocount = 0
