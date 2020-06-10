@@ -334,15 +334,29 @@ class MainWindow(QMainWindow):
         self.pulseTimer.timeout.connect(self.pulseGen)
         self.pulse_state = 0
         self.pulseTimer.setSingleShot(True)
-        self.pulseTimer.start(0.95)
+        #self.pulseTimer.start(0.95)
+        self.pulsegencounter = 0
+
+        self.plottingBaseTimer = QTimer()
+        self.plottingBaseTimer.timeout.connect(self.plotTimer)
+        self.plottingBaseTimer.start(0.025)
+
+    def plotTimer(self):
+        if self.sensorDataString != '':
+            self.LungSensorData(self.sensorDataString)
 
     def pulseGen(self):
-        if self.pulse_state == 0:
-            self.pulse_state = 1
-            self.pulseTimer.start(0.1)
+        if self.pulsegencounter >= 10:
+            self.pulsegencounter = 0
+            if self.pulse_state == 0:
+                self.pulse_state = 1
+                #self.pulseTimer.start(0.1)
+            else:
+                self.pulse_state = 0
+                #self.pulseTimer.start(0.1)
         else:
-            self.pulse_state = 0
-            self.pulseTimer.start(0.1)
+            self.pulsegencounter += 1
+
 
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
@@ -586,7 +600,8 @@ class MainWindow(QMainWindow):
 
     def getStreamData(self, line):
         #print(line)
-        self.LungSensorData(line)
+        #self.LungSensorData(line)
+        self.sensorData(line)
         elements = line.split('\t')
         if len(elements) > 2:
             print(str(elements[1]))
@@ -734,7 +749,7 @@ class MainWindow(QMainWindow):
                 self.sensor = SensorThread(self.serialSensor, self.pressureque)
                 self.sensorThread = QThread()
                 self.sensorThread.started.connect(self.sensor.run)
-                self.sensor.signal.connect(self.LungSensorData)
+                self.sensor.signal.connect(self.sensorData)
                 self.sensor.moveToThread(self.sensorThread)
                 self.sensorThread.start()
                 self.sensorThreadCreated = True
@@ -1137,6 +1152,12 @@ class MainWindow(QMainWindow):
     flag_breath_in_ready = True
     lpzerocount = 0
 
+    sensorDataString = ''
+
+    def sensorData(self, data_stream):
+        self.sensorDataString = data_stream
+
+
     def LungSensorData(self, data_stream):
         #print(data_stream)
         #Logging the data @ 100 data received
@@ -1167,7 +1188,7 @@ class MainWindow(QMainWindow):
         if len(self.lst) < 3:
             return
 
-        self.maxLen = 50  # max number of data points to show on graph
+        self.maxLen = 200  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
                 self.lungpressuredata.popleft()  # remove oldest
@@ -1204,6 +1225,7 @@ class MainWindow(QMainWindow):
                     self.lung_wave.Cycle(float(self.lst[0]))
 
                     try:
+                        self.pulseGen()
                         self.pulseData.append(self.pulse_state * 20)
                     except Exception as e:
                         print('Exception : pulseData.append()')
@@ -1214,7 +1236,7 @@ class MainWindow(QMainWindow):
                         self.vtsnap = time.perf_counter() - self.vtsnap
                         self.tf = self.vtsnap
                         #self.tfdata.append(time.perf_counter()) #self.tf * 100)
-                        self.ttm += 0.1
+                        self.ttm += 0.025
                         self.tfdata.append(self.ttm)
                         self.vtsnap = time.perf_counter()
 
