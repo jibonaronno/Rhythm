@@ -339,7 +339,7 @@ class MainWindow(QMainWindow):
 
         self.plottingBaseTimer = QTimer()
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
-        self.plottingBaseTimer.start(0.025)
+        #self.plottingBaseTimer.start(0.025)
 
     flagStartPulse = False
 
@@ -491,6 +491,9 @@ class MainWindow(QMainWindow):
                         elif value == 3:
                             if self.plot_run:
                                 self.plot_run = False
+                                self.plottingBaseTimer.stop()
+                                self.flagStartPulse = False
+                                self.pulse_state = False
                             else:
                                 self.plot_run = True
                             #self.emulateSpace()
@@ -1380,6 +1383,10 @@ class MainWindow(QMainWindow):
                         self.flag_breath_in_ready = False
                         self.lpzerocount = 0
                         if not self.breath_in_tick:
+                            
+                            if self.flagStartPulse:
+                                self.plottingBaseTimer.start(0.025)
+
                             self.flagStartPulse = True
                             self.breath_in_tick = True
                             self.wave.playin()
