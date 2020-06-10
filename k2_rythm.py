@@ -346,7 +346,7 @@ class MainWindow(QMainWindow):
             self.LungSensorData(self.sensorDataString)
 
     def pulseGen(self):
-        if self.pulsegencounter >= 10:
+        if self.pulsegencounter >= 40:
             self.pulsegencounter = 0
             if self.pulse_state == 0:
                 self.pulse_state = 1
@@ -1188,7 +1188,7 @@ class MainWindow(QMainWindow):
         if len(self.lst) < 3:
             return
 
-        self.maxLen = 200  # max number of data points to show on graph
+        self.maxLen = 400  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
                 self.lungpressuredata.popleft()  # remove oldest
