@@ -341,20 +341,23 @@ class MainWindow(QMainWindow):
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
         self.plottingBaseTimer.start(0.025)
 
+    flagStartPulse = False
+
     def plotTimer(self):
         if self.sensorDataString != '':
             self.LungSensorData(self.sensorDataString)
 
     def pulseGen(self):
-        if self.pulsegencounter >= 40:
-            self.pulsegencounter = 1
-            if self.pulse_state == 0:
-                self.pulse_state = 1
-                #self.pulseTimer.start(0.1)
+        if self.flagStartPulse:
+            if self.pulsegencounter >= 40:
+                self.pulsegencounter = 1
+                if self.pulse_state == 0:
+                    self.pulse_state = 1
+                    #self.pulseTimer.start(0.1)
+                else:
+                    self.pulse_state = 0
             else:
-                self.pulse_state = 0
-        else:
-            self.pulsegencounter += 1
+                self.pulsegencounter += 1
 
 
     def lungtimeout(self):
@@ -1377,6 +1380,7 @@ class MainWindow(QMainWindow):
                         self.flag_breath_in_ready = False
                         self.lpzerocount = 0
                         if not self.breath_in_tick:
+                            self.flagStartPulse = True
                             self.breath_in_tick = True
                             self.wave.playin()
                             self.lungtimer.setInterval(8000)
