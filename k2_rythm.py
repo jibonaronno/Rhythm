@@ -129,7 +129,11 @@ class MainWindow(QMainWindow):
 
         self.flowplotter = PlotWidget()
         self.flowplotter.showGrid(x=True, y=True, alpha=None)
-        self.flowplotter.setTitle("Flow L/M")
+        #self.flowplotter.setTitle("Flow L/M")
+        #self.flowplotter
+        self.flowplotter.getViewBox().enableAutoRange(axis='y', enable=False)
+        #self.flowplotter.getViewBox().setMinimumHeight(45)
+        self.flowplotter.getViewBox().setYRange(-90, 45)
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
         self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
@@ -144,6 +148,8 @@ class MainWindow(QMainWindow):
         self.volplotter = PlotWidget()
         self.volplotter.showGrid(x=True, y=True, alpha=None)
         self.volplotter.setTitle("Volume ml")
+        self.volplotter.getViewBox().enableAutoRange(axis='y', enable=False)
+        self.volplotter.getViewBox().setYRange(-10, 500)
         self.volcurve = self.volplotter.plot(0,0,"volcurve", self.volplotter_pen)
         self.volpeakcurve = self.volplotter.plot(0,0,"volpeakcurve", self.volplotter_pen)
         
@@ -1266,20 +1272,21 @@ class MainWindow(QMainWindow):
                     except:
                         pass
 
-                    self.flowpeakdata.append(1)
+                    self.flowpeakdata.append(45)
 
                     '''Volume data came from kalman of lungpressure'''
                     '''Now volume caming from flowprocess.Volume'''
                     ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
                     ####vol_base = self.kalman.Estimate(float(self.lst[0]))
                     if self.flow_for_volume != 0:
-                        vol_base = self.flowprocess.Volume(self.flow_offseted)
+                        vol_base = self.flowprocess.rootVolume(self.flow_offseted)
                     else:
                         if vol_base > 50:
                             vol_base -= 50
                         else:
                             vol_base = 0
                         self.flowprocess.sum_of_volume = vol_base
+                        self.flowprocess.sum_of_rmsVolume = vol_base
 
                     self.kalmandata.append(vol_base)
                     self.voldata.append(vol_base)

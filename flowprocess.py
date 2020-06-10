@@ -7,6 +7,7 @@ import os
 from flowsetup import JsonFlowSetup
 import pprint
 import math
+from collections import deque
 
 class FlowProcess(object):
     def __init__(self):
@@ -61,6 +62,25 @@ class FlowProcess(object):
 
     def sumofVolumes(self):
         pass
+
+    flow_arr = deque()
+    sum_of_rmsVolume = 0.0
+    def rootVolume(self, flow):
+        rmsVolume = 0.0
+
+        self.flow_arr.append(flow)
+        if len(self.flow_arr) > 2:
+            self.flow_arr.popleft()
+            rmsVolume = math.sqrt((((self.flow_arr[0] + self.flow_arr[1]) / 2) ** 2) * 0.1)
+
+            if self.flow_arr[0] < 0:
+                self.sum_of_rmsVolume -= rmsVolume
+            else:
+                self.sum_of_rmsVolume += rmsVolume
+            return self.sum_of_rmsVolume
+        else:
+            return 0.0
+
 
     def Volume(self, flow):
         self.sum_of_volume += flow
