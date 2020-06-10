@@ -1232,12 +1232,11 @@ class MainWindow(QMainWindow):
 
                 deltaflow = float(self.lst[2])
 
-                dflow = self.flowprocess.CalculateFlowConst(deltaflow - deltaflowoffset)
-                self.flow_offseted = dflow
+                dflow = self.flowprocess.CalculateFlowConst(deltaflow)
                 ##dflow = float(self.lst[1]) - self.flow_average
                 
                 if self.flowavgcount < 100:
-                    self.flow_sum += deltaflow #dflow
+                    self.flow_sum += dflow
                     self.flowavgcount += 1
                     vol_base = 0
 
@@ -1245,8 +1244,8 @@ class MainWindow(QMainWindow):
 
                 else:
                     self.flow_average = self.flow_sum / self.flowavgcount
-                    #self.flow_offseted = dflow ##- self.flow_average
-                    deltaflowoffset = self.flow_average
+                    self.flow_offseted = dflow - self.flow_average
+                    #deltaflowoffset = self.flow_average
                     self.flow_for_volume = self.flow_offseted
 
                     deltaflowoffset = self.deltaflowsum / self.flowavgcount
