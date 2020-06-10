@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
         self.kalmanpen = pg.mkPen(20, 100, 20)
         self.curve3 = self.plotter.plot(0,0, "kalman", pen = self.kalmanpen)
 
-        self.pulsepen = pg.mkPen(255, 70, 70, 70)
+        self.pulsepen = pg.mkPen(255, 200, 0)
         self.pulseCurve = self.plotter.plot(0,0, "pulsecurve", pen=self.pulsepen)
 
         self.derivative_pen = pg.mkPen(70,90,100, 100)
@@ -345,7 +345,7 @@ class MainWindow(QMainWindow):
 
     def plotTimer(self):
         if self.sensorDataString != '':
-            self.LungSensorData(self.sensorDataString)
+            self.LungSensorData(self.sensorDataString, 0.025)
 
     def pulseGen(self):
         if self.flagStartPulse:
@@ -690,7 +690,7 @@ class MainWindow(QMainWindow):
                 self.sensor = SensorThread(self.serialSensor, self.pressureque)
                 self.sensorThread = QThread()
                 self.sensorThread.started.connect(self.sensor.run)
-                self.sensor.signal.connect(self.LungSensorData)
+                self.sensor.signal.connect(self.LungSensorData, 0.025)
                 self.sensor.moveToThread(self.sensorThread)
                 self.sensorThread.start()
                 self.sensorThreadCreated = True
@@ -1166,7 +1166,7 @@ class MainWindow(QMainWindow):
         self.sensorDataString = data_stream
 
 
-    def LungSensorData(self, data_stream):
+    def LungSensorData(self, data_stream, incr):
         #print(data_stream)
         #Logging the data @ 100 data received
         vol_base = 0.0
@@ -1244,7 +1244,7 @@ class MainWindow(QMainWindow):
                         self.vtsnap = time.perf_counter() - self.vtsnap
                         self.tf = self.vtsnap
                         #self.tfdata.append(time.perf_counter()) #self.tf * 100)
-                        self.ttm += 0.025
+                        self.ttm += incr
                         self.tfdata.append(self.ttm)
                         self.vtsnap = time.perf_counter()
 
