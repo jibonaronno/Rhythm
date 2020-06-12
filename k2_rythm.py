@@ -1229,6 +1229,13 @@ class MainWindow(QMainWindow):
             #if len(self.tfdata) > self.maxLen:
             #    self.tfdata.popleft()                
 
+            if len(self.tfdata) > self.maxLen:
+                pass
+                #self.tfdata.popleft()
+            else:
+                self.ttm += incr
+                self.tfdata.append(self.ttm)
+
             try:
 
                 try:
@@ -1251,13 +1258,8 @@ class MainWindow(QMainWindow):
                     self.vtsnap = time.perf_counter() - self.vtsnap
                     self.tf = self.vtsnap
                     #self.tfdata.append(time.perf_counter()) #self.tf * 100)
-                    if len(self.tfdata) > self.maxLen:
-                        pass
-                        #self.tfdata.popleft()
-                    else:
-                        self.ttm += incr
-                        self.tfdata.append(self.ttm)
-                        self.vtsnap = time.perf_counter()
+
+                    self.vtsnap = time.perf_counter()
 
                 lungpressure = float(self.lst[0])
 
