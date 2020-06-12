@@ -1277,7 +1277,7 @@ class MainWindow(QMainWindow):
                 ''' Commented for testing '''
 
                 ##deltaflow = float(self.lst[2])
-                deltaflow = float(self.lst[4])
+                deltaflow = float(self.lst[6])
 
                 dflow = self.flowprocess.CalculateFlowConst(deltaflow)
                 ##dflow = float(self.lst[1]) - self.flow_average
@@ -1339,7 +1339,7 @@ class MainWindow(QMainWindow):
 
                     self.kalmandata.append(vol_base)
                     ###self.voldata.append(vol_base) ###commented
-                    self.voldata.append(float(self.lst[5]))
+                    self.voldata.append(float(self.lst[7]))
                     #if vol_base < 0:
                     #    vol_base = 0
                     self.vol_detector.Cycle(vol_base)
