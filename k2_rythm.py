@@ -358,7 +358,7 @@ class MainWindow(QMainWindow):
     def pulseGen(self):
         if self.flagStartPulse:
             if self.pulsegencounter >= 40:
-                self.pulsegencounter = 1
+                self.pulsegencounter = 0
                 if self.pulse_state == 0:
                     self.pulse_state = 1
                     #self.pulseTimer.start(0.1)
