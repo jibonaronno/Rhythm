@@ -699,7 +699,7 @@ class MainWindow(QMainWindow):
                 self.sensor = SensorThread(self.serialSensor, self.pressureque)
                 self.sensorThread = QThread()
                 self.sensorThread.started.connect(self.sensor.run)
-                self.sensor.signal.connect(self.LungSensorData, 0.025)
+                self.sensor.signal.connect(self.sensorData)
                 self.sensor.moveToThread(self.sensorThread)
                 self.sensorThread.start()
                 self.sensorThreadCreated = True
@@ -1227,7 +1227,7 @@ class MainWindow(QMainWindow):
             if len(self.pulseData) > self.maxLen:
                 self.pulseData.popleft()
             #if len(self.tfdata) > self.maxLen:
-            #    self.tfdata.popleft()                
+            #    self.tfdata.popleft()
 
             if len(self.tfdata) > self.maxLen:
                 pass
