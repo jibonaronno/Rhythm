@@ -961,12 +961,13 @@ class MainWindow(QMainWindow):
                     while self.serialMarlin.in_waiting:
                         self.serialMarlin.readline()
             
+            '''
             if self.ComPorts['Sensor'] != 'NA':
                 
                 if not self.sensorPortOpen:
                     self.serialSensor = serial.Serial(self.ComPorts['Sensor'], baudrate=115200, timeout=0)
                     self.sensorPortOpen = True
-
+            '''
             if self.ComPorts['Encoder'] != 'NA':
                 if not self.EncoderPortOpen:
                     self.serialEncoder = serial.Serial(self.ComPorts['Encoder'], baudrate=115200, timeout=0)
