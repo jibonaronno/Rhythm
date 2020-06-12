@@ -99,6 +99,8 @@ class MainWindow(QMainWindow):
         self.timesnap = 0.0
         self.tic = 0.0
 
+        pg.setConfigOptions(antialias=True)
+
         self.lungpressure_line_pen = pg.mkPen(200, 100, 0)
         self.plotter = PlotWidget()
         self.plotter.showGrid(x=True, y=True, alpha=None)
@@ -343,6 +345,9 @@ class MainWindow(QMainWindow):
         self.plottingBaseTimer = QTimer()
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
         self.plottingBaseTimer.start(0.025)
+
+        self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
+
 
     flagStartPulse = False
 
@@ -685,6 +690,7 @@ class MainWindow(QMainWindow):
         self.streamer = Backfeed('log2.txt')
         self.streamer.setCallback(self.getStreamData)
         self.streamer.Start(25)
+        self.plotter.addItem(self.markerPeakPressure)
 
     @Slot()
     def on_btninitbipap_clicked(self):
@@ -1168,7 +1174,6 @@ class MainWindow(QMainWindow):
     def sensorData(self, data_stream):
         self.sensorDataString = data_stream
 
-
     def LungSensorData(self, data_stream, incr):
         #print(data_stream)
         #Logging the data @ 100 data received
@@ -1221,8 +1226,8 @@ class MainWindow(QMainWindow):
                 self.flowpeakdata.popleft()
             if len(self.pulseData) > self.maxLen:
                 self.pulseData.popleft()
-            if len(self.tfdata) > self.maxLen:
-                self.tfdata.popleft()                
+            #if len(self.tfdata) > self.maxLen:
+            #    self.tfdata.popleft()                
 
             try:
 
@@ -1246,9 +1251,13 @@ class MainWindow(QMainWindow):
                     self.vtsnap = time.perf_counter() - self.vtsnap
                     self.tf = self.vtsnap
                     #self.tfdata.append(time.perf_counter()) #self.tf * 100)
-                    self.ttm += incr
-                    self.tfdata.append(self.ttm)
-                    self.vtsnap = time.perf_counter()
+                    if len(self.tfdata) > self.maxLen:
+                        pass
+                        #self.tfdata.popleft()
+                    else:
+                        self.ttm += incr
+                        self.tfdata.append(self.ttm)
+                        self.vtsnap = time.perf_counter()
 
                 lungpressure = float(self.lst[0])
 
@@ -1383,7 +1392,7 @@ class MainWindow(QMainWindow):
 
             try:
                 if len(self.deriv_points) >= 3:
-                    if lungpressure > 0.5 and self.flag_breath_in_ready:
+                    if lungpressure > 0.2 and self.flag_breath_in_ready:
                         self.curve1.setPen(self.derivative_pen_in)
                         self.flag_breath_in_ready = False
                         self.lpzerocount = 0
@@ -1395,7 +1404,6 @@ class MainWindow(QMainWindow):
                                 self.flagStartPulse = True
 
                             self.breath_in_tick = True
-                            #self.plotter.addXMarker(self.ttm)
                             self.wave.playin()
                             self.lungtimer.setInterval(8000)
                             self.lung_wave.StartWave()
@@ -1406,6 +1414,7 @@ class MainWindow(QMainWindow):
                     elif self.dvdata[-1] < -10:
                         self.curve1.setPen(self.derivative_pen_out)
                         self.exhale_t_count += 1
+                        self.markerPeakPressure.setPos(self.ttm, lungpressure)
                         if self.breath_in_tick:
                             self.breath_in_tick = False
                             self.epsnap = time.perf_counter() - self.eptick
