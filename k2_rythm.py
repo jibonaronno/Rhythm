@@ -165,8 +165,8 @@ class MainWindow(QMainWindow):
         self.verticalLayout_2.addWidget(self.flowplotter)
         self.verticalLayout_2.addWidget(self.volplotter)
         #self.plotter.hide()
-        self.flowplotter.hide()
-        self.volplotter.hide()
+        #self.flowplotter.hide()
+        #self.volplotter.hide()
 
         self.gcodetable = QTableWidget(self)
         self.gcodetable.setRowCount(1)
@@ -961,13 +961,13 @@ class MainWindow(QMainWindow):
                     while self.serialMarlin.in_waiting:
                         self.serialMarlin.readline()
             
-            '''
+            
             if self.ComPorts['Sensor'] != 'NA':
                 
                 if not self.sensorPortOpen:
                     self.serialSensor = serial.Serial(self.ComPorts['Sensor'], baudrate=115200, timeout=0)
                     self.sensorPortOpen = True
-            '''
+            
             if self.ComPorts['Encoder'] != 'NA':
                 if not self.EncoderPortOpen:
                     self.serialEncoder = serial.Serial(self.ComPorts['Encoder'], baudrate=115200, timeout=0)
@@ -1276,7 +1276,8 @@ class MainWindow(QMainWindow):
                     #self.lungtimer.setInterval(3000)
                 ''' Commented for testing '''
 
-                deltaflow = float(self.lst[2])
+                ##deltaflow = float(self.lst[2])
+                deltaflow = float(self.lst[4])
 
                 dflow = self.flowprocess.CalculateFlowConst(deltaflow)
                 ##dflow = float(self.lst[1]) - self.flow_average
@@ -1306,7 +1307,8 @@ class MainWindow(QMainWindow):
                     self.zero_flow_count = 0
                 
                 if len(self.deriv_points) >= 0: #useless logic
-                    self.flowdata.append(self.flow_offseted) # * 1000 * 60)
+                    self.flowdata.append(deltaflow) #change with below
+                    ###self.flowdata.append(self.flow_offseted) # * 1000 * 60)
                     #self.flowdata.append(deltaflow - deltaflowoffset)
                     
                     if self.flow_offseted > 0:
@@ -1336,7 +1338,8 @@ class MainWindow(QMainWindow):
                         self.flowprocess.sum_of_rmsVolume = vol_base
 
                     self.kalmandata.append(vol_base)
-                    self.voldata.append(vol_base)
+                    ###self.voldata.append(vol_base) ###commented
+                    self.voldata.append(float(self.lst[5]))
                     #if vol_base < 0:
                     #    vol_base = 0
                     self.vol_detector.Cycle(vol_base)
