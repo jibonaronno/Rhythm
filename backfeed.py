@@ -26,6 +26,10 @@ class Backfeed(QObject):
         else:
             self.gidx = 1
 
+    def StreamDirect(self):
+        for item in self.array:
+            self.feeder.emit(item)
+
     def Start(self, time):
         self.timer.start(time)
 
