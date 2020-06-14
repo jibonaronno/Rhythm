@@ -17,11 +17,12 @@ class DataLogger(object):
         with open(self.filename, "a+") as writer:
             writer.write(combined)
 
+'''
 logger = DataLogger('log4.csv')
-iCount = 0
+
 lData = []
+
 def getStreamData(line):
-    iCount = iCount
     if iCount < 10:
         iCount += 1
         if len(line > 15):
@@ -36,4 +37,6 @@ def getStreamData(line):
 
 streamer = Backfeed('log2.txt')
 streamer.setCallback(getStreamData)
+streamer.StreamDirect()
 #streamer.Start(1)
+'''
