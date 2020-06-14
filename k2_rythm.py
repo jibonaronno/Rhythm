@@ -1239,7 +1239,6 @@ class MainWindow(QMainWindow):
                 self.tfdata.append(self.ttm)
 
             try:
-
                 try:
                     self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
                 except Exception as e:
@@ -1393,7 +1392,8 @@ class MainWindow(QMainWindow):
                     self.dvdata_compressed.append(0.0)
             except Exception as e:
                 print("Exception Section 0x05" + str(e) + ' - ' + data_stream)
-
+                
+            '''
             try:
                 if len(self.deriv_points) >= 3:
                     if lungpressure > 0.2 and self.flag_breath_in_ready:
@@ -1436,8 +1436,8 @@ class MainWindow(QMainWindow):
 
             except Exception as e:
                 print('Exception In Breath in / Breath out detection L-1319 : ' + str(e))
-
             '''
+
             try:
                 if(len(self.deriv_points) >= 3):
                     if self.dvdata[-1] > 10:
@@ -1479,7 +1479,6 @@ class MainWindow(QMainWindow):
                                 self.exhale_t_count = 0
             except Exception as e:
                 print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
-            '''
 
             self.tic = time.perf_counter()
 
