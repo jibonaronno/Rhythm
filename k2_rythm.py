@@ -344,7 +344,7 @@ class MainWindow(QMainWindow):
 
         self.plottingBaseTimer = QTimer()
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
-        self.plottingBaseTimer.start(0.025)
+        ###self.plottingBaseTimer.start(0.025)
 
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
@@ -353,7 +353,8 @@ class MainWindow(QMainWindow):
 
     def plotTimer(self):
         if self.sensorDataString != '':
-            self.LungSensorData(self.sensorDataString, 0.025)
+            pass
+            #self.LungSensorData(self.sensorDataString, 0.025)
 
     def pulseGen(self):
         if self.flagStartPulse:
@@ -616,8 +617,8 @@ class MainWindow(QMainWindow):
 
     def getStreamData(self, line):
         #print(line)
-        #self.LungSensorData(line)
-        self.sensorData(line)
+        self.LungSensorData(line)
+        #self.sensorData(line)
         elements = line.split('\t')
         if len(elements) > 2:
             print(str(elements[1]))
@@ -689,7 +690,7 @@ class MainWindow(QMainWindow):
     def on_btnstream_clicked(self):
         self.streamer = Backfeed('log2.txt')
         self.streamer.setCallback(self.getStreamData)
-        self.streamer.Start(25)
+        self.streamer.Start(100)
         #self.plotter.addItem(self.markerPeakPressure)
 
     @Slot()
@@ -766,7 +767,8 @@ class MainWindow(QMainWindow):
                 self.sensor = SensorThread(self.serialSensor, self.pressureque)
                 self.sensorThread = QThread()
                 self.sensorThread.started.connect(self.sensor.run)
-                self.sensor.signal.connect(self.sensorData)
+                ##self.sensor.signal.connect(self.sensorData)
+                self.sensor.signal.connect(self.LungSensorData)
                 self.sensor.moveToThread(self.sensorThread)
                 self.sensorThread.start()
                 self.sensorThreadCreated = True
@@ -1174,7 +1176,7 @@ class MainWindow(QMainWindow):
     def sensorData(self, data_stream):
         self.sensorDataString = data_stream
 
-    def LungSensorData(self, data_stream, incr):
+    def LungSensorData(self, data_stream):
         #print(data_stream)
         #Logging the data @ 100 data received
         vol_base = 0.0
@@ -1233,7 +1235,7 @@ class MainWindow(QMainWindow):
                 pass
                 #self.tfdata.popleft()
             else:
-                self.ttm += incr
+                self.ttm += 0.1 ###incr
                 self.tfdata.append(self.ttm)
 
             try:
