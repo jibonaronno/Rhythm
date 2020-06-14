@@ -89,6 +89,7 @@ class MainWindow(QMainWindow):
         self.peeppressuredata = deque()
         self.peeppressurepeakdata = deque()
         self.kalmandata = deque()
+        self.kalmanofpressuredata = deque()
         self.voldata = deque()
         self.volpeakdata = deque()
         self.sumofvolume = 0.0
@@ -237,6 +238,7 @@ class MainWindow(QMainWindow):
         #self.btnstream.hide()
 
         self.kalman = kalman(1.2)
+        self.kalmanpressure = kalman(2.0)
 
         #self.vtdial.setStyleSheet("{ background-color: rgb(20,20,20) }")
 
@@ -1238,6 +1240,8 @@ class MainWindow(QMainWindow):
                 self.flowpeakdata.popleft()
             if len(self.pulseData) > self.maxLen:
                 self.pulseData.popleft()
+            if len(self.kalmanofpressuredata) > self.maxLen:
+                self.kalmanofpressuredata.popleft()
             #if len(self.tfdata) > self.maxLen:
             #    self.tfdata.popleft()
 
@@ -1249,16 +1253,17 @@ class MainWindow(QMainWindow):
                 self.tfdata.append(self.ttm)
 
             try:
+                lungpressure = float(self.lst[0])
                 try:
-                    self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
+                    self.deriv_points.append([lungpressure, self.timesnap])
                 except Exception as e:
                     print('Exception : deriv_points.append()')
 
                 if len(self.deriv_points) >= 0:
                     self.lungpressurepeakdata.append(float(self.peakdial.value()))
-                    self.lungpressuredata.append(float(self.lst[0]) + float(self.peepdial.value()))
-                    self.lung_detector.Cycle(float(self.lst[0]))
-                    self.lung_wave.Cycle(float(self.lst[0]))
+                    self.lungpressuredata.append(lungpressure + float(self.peepdial.value()))
+                    self.lung_detector.Cycle(lungpressure)
+                    self.lung_wave.Cycle(lungpressure)
 
                     try:
                         self.pulseGen()
@@ -1271,8 +1276,6 @@ class MainWindow(QMainWindow):
                     #self.tfdata.append(time.perf_counter()) #self.tf * 100)
 
                     self.vtsnap = time.perf_counter()
-
-                lungpressure = float(self.lst[0])
 
                 if self.lung_wave.wave_in_buffer:
                     pass
@@ -1352,6 +1355,12 @@ class MainWindow(QMainWindow):
                     self.vol_detector.Cycle(vol_base)
                     ####self.volpeakdata.append(500.0)
                     self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
+
+                    if lungpressure >= 0:
+                        self.kalmanofpressuredata.append(self.kalmanpressure.Estimate(lungpressure ** 1.0))
+                    else:
+                        lungpressure = -lungpressure
+                        self.kalmanofpressuredata.append(self.kalmanpressure.Estimate(lungpressure ** 1.0))
 
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e) + ' - ' + data_stream)
@@ -1495,9 +1504,9 @@ class MainWindow(QMainWindow):
             try:
                 self.curve1.setData(self.tfdata, self.lungpressuredata)
                 #self.curve2.setData(self.tfdata, self.lungpressurepeakdata)
-                #self.curve3.setData(self.kalmandata)
+                self.curve3.setData(self.tfdata, self.kalmanofpressuredata)
             except Exception as e:
-                print('Exception SetData curve1 : ' + str(e))
+                print('Exception SetData curve1 curve3 : ' + str(e))
                 
             try:
                 '''Assign volume data to volume plotter curve'''
