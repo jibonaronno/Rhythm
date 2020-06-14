@@ -674,6 +674,13 @@ class MainWindow(QMainWindow):
                 self.changeCmvParams()
 
     @Slot()
+    def on_btnpausegraph_clicked(self):
+        if self.plot_run:
+            self.plot_run = False
+        else:
+            self.plot_run = True
+
+    @Slot()
     def on_peepdisable_clicked(self):
         self.strtx = "<D,1," + str(self.peepdial.value()) + ".0>\r\n"
         self.flag_sensorlimit_tx = True
@@ -690,7 +697,7 @@ class MainWindow(QMainWindow):
     def on_btnstream_clicked(self):
         self.streamer = Backfeed('log2.txt')
         self.streamer.setCallback(self.getStreamData)
-        self.streamer.Start(100)
+        self.streamer.Start(25)
         #self.plotter.addItem(self.markerPeakPressure)
 
     @Slot()
@@ -1176,6 +1183,9 @@ class MainWindow(QMainWindow):
     def sensorData(self, data_stream):
         self.sensorDataString = data_stream
 
+    def splitSensorData(self, data_stream):
+        pass
+
     def LungSensorData(self, data_stream):
         #print(data_stream)
         #Logging the data @ 100 data received
@@ -1367,7 +1377,7 @@ class MainWindow(QMainWindow):
                     Working code for derivative data from lung pressure data.
                     '''
                     self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
-                    self.dvdata_compressed.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (2)))
+                    self.dvdata_compressed.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (1)))
 
                     '''
                     Following instruction will derive the data from the kalman of lung pressure.
