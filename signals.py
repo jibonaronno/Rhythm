@@ -34,12 +34,12 @@ class SignalDetector(object):
             self.edge = (((self.deriv_points[5] + self.deriv_points[4])/2) - ((self.deriv_points[0] + self.deriv_points[1])/2)) / 0.2
         
         if not self.first_negative:
-            if self.edge < -1:
+            if self.edge < 0:
                 self.peak_value = self.deriv_points[2] # element
                 self.first_negative = True
                 if self.func:
                     self.func()
-        elif self.edge > 1:
+        elif self.edge > 0:
             self.first_negative = False
 
 class WaveShape(object):
