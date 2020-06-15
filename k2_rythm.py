@@ -43,6 +43,7 @@ import struct
 from time import sleep
 import pyautogui
 
+
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
 class AlarmTypes(enum.Enum):
@@ -169,6 +170,7 @@ class MainWindow(QMainWindow):
         #self.flowplotter.hide()
         self.volplotter.hide()
 
+        self.show_hide_LeftPanel()
         #self.infoStack.hide()
         self.controlStack.hide()
         self.controls_show_hide = False
@@ -476,7 +478,7 @@ class MainWindow(QMainWindow):
             self.stackedWidget_2.show()
 
     def onEncoderValue(self, msg):
-        if self.runMode == MachineRunModes.CMV:
+        if self.runMode == MachineRunModes.BiPAP:
             parts = None
             value = 2
             if len(msg) <= 7:
@@ -520,18 +522,22 @@ class MainWindow(QMainWindow):
                     if parts[0] == '4':
                         value = int(parts[1])
                         if value < 3:
-                            self.changeFIOdial(value)
+                            #self.changeFIOdial(value)
+                            self.changeBipapdial(value)
                         elif value == 3:
-                            self.show_hide_LeftPanel()
+                            pass
+                            ##self.show_hide_LeftPanel()
                     if parts[0] == '5':
                         value = int(parts[1])
                         if value < 3:
                             self.encrFocus(value)
                         elif value == 3:
                             self.change_set(parts[1])
+                            self.change_set_bipap(parts[1])
                             self.ShowHideControls()
+                            self.show_hide_LeftPanel()
 
-        elif self.runMode == MachineRunModes.BiPAP:
+        elif self.runMode == MachineRunModes.CMV:
             parts = None
             value = 2
             if len(msg) <= 7:
@@ -640,6 +646,7 @@ class MainWindow(QMainWindow):
         self.iedial.setEnabled(True)
         self.rrdial.setEnabled(True)
         self.fiodial.setEnabled(True)
+        self.ipapdial.setEnabled(True)
         self.btnchangeset.setText("Set")
         self.flagEditCmv = True
 
@@ -648,6 +655,7 @@ class MainWindow(QMainWindow):
         self.iedial.setEnabled(False)
         self.rrdial.setEnabled(False)
         self.fiodial.setEnabled(False)
+        self.ipapdial.setEnabled(False)
         self.btnchangeset.setText("Change")
         self.flagEditCmv = False
 
@@ -702,6 +710,8 @@ class MainWindow(QMainWindow):
             self.controlStack.show()
             self.controls_show_hide = True
 
+        self.show_hide_LeftPanel()
+
     @Slot()
     def on_btnpausegraph_clicked(self):
         if self.plot_run:
@@ -727,6 +737,7 @@ class MainWindow(QMainWindow):
         self.streamer = Backfeed('log4.txt')
         self.streamer.setCallback(self.getStreamData)
         self.streamer.Start(100)
+        self.lungtimer.start(8000)
         #self.plotter.addItem(self.markerPeakPressure)
 
     @Slot()
@@ -1063,11 +1074,11 @@ class MainWindow(QMainWindow):
             self.buttonstack.setCurrentIndex(0)
             self.controlStack.setCurrentIndex(0)
             #self.label.setText("Mode : CMV")
-            self.runMode = MachineRunModes.CMV
+            self.runMode = MachineRunModes.BiPAP
         elif "CMV" in self.modecombobox.currentText():
             self.buttonstack.setCurrentIndex(2)
             self.controlStack.setCurrentIndex(2)
-            self.runMode = MachineRunModes.BiPAP
+            self.runMode = MachineRunModes.CMV
         elif "PS" in self.modecombobox.currentText():
             #self.label.setText("Mode : PS")
             self.runMode = MachineRunModes.PS
