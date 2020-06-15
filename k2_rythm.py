@@ -527,6 +527,8 @@ class MainWindow(QMainWindow):
                             self.encrFocus(value)
                         elif value == 3:
                             self.change_set(parts[1])
+                            self.ShowHideControls()
+                            
         elif self.runMode == MachineRunModes.BiPAP:
             parts = None
             value = 2
@@ -678,6 +680,16 @@ class MainWindow(QMainWindow):
                 self.setCmvParams()
             else:
                 self.changeCmvParams()
+
+    def ShowHideControls(self):
+        if self.controls_show_hide:
+            self.controlStack.hide()
+            self.infoStack.show()
+            self.controls_show_hide = False
+        else:
+            self.controlStack.show()
+            self.infoStack.hide()
+            self.controls_show_hide = True
 
     @Slot()
     def on_btnShowHide_clicked(self):
