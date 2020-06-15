@@ -169,6 +169,10 @@ class MainWindow(QMainWindow):
         #self.flowplotter.hide()
         self.volplotter.hide()
 
+        #self.infoStack.hide()
+        self.controlStack.hide()
+        self.controls_show_hide = False
+
         self.gcodetable = QTableWidget(self)
         self.gcodetable.setRowCount(1)
         self.gcodetable.setColumnCount(1)
@@ -676,6 +680,15 @@ class MainWindow(QMainWindow):
                 self.changeCmvParams()
 
     @Slot()
+    def on_btnShowHide_clicked(self):
+        if self.controls_show_hide:
+            self.controlStack.hide()
+            self.controls_show_hide = False
+        else:
+            self.controlStack.show()
+            self.controls_show_hide = True
+
+    @Slot()
     def on_btnpausegraph_clicked(self):
         if self.plot_run:
             self.plot_run = False
@@ -697,9 +710,9 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_btnstream_clicked(self):
-        self.streamer = Backfeed('log2.txt')
+        self.streamer = Backfeed('log4.txt')
         self.streamer.setCallback(self.getStreamData)
-        self.streamer.Start(25)
+        self.streamer.Start(100)
         #self.plotter.addItem(self.markerPeakPressure)
 
     @Slot()
@@ -1035,14 +1048,14 @@ class MainWindow(QMainWindow):
         if "CMV" in self.modecombobox.currentText():
             self.buttonstack.setCurrentIndex(0)
             self.controlStack.setCurrentIndex(0)
-            self.label.setText("Mode : CMV")
+            #self.label.setText("Mode : CMV")
             self.runMode = MachineRunModes.CMV
         elif "BiPAP" in self.modecombobox.currentText():
             self.buttonstack.setCurrentIndex(2)
             self.controlStack.setCurrentIndex(2)
             self.runMode = MachineRunModes.BiPAP
         elif "PS" in self.modecombobox.currentText():
-            self.label.setText("Mode : PS")
+            #self.label.setText("Mode : PS")
             self.runMode = MachineRunModes.PS
 
     def iedial_bipapChanged(self):
@@ -1262,8 +1275,10 @@ class MainWindow(QMainWindow):
                 if len(self.deriv_points) >= 0:
                     self.lungpressurepeakdata.append(float(self.peakdial.value()))
                     self.lungpressuredata.append(lungpressure + float(self.peepdial.value()))
-                    self.lung_detector.Cycle(lungpressure)
-                    self.lung_wave.Cycle(lungpressure)
+                    
+                    ## Shift below 2 lines in breath in only logic
+                    #self.lung_detector.Cycle(lungpressure)
+                    #self.lung_wave.Cycle(lungpressure)
 
                     try:
                         self.pulseGen()
@@ -1282,7 +1297,8 @@ class MainWindow(QMainWindow):
                     #pprint.pprint(self.lung_wave.wvdata)
                     #print(str(max(self.lung_wave.wvdata)))
                 try:
-                    self.peak_lung.setText('Lung Peak: ' + '{:03.2f}'.format(self.lung_detector.peak_value) + 'mb')
+                    #self.peak_lung.setText('Lung Peak: ' + '{:03.2f}'.format(self.lung_detector.peak_value) + 'mb')
+                    self.peak_lung.setText('{:03.2f}'.format(self.lung_wave.GetMax() ) + 'mb')
                 except:
                     pass
                 #if self.lung_detector.peak_value > 5:
@@ -1328,7 +1344,7 @@ class MainWindow(QMainWindow):
                         self.flow_detector.Cycle(0)
                     
                     try:
-                        self.peak_flow.setText("Flow Peak: " + '{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
+                        self.peak_flow.setText("FP" + '{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
                     except:
                         pass
 
@@ -1354,7 +1370,7 @@ class MainWindow(QMainWindow):
                     #    vol_base = 0
                     self.vol_detector.Cycle(vol_base)
                     ####self.volpeakdata.append(500.0)
-                    self.peak_vol.setText("Vol Peak: " + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
+                    self.peak_vol.setText("VP" + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
 
                     if lungpressure >= 0:
                         self.kalmanofpressuredata.append(self.kalmanpressure.Estimate(lungpressure ** 1.0))
@@ -1456,7 +1472,7 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print('Exception In Breath in / Breath out detection L-1319 : ' + str(e))
             '''
-
+            '''
             try:
                 if(len(self.deriv_points) >= 3):
                     if self.dvdata[-1] > 1:
@@ -1496,6 +1512,56 @@ class MainWindow(QMainWindow):
                                 self.idle_count = 3
                                 self.inhale_t_count = 0
                                 self.exhale_t_count = 0
+            except Exception as e:
+                print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
+            '''
+
+            try:
+                if self.flow_offseted > 0.5:
+                    self.curve1.setPen(self.derivative_pen_in)
+                    self.inhale_t_count += 1
+                    self.flag_idle = False
+                    self.idle_count = 0
+
+                    if not self.breath_in_tick:
+                        self.breath_in_tick = True
+                        self.wave.playin()
+                        self.lungtimer.setInterval(8000)
+                        self.lung_wave.StartWave()
+                        self.tsnap = time.perf_counter() - self.ttick
+                        self.lbl_rr.setText('RR  : ' + '{:02f}'.format(60 / self.tsnap) + ' E->E : {:f}'.format(self.tsnap))
+                        self.ttick = time.perf_counter()
+                        self.eptick = self.ttick
+
+                    
+                    # To detect peak lung pressure at breat in time only
+                    self.lung_detector.Cycle(lungpressure)
+                    self.lung_wave.Cycle(lungpressure)
+                    self.lung_wave.zero_count = 0
+                
+                elif self.flow_offseted <= 0:
+                    self.curve1.setPen(self.derivative_pen_out)
+                    self.exhale_t_count += 1
+                    self.flag_idle = False
+                    self.idle_count = 0
+                    self.sumofvolume = 0.0
+                    if self.breath_in_tick:
+                        self.breath_in_tick = False
+                        self.epsnap = time.perf_counter() - self.eptick
+                        self.lbl_ep.setText('E->P: ' + '{:f}'.format(self.epsnap))
+                        ### Reset the over pressure alarm when next peak is detcted ###
+                        if self.over_pressure_detection_delay == 0:
+                            if self.lung_detector.peak_value > 5:
+                                self.label_alarm.setText("Alarm: ")
+                else:
+                    if not self.flag_idle:
+                        self.idle_count += 1
+                        if self.idle_count > 2:
+                            ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
+                            self.flag_idle = True
+                            self.idle_count = 3
+                            self.inhale_t_count = 0
+                            self.exhale_t_count = 0
             except Exception as e:
                 print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
 

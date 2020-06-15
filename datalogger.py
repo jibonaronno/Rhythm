@@ -6,7 +6,7 @@ import pprint
 from backfeed import Backfeed
 
 class DataLogger(object):
-    def __init__(self, filename="log4.txt"):
+    def __init__(self, filename="log5.txt"):
         self.filename = filename
 
     def writeBlock(self, datalist):

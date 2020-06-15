@@ -53,6 +53,12 @@ class WaveShape(object):
         self.wave_in_buffer = False
         self.wvdata.clear()
 
+    def GetMax(self):
+        if len(self.wvdata) > 0:
+            return max(self.wvdata)
+        else:
+            return 0.0
+
     def Cycle(self, element:float):
         if self.zero_count < 5:
             self.wvdata.append(element)
