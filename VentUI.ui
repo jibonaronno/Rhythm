@@ -530,6 +530,12 @@
               <height>110</height>
              </size>
             </property>
+            <property name="maximumSize">
+             <size>
+              <width>400</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="currentIndex">
              <number>0</number>
             </property>
@@ -1931,7 +1937,7 @@
                <rect>
                 <x>25</x>
                 <y>0</y>
-                <width>100</width>
+                <width>121</width>
                 <height>30</height>
                </rect>
               </property>
@@ -1956,9 +1962,9 @@
              <widget class="QLabel" name="peak_flow">
               <property name="geometry">
                <rect>
-                <x>144</x>
+                <x>149</x>
                 <y>0</y>
-                <width>100</width>
+                <width>121</width>
                 <height>30</height>
                </rect>
               </property>
@@ -1983,9 +1989,9 @@
              <widget class="QLabel" name="peak_vol">
               <property name="geometry">
                <rect>
-                <x>270</x>
+                <x>276</x>
                 <y>0</y>
-                <width>91</width>
+                <width>121</width>
                 <height>31</height>
                </rect>
               </property>
@@ -2049,7 +2055,7 @@
                <rect>
                 <x>20</x>
                 <y>0</y>
-                <width>111</width>
+                <width>126</width>
                 <height>61</height>
                </rect>
               </property>
@@ -2060,9 +2066,9 @@
              <widget class="QWidget" name="lp_back_2" native="true">
               <property name="geometry">
                <rect>
-                <x>140</x>
+                <x>146</x>
                 <y>0</y>
-                <width>111</width>
+                <width>126</width>
                 <height>61</height>
                </rect>
               </property>
@@ -2107,9 +2113,9 @@ background-color: rgba(255, 255, 255, 0);</string>
              <widget class="QWidget" name="lp_back_3" native="true">
               <property name="geometry">
                <rect>
-                <x>260</x>
+                <x>272</x>
                 <y>0</y>
-                <width>111</width>
+                <width>126</width>
                 <height>61</height>
                </rect>
               </property>
@@ -2154,7 +2160,7 @@ background-color: rgba(255, 255, 255, 0);</string>
              <widget class="QWidget" name="lp_back_4" native="true">
               <property name="geometry">
                <rect>
-                <x>380</x>
+                <x>398</x>
                 <y>0</y>
                 <width>111</width>
                 <height>61</height>
@@ -2201,9 +2207,9 @@ background-color: rgba(255, 255, 255, 0);</string>
              <widget class="QLabel" name="lbl_rr">
               <property name="geometry">
                <rect>
-                <x>390</x>
+                <x>400</x>
                 <y>0</y>
-                <width>91</width>
+                <width>111</width>
                 <height>31</height>
                </rect>
               </property>
@@ -2229,7 +2235,7 @@ color: rgb(0, 255, 0);</string>
              <widget class="QWidget" name="lp_back_5" native="true">
               <property name="geometry">
                <rect>
-                <x>500</x>
+                <x>509</x>
                 <y>0</y>
                 <width>111</width>
                 <height>61</height>
