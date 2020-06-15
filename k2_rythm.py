@@ -377,8 +377,10 @@ class MainWindow(QMainWindow):
 
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
-        self.wave.playBeep  ()
+        self.wave.playBeep()
         self.lungtimer.setInterval(8000)
+
+    
     
     def reconnectSensor(self):
         pass
@@ -1361,7 +1363,7 @@ class MainWindow(QMainWindow):
                         self.flow_detector.Cycle(0)
                     
                     try:
-                        self.peak_flow.setText("FP" + '{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
+                        self.peak_flow.setText('{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
                     except:
                         pass
 
@@ -1387,7 +1389,7 @@ class MainWindow(QMainWindow):
                     #    vol_base = 0
                     self.vol_detector.Cycle(vol_base)
                     ####self.volpeakdata.append(500.0)
-                    self.peak_vol.setText("VP" + '{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
+                    self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
 
                     if lungpressure >= 0:
                         self.kalmanofpressuredata.append(self.kalmanpressure.Estimate(lungpressure ** 1.0))
@@ -1543,10 +1545,10 @@ class MainWindow(QMainWindow):
                     if not self.breath_in_tick:
                         self.breath_in_tick = True
                         self.wave.playin()
-                        self.lungtimer.setInterval(8000)
+                        #self.lungtimer.setInterval(8000)
                         self.lung_wave.StartWave()
                         self.tsnap = time.perf_counter() - self.ttick
-                        self.lbl_rr.setText('{:02f}'.format(60 / self.tsnap)) # + ' E->E : {:f}'.format(self.tsnap))
+                        self.lbl_rr.setText('{:03.2f}'.format(60 / self.tsnap)) # + ' E->E : {:f}'.format(self.tsnap))
                         self.ttick = time.perf_counter()
                         self.eptick = self.ttick
 
@@ -1565,7 +1567,7 @@ class MainWindow(QMainWindow):
                     if self.breath_in_tick:
                         self.breath_in_tick = False
                         self.epsnap = time.perf_counter() - self.eptick
-                        self.lbl_ep.setText('{:f}'.format(self.epsnap))
+                        self.lbl_ep.setText('{:02f}'.format(self.epsnap))
                         
                         ### Reset the over pressure alarm when next peak is detcted ###
                         if self.over_pressure_detection_delay == 0:
@@ -1582,6 +1584,7 @@ class MainWindow(QMainWindow):
                         else:
                             self.lungLowPressureCount = 0
                             self.lungLowPressureDetected = False
+                            self.lungtimer.setInterval(8000)
                 else:
                     if not self.flag_idle:
                         self.idle_count += 1
@@ -1638,7 +1641,7 @@ class MainWindow(QMainWindow):
                 print('Exception SetData pulseCurve')
             
             try:
-                if (float(self.lst[0]) + float(self.peepdial.value())) > float(self.peakdial.value()):
+                if (lungpressure > float(self.peakdial.value())):
                     if self.sensorThreadCreated:
                         self.wave.playfile()
                         self.label_alarm.setText("Alarm: Over Pressure")
