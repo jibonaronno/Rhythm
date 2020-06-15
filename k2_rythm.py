@@ -281,8 +281,8 @@ class MainWindow(QMainWindow):
 
         self.pulseTimer = QTimer(self)
 
-        self.modecombobox.addItem("CMV")
         self.modecombobox.addItem("BiPAP")
+        self.modecombobox.addItem("CMV")
         self.modecombobox.addItem("PS")
 
         self.ComPorts = {'Marlin':'NA', 'Sensor':'NA', 'Encoder':'NA'}
@@ -528,7 +528,7 @@ class MainWindow(QMainWindow):
                         elif value == 3:
                             self.change_set(parts[1])
                             self.ShowHideControls()
-                            
+
         elif self.runMode == MachineRunModes.BiPAP:
             parts = None
             value = 2
@@ -1057,12 +1057,12 @@ class MainWindow(QMainWindow):
         self.rrlcd_bp.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 
     def modeselectionchanged(self):
-        if "CMV" in self.modecombobox.currentText():
+        if "BiPAP" in self.modecombobox.currentText():
             self.buttonstack.setCurrentIndex(0)
             self.controlStack.setCurrentIndex(0)
             #self.label.setText("Mode : CMV")
             self.runMode = MachineRunModes.CMV
-        elif "BiPAP" in self.modecombobox.currentText():
+        elif "CMV" in self.modecombobox.currentText():
             self.buttonstack.setCurrentIndex(2)
             self.controlStack.setCurrentIndex(2)
             self.runMode = MachineRunModes.BiPAP
@@ -1206,6 +1206,11 @@ class MainWindow(QMainWindow):
     lpzerocount = 0
 
     sensorDataString = ''
+
+    lungPeakPressure = 0
+    lungLowPressureCount = 0
+    lungLowPressureDetected = False
+    
 
     def sensorData(self, data_stream):
         self.sensorDataString = data_stream
@@ -1541,7 +1546,7 @@ class MainWindow(QMainWindow):
                         self.lungtimer.setInterval(8000)
                         self.lung_wave.StartWave()
                         self.tsnap = time.perf_counter() - self.ttick
-                        self.lbl_rr.setText('RR  : ' + '{:02f}'.format(60 / self.tsnap) + ' E->E : {:f}'.format(self.tsnap))
+                        self.lbl_rr.setText('{:02f}'.format(60 / self.tsnap)) # + ' E->E : {:f}'.format(self.tsnap))
                         self.ttick = time.perf_counter()
                         self.eptick = self.ttick
 
@@ -1560,11 +1565,23 @@ class MainWindow(QMainWindow):
                     if self.breath_in_tick:
                         self.breath_in_tick = False
                         self.epsnap = time.perf_counter() - self.eptick
-                        self.lbl_ep.setText('E->P: ' + '{:f}'.format(self.epsnap))
+                        self.lbl_ep.setText('{:f}'.format(self.epsnap))
+                        
                         ### Reset the over pressure alarm when next peak is detcted ###
                         if self.over_pressure_detection_delay == 0:
                             if self.lung_detector.peak_value > 5:
                                 self.label_alarm.setText("Alarm: ")
+
+                        self.lungPeakPressure = self.lung_wave.GetMax()
+                        if self.lungPeakPressure < 10:
+                            if self.lungLowPressureCount < 2:
+                                self.lungLowPressureCount += 1
+                            else:
+                                self.lungLowPressureDetected = True
+                                self.label_alarm.setText('Alarm : Low Pressure')
+                        else:
+                            self.lungLowPressureCount = 0
+                            self.lungLowPressureDetected = False
                 else:
                     if not self.flag_idle:
                         self.idle_count += 1
@@ -1574,6 +1591,9 @@ class MainWindow(QMainWindow):
                             self.idle_count = 3
                             self.inhale_t_count = 0
                             self.exhale_t_count = 0
+
+                ### Low Pressure Detection
+
             except Exception as e:
                 print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
 

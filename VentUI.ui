@@ -526,13 +526,13 @@
            <widget class="QStackedWidget" name="controlStack">
             <property name="minimumSize">
              <size>
-              <width>300</width>
+              <width>100</width>
               <height>110</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>400</width>
+              <width>100</width>
               <height>16777215</height>
              </size>
             </property>
@@ -1944,7 +1944,7 @@
               <property name="font">
                <font>
                 <family>Consolas</family>
-                <pointsize>20</pointsize>
+                <pointsize>14</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -1971,7 +1971,7 @@
               <property name="font">
                <font>
                 <family>Consolas</family>
-                <pointsize>20</pointsize>
+                <pointsize>14</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -1998,7 +1998,7 @@
               <property name="font">
                <font>
                 <family>Consolas</family>
-                <pointsize>20</pointsize>
+                <pointsize>14</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -2125,7 +2125,7 @@ background-color: rgba(255, 255, 255, 0);</string>
               <widget class="QLabel" name="label_7">
                <property name="geometry">
                 <rect>
-                 <x>30</x>
+                 <x>40</x>
                  <y>30</y>
                  <width>47</width>
                  <height>31</height>
@@ -2216,7 +2216,7 @@ background-color: rgba(255, 255, 255, 0);</string>
               <property name="font">
                <font>
                 <family>Consolas</family>
-                <pointsize>20</pointsize>
+                <pointsize>14</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
@@ -2290,7 +2290,7 @@ background-color: rgba(255, 255, 255, 0);</string>
                <property name="font">
                 <font>
                  <family>Tw Cen MT</family>
-                 <pointsize>20</pointsize>
+                 <pointsize>14</pointsize>
                  <weight>75</weight>
                  <italic>false</italic>
                  <bold>true</bold>
