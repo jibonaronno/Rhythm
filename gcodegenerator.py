@@ -124,7 +124,7 @@ class GcodeGenerator(object):
         #self.xav = self.calib_dict[self.vt]
         #self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
         try:
-            self.xav = self.calib_dict[self.vt]
+            self.xav = self.calib_dict[self.vt] + self.xavv
             print('Dict : ' + str(self.calib_dict[self.vt]))
         except Exception as e:
             print('ComputeCMV - ' + str(e))
@@ -133,7 +133,7 @@ class GcodeGenerator(object):
         #if self.xavv != 0:
             #self.xav = self.xrect * ((self.vt + self.x_adj) / self.vtmax) * self.vtfactor
         
-        self.Dp = self.Dt + self.xav + self.xavv
+        self.Dp = self.Dt + self.xav
         self.TDMS = 0.5
 
         self.Kie =  1/self.ie
@@ -147,8 +147,8 @@ class GcodeGenerator(object):
         self.sol1_ti=(-1*self.midpart_ti+self.identifier_ti)/2
         self.sol2_ti=(-1*self.midpart_ti-self.identifier_ti)/2
 
-        if self.sol1_ti>self.xav:
-            if self.sol2_ti>self.xav:
+        if self.sol1_ti > self.xav:
+            if self.sol2_ti > self.xav:
                 self.dsmall_ti=0.1
             else:
                 self.dsmall_ti=self.sol2_ti
