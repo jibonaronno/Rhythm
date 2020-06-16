@@ -117,6 +117,7 @@ class GcodeGenerator(object):
     
     def ComputeCMV(self):
         self.Dt = self.xmax - self.xrect
+        self.xav = self.calib_dict[self.vt]
         #self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
         try:
                 self.xav = self.calib_dict[self.vt]
