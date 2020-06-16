@@ -1599,7 +1599,7 @@ class MainWindow(QMainWindow):
                             self.lungtimer.setInterval(8000)
 
                         if self.lungPeakPressure < (self.ipapdial.value() - 1):
-                            if self.generator.xav 65 30:
+                            if self.generator.xav < 65:
                                 if self.vt_unmatch_count < 2:
                                     self.vt_unmatch_count += 1
                                 else:
