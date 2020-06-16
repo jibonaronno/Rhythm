@@ -168,7 +168,7 @@ class MainWindow(QMainWindow):
         self.verticalLayout_2.addWidget(self.volplotter)
         #self.plotter.hide()
         #self.flowplotter.hide()
-        self.volplotter.hide()
+        #self.volplotter.hide()
 
         self.show_hide_LeftPanel()
         #self.infoStack.hide()
@@ -1382,7 +1382,7 @@ class MainWindow(QMainWindow):
                     self.flowpeakdata.append(1)
 
                     '''Volume data came from kalman of lungpressure'''
-                    '''Now volume caming from flowprocess.Volume'''
+                    '''Now volume coming from flowprocess.Volume'''
                     ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
                     ####vol_base = self.kalman.Estimate(float(self.lst[0]))
                     if self.flow_for_volume != 0:
@@ -1598,7 +1598,7 @@ class MainWindow(QMainWindow):
                             self.lungLowPressureDetected = False
                             self.lungtimer.setInterval(8000)
 
-                        if self.lungPeakPressure < (self.ipapDial.value() - 1):
+                        if self.lungPeakPressure < (self.ipapdial.value() - 1):
                             if self.vt < 550:
                                 if self.vt_unmatch_count < 2:
                                     self.vt_unmatch_count += 1
@@ -1606,7 +1606,7 @@ class MainWindow(QMainWindow):
                                     self.vt_adjust = self.vt_adjust + self.vt + 1
                                     self.vt_unmatch_count = 0
                                 self.SaveSettings()
-                        elif self.lungPeakPressure > (self.ipapDial.value() + 1):
+                        elif self.lungPeakPressure > (self.ipapdial.value() + 1):
                             if self.vt >= 250:
                                 if self.vt_unmatch_count < 2:
                                     self.vt_unmatch_count += 1
