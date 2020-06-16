@@ -1607,6 +1607,7 @@ class MainWindow(QMainWindow):
                                     self.vt_unmatch_count = 0
                                     self.vt = self.vt_adjust
                                     print('Adjusting Bipap ++')
+                                    self.settings_dict[r"vt"] = str(self.vt)
                                     self.SaveSettings()
                         elif self.lungPeakPressure > (self.ipapdial.value() + 1):
                             if self.vt >= 250:
@@ -1617,6 +1618,7 @@ class MainWindow(QMainWindow):
                                     self.vt_unmatch_count = 0
                                     self.vt = self.vt_adjust
                                     print('Adjusting Bipap --')
+                                    self.settings_dict[r"vt"] = str(self.vt)
                                     self.SaveSettings()
                         else:
                             self.vt_unmatch_count = 0
