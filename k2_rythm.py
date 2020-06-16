@@ -837,7 +837,10 @@ class MainWindow(QMainWindow):
 
     def on_encoder(self, data_stream):
         #print(str(data_stream))
-        self.onEncoderValue(data_stream)
+        try:
+            self.onEncoderValue(data_stream)
+        except Exception as e:
+            print('Exception At on_encoder() : ' + str(e))
 
     
     pparr = []
