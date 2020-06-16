@@ -114,16 +114,19 @@ class GcodeGenerator(object):
         self.Vi = self.ViAvg
         self.VhAvg = self.vhmax* 60
         self.Vh = self.VhAvg
+
+    xavv = 0
     
     def ComputeCMV(self):
         self.Dt = self.xmax - self.xrect
-        self.xav = self.calib_dict[self.vt]
+        #self.xav = self.calib_dict[self.vt]
         #self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
         try:
                 self.xav = self.calib_dict[self.vt]
                 print('Dict : ' + str(self.calib_dict[self.vt]))
         except Exception as e:
                 print('ComputeCMV - ' + str(e))
+                self.xav = self.xavv
         self.Dp = self.Dt + self.xav
         self.TDMS = 0.5
 

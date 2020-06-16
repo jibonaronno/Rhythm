@@ -1599,26 +1599,26 @@ class MainWindow(QMainWindow):
                             self.lungtimer.setInterval(8000)
 
                         if self.lungPeakPressure < (self.ipapdial.value() - 1):
-                            if self.vt < 550:
+                            if self.generator.xav 65 30:
                                 if self.vt_unmatch_count < 2:
                                     self.vt_unmatch_count += 1
                                 else:
-                                    self.vt_adjust = self.vt_adjust + self.vt + 1
+                                    self.vt_adjust = self.generator.xav + 1
                                     self.vt_unmatch_count = 0
-                                    self.vt = self.vt_adjust
+                                    self.generator.xavv = self.vt_adjust
                                     print('Adjusting Bipap ++')
-                                    self.settings_dict[r"vt"] = str(self.vt)
+                                    #self.settings_dict[r"vt"] = str(self.vt)
                                     self.SaveSettings()
                         elif self.lungPeakPressure > (self.ipapdial.value() + 1):
-                            if self.vt >= 250:
+                            if self.vt >= 30:
                                 if self.vt_unmatch_count < 2:
                                     self.vt_unmatch_count += 1
                                 else:
-                                    self.vt_adjust = self.vt_adjust + (self.vt - 1)
+                                    self.vt_adjust = self.generator.xav - 1
                                     self.vt_unmatch_count = 0
-                                    self.vt = self.vt_adjust
+                                    self.generator.xavv = self.vt_adjust
                                     print('Adjusting Bipap --')
-                                    self.settings_dict[r"vt"] = str(self.vt)
+                                    #self.settings_dict[r"vt"] = str(self.vt)
                                     self.SaveSettings()
                         else:
                             self.vt_unmatch_count = 0
