@@ -1598,30 +1598,31 @@ class MainWindow(QMainWindow):
                             self.lungLowPressureDetected = False
                             self.lungtimer.setInterval(8000)
 
-                        if self.lungPeakPressure < (self.ipapdial.value() - 5):
-                            if self.generator.xavv < 20: #------------------
-                                if self.vt_unmatch_count < 1:
-                                    self.vt_unmatch_count += 1
-                                else:
-                                    self.vt_adjust += 1 #----------------
-                                    self.vt_unmatch_count = 0
-                                    self.generator.xavv = self.vt_adjust
-                                    print('Adjusting Bipap ++')
-                                    #self.settings_dict[r"vt"] = str(self.vt)
-                                    self.SaveSettings()
-                        elif self.lungPeakPressure > (self.ipapdial.value() + 5):
-                            if self.vt >= -20: #-------------------
-                                if self.vt_unmatch_count < 1:
-                                    self.vt_unmatch_count += 1
-                                else:
-                                    self.vt_adjust -= 1 #---------------------
-                                    self.vt_unmatch_count = 0
-                                    self.generator.xavv = self.vt_adjust
-                                    print('Adjusting Bipap --')
-                                    #self.settings_dict[r"vt"] = str(self.vt)
-                                    self.SaveSettings()
-                        else:
-                            self.vt_unmatch_count = 0
+                        if not self.worker.flagStop:
+                            if self.lungPeakPressure < (self.ipapdial.value() - 1):
+                                if self.generator.xavv < 20: #------------------
+                                    if self.vt_unmatch_count < 1:
+                                        self.vt_unmatch_count += 1
+                                    else:
+                                        self.vt_adjust += 5 #----------------
+                                        self.vt_unmatch_count = 0
+                                        self.generator.xavv = self.vt_adjust
+                                        print('Adjusting Bipap ++')
+                                        #self.settings_dict[r"vt"] = str(self.vt)
+                                        self.SaveSettings()
+                            elif self.lungPeakPressure > (self.ipapdial.value() + 1):
+                                if self.vt >= -20: #-------------------
+                                    if self.vt_unmatch_count < 1:
+                                        self.vt_unmatch_count += 1
+                                    else:
+                                        self.vt_adjust -= 5 #---------------------
+                                        self.vt_unmatch_count = 0
+                                        self.generator.xavv = self.vt_adjust
+                                        print('Adjusting Bipap --')
+                                        #self.settings_dict[r"vt"] = str(self.vt)
+                                        self.SaveSettings()
+                            else:
+                                self.vt_unmatch_count = 0
 
                         
                 else:
