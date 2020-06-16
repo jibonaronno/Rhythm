@@ -1112,8 +1112,7 @@ class MainWindow(QMainWindow):
         self.epaplcd.display(self.epapdial.value())
 
     def ipapDialChanged(self):
-        pass
-        #self.ipaplcd.display(self.ipapdial.value())
+        self.ipaplcd.display(self.ipapdial.value())
         #self.flag_sensorlimit_tx = False
         #if self.workerThreadCreated:
             #self.generator.GenerateBiPAP(self.pparr, self.ipapdial.value())
