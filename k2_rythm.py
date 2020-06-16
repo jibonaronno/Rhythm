@@ -1614,6 +1614,8 @@ class MainWindow(QMainWindow):
                                     self.vt_adjust = self.vt_adjust + (self.vt - 1)
                                     self.vt_unmatch_count = 0
                                 self.SaveSettings()
+                        else:
+                            self.vt_unmatch_count = 0
 
                         
                 else:
