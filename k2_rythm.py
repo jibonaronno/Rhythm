@@ -522,15 +522,17 @@ class MainWindow(QMainWindow):
                     if parts[0] == '4':
                         value = int(parts[1])
                         if value < 3:
+                            pass
                             #self.changeFIOdial(value)
-                            self.changeBipapdial(value)
+                            #self.changeBipapdial(value)
                         elif value == 3:
                             pass
                             ##self.show_hide_LeftPanel()
                     if parts[0] == '5':
                         value = int(parts[1])
                         if value < 3:
-                            self.encrFocus(value)
+                            self.changeBipapdial(value)
+                            #self.encrFocus(value)
                         elif value == 3:
                             self.change_set(parts[1])
                             self.change_set_bipap(parts[1])
@@ -986,14 +988,7 @@ class MainWindow(QMainWindow):
         if self.workerThreadCreated:
             self.worker.updateGcode(self.generator)
         pprint.pprint(self.generator.gcodestr)
-        #self.json.dumptojson()
-        ###self.vt = int(self.settings_dict[r"vt"])
-        ###self.rr = int(self.settings_dict[r"rr"])
-        ###self.ie = int(self.settings_dict[r"ie"])
-        ###self.fio2 = int(self.settings_dict[r"fio2"])
         self.CalculateSettings()
-        ###print(str(self.vt) + ", "+str(self.ie)+", "+str(self.rr)+", "+str(self.fio2)+"\r\n")
-        ###pprint.pprint(self.json.dict)
 
     @Slot()
     def on_alarm_clicked(self):
@@ -1117,11 +1112,12 @@ class MainWindow(QMainWindow):
         self.epaplcd.display(self.epapdial.value())
 
     def ipapDialChanged(self):
-        self.ipaplcd.display(self.ipapdial.value())
-        self.flag_sensorlimit_tx = False
-        if self.workerThreadCreated:
-            self.generator.GenerateBiPAP(self.pparr, self.ipapdial.value())
-            self.worker.updateGcode(self.generator)
+        pass
+        #self.ipaplcd.display(self.ipapdial.value())
+        #self.flag_sensorlimit_tx = False
+        #if self.workerThreadCreated:
+            #self.generator.GenerateBiPAP(self.pparr, self.ipapdial.value())
+            #self.worker.updateGcode(self.generator)
 
 
     def vtDialChanged(self):
@@ -1226,6 +1222,9 @@ class MainWindow(QMainWindow):
     lungPeakPressure = 0
     lungLowPressureCount = 0
     lungLowPressureDetected = False
+
+    vt_adjust = 0
+    vt_unmatch_count = 0
     
 
     def sensorData(self, data_stream):
@@ -1599,6 +1598,11 @@ class MainWindow(QMainWindow):
                             self.lungLowPressureCount = 0
                             self.lungLowPressureDetected = False
                             self.lungtimer.setInterval(8000)
+
+                        if self.lungPeakPressure < (self.ipapDial.value() - 1):
+                            self.vt_unmatch_count += 1
+
+                        
                 else:
                     if not self.flag_idle:
                         self.idle_count += 1
