@@ -1570,7 +1570,7 @@ class MainWindow(QMainWindow):
                     self.lung_wave.Cycle(lungpressure)
                     self.lung_wave.zero_count = 0
                 
-                elif self.flow_offseted <= 0:
+                elif self.flow_offseted <= 0.5:
                     self.curve1.setPen(self.derivative_pen_out)
                     self.exhale_t_count += 1
                     self.flag_idle = False
@@ -1579,7 +1579,7 @@ class MainWindow(QMainWindow):
                     if self.breath_in_tick:
                         self.breath_in_tick = False
                         self.epsnap = time.perf_counter() - self.eptick
-                        self.lbl_ep.setText('{:02f}'.format(self.epsnap))
+                        self.lbl_ep.setText('{:02.2f}'.format(self.epsnap))
                         
                         ### Reset the over pressure alarm when next peak is detcted ###
                         if self.over_pressure_detection_delay == 0:
@@ -1599,22 +1599,22 @@ class MainWindow(QMainWindow):
                             self.lungtimer.setInterval(8000)
 
                         if self.lungPeakPressure < (self.ipapdial.value() - 1):
-                            if self.generator.xav < 65:
+                            if self.generator.xavv < 10: #------------------
                                 if self.vt_unmatch_count < 2:
                                     self.vt_unmatch_count += 1
                                 else:
-                                    self.vt_adjust = self.generator.xav + 1
+                                    self.vt_adjust += 1 #----------------
                                     self.vt_unmatch_count = 0
                                     self.generator.xavv = self.vt_adjust
                                     print('Adjusting Bipap ++')
                                     #self.settings_dict[r"vt"] = str(self.vt)
                                     self.SaveSettings()
                         elif self.lungPeakPressure > (self.ipapdial.value() + 1):
-                            if self.vt >= 30:
+                            if self.vt >= -10: #-------------------
                                 if self.vt_unmatch_count < 2:
                                     self.vt_unmatch_count += 1
                                 else:
-                                    self.vt_adjust = self.generator.xav - 1
+                                    self.vt_adjust -= 1 #---------------------
                                     self.vt_unmatch_count = 0
                                     self.generator.xavv = self.vt_adjust
                                     print('Adjusting Bipap --')

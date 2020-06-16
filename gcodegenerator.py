@@ -122,12 +122,13 @@ class GcodeGenerator(object):
         #self.xav = self.calib_dict[self.vt]
         #self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
         try:
-                self.xav = self.calib_dict[self.vt]
-                print('Dict : ' + str(self.calib_dict[self.vt]))
+            self.xav = self.calib_dict[self.vt]
+            print('Dict : ' + str(self.calib_dict[self.vt]))
         except Exception as e:
-                print('ComputeCMV - ' + str(e))
-                self.xav = self.xavv
-        self.Dp = self.Dt + self.xav
+            print('ComputeCMV - ' + str(e))
+            #self.xav = self.xavv
+        
+        self.Dp = self.Dt + self.xav + self.xavv
         self.TDMS = 0.5
 
         self.Kie =  1/self.ie
