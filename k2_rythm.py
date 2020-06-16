@@ -1600,19 +1600,21 @@ class MainWindow(QMainWindow):
                             self.lungtimer.setInterval(8000)
 
                         if self.lungPeakPressure < (self.ipapDial.value() - 1):
-                            if self.vt_unmatch_count < 2:
-                                self.vt_unmatch_count += 1
-                            else:
-                                self.vt_adjust = self.vt_adjust + self.vt + 1
-                                self.vt_unmatch_count = 0
-                            self.SaveSettings()
+                            if self.vt < 550:
+                                if self.vt_unmatch_count < 2:
+                                    self.vt_unmatch_count += 1
+                                else:
+                                    self.vt_adjust = self.vt_adjust + self.vt + 1
+                                    self.vt_unmatch_count = 0
+                                self.SaveSettings()
                         elif self.lungPeakPressure > (self.ipapDial.value() + 1):
-                            if self.vt_unmatch_count < 2:
-                                self.vt_unmatch_count += 1
-                            else:
-                                self.vt_adjust = self.vt_adjust + (self.vt - 1)
-                                self.vt_unmatch_count = 0
-                            self.SaveSettings()
+                            if self.vt >= 250:
+                                if self.vt_unmatch_count < 2:
+                                    self.vt_unmatch_count += 1
+                                else:
+                                    self.vt_adjust = self.vt_adjust + (self.vt - 1)
+                                    self.vt_unmatch_count = 0
+                                self.SaveSettings()
 
                         
                 else:
