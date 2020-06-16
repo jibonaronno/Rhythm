@@ -129,6 +129,9 @@ class GcodeGenerator(object):
         except Exception as e:
             print('ComputeCMV - ' + str(e))
             #self.xav = self.xavv
+
+        #if self.xavv != 0:
+            #self.xav = self.xrect * ((self.vt + self.x_adj) / self.vtmax) * self.vtfactor
         
         self.Dp = self.Dt + self.xav + self.xavv
         self.TDMS = 0.5
