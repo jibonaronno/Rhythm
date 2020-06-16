@@ -1557,13 +1557,13 @@ class MainWindow(QMainWindow):
             '''
 
             try:
-                if not self.breathInState:
-                    if self.flow_offseted > 0.5:
-                        
+                
+                if self.flow_offseted > 0.5:
+                    if not self.breathInState:
                         self.breath_in_min_time = ((60 / self.rr) / self.ie) * 1000
                         self.breathInState = True
                         self.breathInMinTimer.start(self.breath_in_min_time)
-                      
+                    
                         self.curve1.setPen(self.derivative_pen_in)
                         self.inhale_t_count += 1
                         self.flag_idle = False
@@ -1579,76 +1579,76 @@ class MainWindow(QMainWindow):
                             self.ttick = time.perf_counter()
                             self.eptick = self.ttick
 
-                        
-                        # To detect peak lung pressure at breat in time only
-                        self.lung_detector.Cycle(lungpressure)
-                        self.lung_wave.Cycle(lungpressure)
-                        self.lung_wave.zero_count = 0
                     
-                    elif self.flow_offseted <= 0.5:
-                        self.curve1.setPen(self.derivative_pen_out)
-                        self.exhale_t_count += 1
-                        self.flag_idle = False
-                        self.idle_count = 0
-                        self.sumofvolume = 0.0
-                        if self.breath_in_tick:
-                            self.breath_in_tick = False
-                            self.epsnap = time.perf_counter() - self.eptick
-                            self.lbl_ep.setText('{:02.2f}'.format(self.epsnap))
-                            
-                            ### Reset the over pressure alarm when next peak is detcted ###
-                            if self.over_pressure_detection_delay == 0:
-                                if self.lung_detector.peak_value > 5:
-                                    self.label_alarm.setText("Alarm: ")
+                    # To detect peak lung pressure at breat in time only
+                    self.lung_detector.Cycle(lungpressure)
+                    self.lung_wave.Cycle(lungpressure)
+                    self.lung_wave.zero_count = 0
+                
+                elif self.flow_offseted <= 0.5:
+                    self.curve1.setPen(self.derivative_pen_out)
+                    self.exhale_t_count += 1
+                    self.flag_idle = False
+                    self.idle_count = 0
+                    self.sumofvolume = 0.0
+                    if self.breath_in_tick and not self.breathInState:
+                        self.breath_in_tick = False
+                        self.epsnap = time.perf_counter() - self.eptick
+                        self.lbl_ep.setText('{:02.2f}'.format(self.epsnap))
+                        
+                        ### Reset the over pressure alarm when next peak is detcted ###
+                        if self.over_pressure_detection_delay == 0:
+                            if self.lung_detector.peak_value > 5:
+                                self.label_alarm.setText("Alarm: ")
 
-                            self.lungPeakPressure = self.lung_wave.GetMax()
-                            if self.lungPeakPressure < 10:
-                                if self.lungLowPressureCount < 2:
-                                    self.lungLowPressureCount += 1
-                                else:
-                                    self.lungLowPressureDetected = True
-                                    self.label_alarm.setText('Alarm : Low Pressure')
+                        self.lungPeakPressure = self.lung_wave.GetMax()
+                        if self.lungPeakPressure < 10:
+                            if self.lungLowPressureCount < 2:
+                                self.lungLowPressureCount += 1
                             else:
-                                self.lungLowPressureCount = 0
-                                self.lungLowPressureDetected = False
-                                self.lungtimer.setInterval(8000)
+                                self.lungLowPressureDetected = True
+                                self.label_alarm.setText('Alarm : Low Pressure')
+                        else:
+                            self.lungLowPressureCount = 0
+                            self.lungLowPressureDetected = False
+                            self.lungtimer.setInterval(8000)
 
-                            if not self.worker.flagStop:
-                                if self.lungPeakPressure < (self.ipapdial.value() - 1):
-                                    if self.generator.xavv < 20: #------------------
-                                        if self.vt_unmatch_count < 1:
-                                            self.vt_unmatch_count += 1
-                                        else:
-                                            self.vt_adjust += 5 #----------------
-                                            self.vt_unmatch_count = 0
-                                            self.generator.xavv = self.vt_adjust
-                                            print('Adjusting Bipap ++')
-                                            #self.settings_dict[r"vt"] = str(self.vt)
-                                            self.SaveSettings()
-                                elif self.lungPeakPressure > (self.ipapdial.value() + 1):
-                                    if self.vt >= -20: #-------------------
-                                        if self.vt_unmatch_count < 1:
-                                            self.vt_unmatch_count += 1
-                                        else:
-                                            self.vt_adjust -= 5 #---------------------
-                                            self.vt_unmatch_count = 0
-                                            self.generator.xavv = self.vt_adjust
-                                            print('Adjusting Bipap --')
-                                            #self.settings_dict[r"vt"] = str(self.vt)
-                                            self.SaveSettings()
-                                else:
-                                    self.vt_unmatch_count = 0
+                        if not self.worker.flagStop:
+                            if self.lungPeakPressure < (self.ipapdial.value() - 1):
+                                if self.generator.xavv < 20: #------------------
+                                    if self.vt_unmatch_count < 1:
+                                        self.vt_unmatch_count += 1
+                                    else:
+                                        self.vt_adjust += 5 #----------------
+                                        self.vt_unmatch_count = 0
+                                        self.generator.xavv = self.vt_adjust
+                                        print('Adjusting Bipap ++')
+                                        #self.settings_dict[r"vt"] = str(self.vt)
+                                        self.SaveSettings()
+                            elif self.lungPeakPressure > (self.ipapdial.value() + 1):
+                                if self.vt >= -20: #-------------------
+                                    if self.vt_unmatch_count < 1:
+                                        self.vt_unmatch_count += 1
+                                    else:
+                                        self.vt_adjust -= 5 #---------------------
+                                        self.vt_unmatch_count = 0
+                                        self.generator.xavv = self.vt_adjust
+                                        print('Adjusting Bipap --')
+                                        #self.settings_dict[r"vt"] = str(self.vt)
+                                        self.SaveSettings()
+                            else:
+                                self.vt_unmatch_count = 0
 
-                            
-                    else:
-                        if not self.flag_idle:
-                            self.idle_count += 1
-                            if self.idle_count > 2:
-                                ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
-                                self.flag_idle = True
-                                self.idle_count = 3
-                                self.inhale_t_count = 0
-                                self.exhale_t_count = 0
+                        
+                else:
+                    if not self.flag_idle:
+                        self.idle_count += 1
+                        if self.idle_count > 2:
+                            ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
+                            self.flag_idle = True
+                            self.idle_count = 3
+                            self.inhale_t_count = 0
+                            self.exhale_t_count = 0
 
                 ### Low Pressure Detection
 
