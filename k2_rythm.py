@@ -79,7 +79,7 @@ class MainWindow(QMainWindow):
         self.rr = self.rrdial.value()
         self.fio2 = self.fiodial.value()
 
-        self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
+        self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2, self.vt_adjust)
 
         self.loadMachineSetup(self.generator)
 
@@ -983,12 +983,12 @@ class MainWindow(QMainWindow):
         self.json.dict[r'ie'] = str(self.ie)
         self.json.dict[r'rr'] = str(self.rr)
         self.json.dict[r'fio2'] = str(self.fio2)
-        self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
+        self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2, self.vt_adjust)
         self.generator.GenerateCMV()
         if self.workerThreadCreated:
             self.worker.updateGcode(self.generator)
         pprint.pprint(self.generator.gcodestr)
-        self.CalculateSettings()
+        #self.CalculateSettings()
 
     @Slot()
     def on_alarm_clicked(self):
@@ -1155,7 +1155,7 @@ class MainWindow(QMainWindow):
 
     def CalculateSettings(self):
         del self.generator
-        self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2)
+        self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2, self.vt_adjust)
         self.generator.GenerateCMV()
 
     def parseSensorData(self, data_stream):

@@ -5,12 +5,13 @@ from machinesetup import MachineSetup
 import pprint
 
 class GcodeGenerator(object):
-    def __init__(self, vt, rr, ie, fio2):
+    def __init__(self, vt, rr, ie, fio2, x_adj):
         self.vtfactor = 1.0
         self.vt = vt
         self.rr = rr
         self.ie = ie
         self.fio2 = fio2
+        self.x_adj = x_adj
         self.ACC=1000
         self.xmax = 75 #60
         self.xamb = 40 #12
@@ -118,6 +119,7 @@ class GcodeGenerator(object):
     xavv = 0
     
     def ComputeCMV(self):
+        self.xavv = self.x_adj
         self.Dt = self.xmax - self.xrect
         #self.xav = self.calib_dict[self.vt]
         #self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
