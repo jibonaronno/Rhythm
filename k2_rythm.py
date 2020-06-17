@@ -1617,7 +1617,7 @@ class MainWindow(QMainWindow):
                         ## Auto adjust code for pressure or Bipap Mode
                         ############################################################################
                         lpdiff = 0 ## Lung Pressure Diff from Target Pressure ipapdial
-                        changefactor = 0
+                        changefactor = 0.0
 
                         if self.runMode == MachineRunModes.BiPAP:
                             if self.workerThreadCreated:
@@ -1634,7 +1634,7 @@ class MainWindow(QMainWindow):
                                                 self.vt_adjust += changefactor #----------------
                                                 self.vt_unmatch_count = 0
                                                 self.generator.xavv = self.vt_adjust
-                                                print('Adjusting Bipap ++ : ' + str(changefactor))
+                                                print('Adjusting Bipap ++ : ' + str(changefactor) + ' lpDiff-' + str(lpdiff))
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
                                     elif self.lungPeakPressure > (self.ipapdial.value() + 1):
@@ -1649,7 +1649,7 @@ class MainWindow(QMainWindow):
                                                 self.vt_adjust -= changefactor #---------------------
                                                 self.vt_unmatch_count = 0
                                                 self.generator.xavv = self.vt_adjust
-                                                print('Adjusting Bipap -- : ' + str(changefactor))
+                                                print('Adjusting Bipap -- : ' + str(changefactor) + ' lpDiff-' + str(lpdiff))
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
                                     else:
