@@ -1235,6 +1235,9 @@ class MainWindow(QMainWindow):
     
     breath_in_min_time = 1.8
 
+    lpdiff = 0.0 ## Lung Pressure Diff from Target Pressure ipapdial
+    changefactor = 0.0
+
     def sensorData(self, data_stream):
         self.sensorDataString = data_stream
 
@@ -1616,40 +1619,38 @@ class MainWindow(QMainWindow):
                         ############################################################################
                         ## Auto adjust code for pressure or Bipap Mode
                         ############################################################################
-                        lpdiff = 0 ## Lung Pressure Diff from Target Pressure ipapdial
-                        changefactor = 0.0
 
                         if self.runMode == MachineRunModes.BiPAP:
                             if self.workerThreadCreated:
                                 if not self.worker.flagStop:
                                     if self.lungPeakPressure < (self.ipapdial.value() - 1):
                                         lpdiff = self.ipapdial.value() - self.lungPeakPressure
-                                        changefactor = lpdiff * 0.5
-                                        if changefactor < 1:
-                                            changefactor = 1
+                                        self.changefactor = self.lpdiff * 0.5
+                                        if self.changefactor < 1:
+                                            self.changefactor = 1
                                         if self.generator.xavv < 20: #------------------
                                             if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
                                                 self.vt_unmatch_count += 1
                                             else:
-                                                self.vt_adjust += changefactor #----------------
+                                                self.vt_adjust += self.changefactor #----------------
                                                 self.vt_unmatch_count = 0
                                                 self.generator.xavv = self.vt_adjust
-                                                print('Adjusting Bipap ++ : ' + str(changefactor) + ' lpDiff-' + str(lpdiff))
+                                                print('Adjusting Bipap ++ : ' + str(self.changefactor) + ' lpDiff-' + str(self.lpdiff))
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
                                     elif self.lungPeakPressure > (self.ipapdial.value() + 1):
                                         if self.vt >= -20: #-------------------
                                             if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
                                                 self.vt_unmatch_count += 1
-                                                lpdiff = self.lungPeakPressure - self.ipapdial.value()
-                                                changefactor = lpdiff * 0.5
-                                                if changefactor < 1:
-                                                    changefactor = 1
+                                                self.lpdiff = self.lungPeakPressure - self.ipapdial.value()
+                                                self.changefactor = self.lpdiff * 0.5
+                                                if self.changefactor < 1:
+                                                    self.changefactor = 1
                                             else:
-                                                self.vt_adjust -= changefactor #---------------------
+                                                self.vt_adjust -= self.changefactor #---------------------
                                                 self.vt_unmatch_count = 0
                                                 self.generator.xavv = self.vt_adjust
-                                                print('Adjusting Bipap -- : ' + str(changefactor) + ' lpDiff-' + str(lpdiff))
+                                                print('Adjusting Bipap -- : ' + str(self.changefactor) + ' lpDiff-' + str(self.lpdiff))
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
                                     else:
