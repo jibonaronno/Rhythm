@@ -1634,7 +1634,7 @@ class MainWindow(QMainWindow):
                                                 self.vt_adjust += changefactor #----------------
                                                 self.vt_unmatch_count = 0
                                                 self.generator.xavv = self.vt_adjust
-                                                print('Adjusting Bipap ++')
+                                                print('Adjusting Bipap ++ : ' + str(changefactor))
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
                                     elif self.lungPeakPressure > (self.ipapdial.value() + 1):
@@ -1649,7 +1649,7 @@ class MainWindow(QMainWindow):
                                                 self.vt_adjust -= changefactor #---------------------
                                                 self.vt_unmatch_count = 0
                                                 self.generator.xavv = self.vt_adjust
-                                                print('Adjusting Bipap --')
+                                                print('Adjusting Bipap -- : ' + str(changefactor))
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
                                     else:
