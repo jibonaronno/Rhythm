@@ -1624,7 +1624,7 @@ class MainWindow(QMainWindow):
                             if self.workerThreadCreated:
                                 if not self.worker.flagStop:
                                     if self.lungPeakPressure < (self.ipapdial.value() - 1):
-                                        lpdiff = self.ipapdial.value() - self.lungPeakPressure
+                                        self.lpdiff = self.ipapdial.value() - self.lungPeakPressure
                                         self.changefactor = self.lpdiff * 0.5
                                         if self.changefactor < 1:
                                             self.changefactor = 1
@@ -1639,13 +1639,13 @@ class MainWindow(QMainWindow):
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
                                     elif self.lungPeakPressure > (self.ipapdial.value() + 1):
+                                        self.lpdiff = self.lungPeakPressure - self.ipapdial.value()
+                                        self.changefactor = self.lpdiff * 0.5
+                                        if self.changefactor < 1:
+                                            self.changefactor = 1
                                         if self.vt >= -20: #-------------------
                                             if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
                                                 self.vt_unmatch_count += 1
-                                                self.lpdiff = self.lungPeakPressure - self.ipapdial.value()
-                                                self.changefactor = self.lpdiff * 0.5
-                                                if self.changefactor < 1:
-                                                    self.changefactor = 1
                                             else:
                                                 self.vt_adjust -= self.changefactor #---------------------
                                                 self.vt_unmatch_count = 0
