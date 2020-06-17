@@ -1580,18 +1580,18 @@ class MainWindow(QMainWindow):
                             self.eptick = self.ttick
 
                     
-                    # To detect peak lung pressure at breat in time only
+                    # To detect peak lung pressure at breath in time only
                     self.lung_detector.Cycle(lungpressure)
                     self.lung_wave.Cycle(lungpressure)
                     self.lung_wave.zero_count = 0
                 
-                elif self.flow_offseted <= 0.5:
+                elif self.flow_offseted <= 0.5  and not self.breathInState:
                     self.curve1.setPen(self.derivative_pen_out)
                     self.exhale_t_count += 1
                     self.flag_idle = False
                     self.idle_count = 0
                     self.sumofvolume = 0.0
-                    if self.breath_in_tick and not self.breathInState:
+                    if self.breath_in_tick:
                         self.breath_in_tick = False
                         self.epsnap = time.perf_counter() - self.eptick
                         self.lbl_ep.setText('{:02.2f}'.format(self.epsnap))
@@ -1613,31 +1613,47 @@ class MainWindow(QMainWindow):
                             self.lungLowPressureDetected = False
                             self.lungtimer.setInterval(8000)
 
-                        if not self.worker.flagStop:
-                            if self.lungPeakPressure < (self.ipapdial.value() - 1):
-                                if self.generator.xavv < 20: #------------------
-                                    if self.vt_unmatch_count < 1:
-                                        self.vt_unmatch_count += 1
+                        ############################################################################
+                        ## Auto adjust code for pressure or Bipap Mode
+                        ############################################################################
+                        lpdiff = 0 ## Lung Pressure Diff from Target Pressure ipapdial
+                        changefactor = 0
+
+                        if self.runMode == MachineRunModes.BiPAP:
+                            if self.workerThreadCreated:
+                                if not self.worker.flagStop:
+                                    if self.lungPeakPressure < (self.ipapdial.value() - 1):
+                                        lpdiff = self.ipapdial.value() - self.lungPeakPressure
+                                        changefactor = lpdiff * 0.5
+                                        if changefactor < 1:
+                                            changefactor = 1
+                                        if self.generator.xavv < 20: #------------------
+                                            if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
+                                                self.vt_unmatch_count += 1
+                                            else:
+                                                self.vt_adjust += changefactor #----------------
+                                                self.vt_unmatch_count = 0
+                                                self.generator.xavv = self.vt_adjust
+                                                print('Adjusting Bipap ++')
+                                                #self.settings_dict[r"vt"] = str(self.vt)
+                                                self.SaveSettings()
+                                    elif self.lungPeakPressure > (self.ipapdial.value() + 1):
+                                        if self.vt >= -20: #-------------------
+                                            if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
+                                                self.vt_unmatch_count += 1
+                                                lpdiff = self.lungPeakPressure - self.ipapdial.value()
+                                                changefactor = lpdiff * 0.5
+                                                if changefactor < 1:
+                                                    changefactor = 1
+                                            else:
+                                                self.vt_adjust -= changefactor #---------------------
+                                                self.vt_unmatch_count = 0
+                                                self.generator.xavv = self.vt_adjust
+                                                print('Adjusting Bipap --')
+                                                #self.settings_dict[r"vt"] = str(self.vt)
+                                                self.SaveSettings()
                                     else:
-                                        self.vt_adjust += 5 #----------------
                                         self.vt_unmatch_count = 0
-                                        self.generator.xavv = self.vt_adjust
-                                        print('Adjusting Bipap ++')
-                                        #self.settings_dict[r"vt"] = str(self.vt)
-                                        self.SaveSettings()
-                            elif self.lungPeakPressure > (self.ipapdial.value() + 1):
-                                if self.vt >= -20: #-------------------
-                                    if self.vt_unmatch_count < 1:
-                                        self.vt_unmatch_count += 1
-                                    else:
-                                        self.vt_adjust -= 5 #---------------------
-                                        self.vt_unmatch_count = 0
-                                        self.generator.xavv = self.vt_adjust
-                                        print('Adjusting Bipap --')
-                                        #self.settings_dict[r"vt"] = str(self.vt)
-                                        self.SaveSettings()
-                            else:
-                                self.vt_unmatch_count = 0
 
                         
                 else:
