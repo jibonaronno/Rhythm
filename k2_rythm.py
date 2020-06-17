@@ -7,7 +7,7 @@ import serial
 import serial.tools.list_ports as port_list
 from qtpy import uic
 from qtpy.QtCore import Slot, QTimer, QThread, Signal, QObject, Qt
-from qtpy.QtWidgets import QApplication, QMainWindow, QMessageBox, QAction, QDialog, QTableWidgetItem
+from qtpy.QtWidgets import QApplication, QMainWindow, QMessageBox, QAction, QDialog, QTableWidgetItem, QLabel
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 from collections import deque
@@ -368,6 +368,8 @@ class MainWindow(QMainWindow):
         self.lowp_alarm_enable = False
         self.breathfail_alarm_enable = False
 
+        self.msgwindow = MessageWindow(['Low Pressure', 'Check Patient Tubing'])
+
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
 
@@ -378,11 +380,14 @@ class MainWindow(QMainWindow):
             if self.alarm_show:
                 self.alarm_show = False
                 self.label_alarm.hide()
+                self.msgwindow.hide()
             else:
                 self.alarm_show = True
                 self.label_alarm.show()
+                self.msgwindow.show()
         else:
             self.label_alarm.hide()
+            self.msgwindow.hide()
 
     def BreathInOver(self):
         self.breathInState = False
@@ -403,7 +408,6 @@ class MainWindow(QMainWindow):
                     self.pulse_state = 0
             else:
                 self.pulsegencounter += 1
-
 
     def lungtimeout(self):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
@@ -1642,6 +1646,7 @@ class MainWindow(QMainWindow):
                                 self.lungLowPressureDetected = True
                                 self.label_alarm.setText('Alarm : Low Pressure')
                                 self.lowp_alarm_enable = True
+                                
                         else:
                             self.lungLowPressureCount = 0
                             self.lungLowPressureDetected = False
@@ -1805,6 +1810,26 @@ class JsonSettings(object):
     def _load(self):
         self.dict = json.load(open(self.location , "r"))
 
+class MessageWindow(QWidget):
+    def __init__(self, messages, parent = None):
+        super(MessageWindow, self).__init__(parent)
+        vbox = QVBoxLayout()
+        label = QLabel("Alarms",  self)
+        self.labels = []
+        if len(messages) > 0:
+            for text in messages:
+                lbl = QLabel()
+                lbl.setText(text)
+                lbl.setStyleSheet('color: red;font: 75 26pt "MS Shell Dlg 2";')
+                vbox.addWidget(lbl)
+
+        self.setLayout(vbox)
+                
+
+    def closeEvent(self, event):
+        pass
+        #event.ignore()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -1815,3 +1840,4 @@ if __name__ == '__main__':
     mw = qtmodern.windows.ModernWindow(mw_class_instance)
     mw.showFullScreen()
     sys.exit(app.exec_())
+
