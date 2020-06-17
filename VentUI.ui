@@ -2012,11 +2012,15 @@
               </property>
               <property name="font">
                <font>
-                <family>Consolas</family>
-                <pointsize>14</pointsize>
+                <family>Britannic Bold</family>
+                <pointsize>20</pointsize>
                 <weight>50</weight>
                 <bold>false</bold>
                </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(255, 0, 0);
+background-color: rgb(255, 255, 0);</string>
               </property>
               <property name="text">
                <string>Alarm : </string>

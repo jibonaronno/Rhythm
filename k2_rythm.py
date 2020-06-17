@@ -168,7 +168,7 @@ class MainWindow(QMainWindow):
         self.verticalLayout_2.addWidget(self.volplotter)
         #self.plotter.hide()
         #self.flowplotter.hide()
-        #self.volplotter.hide()
+        self.volplotter.hide()
 
         self.show_hide_LeftPanel()
         #self.infoStack.hide()
@@ -359,10 +359,30 @@ class MainWindow(QMainWindow):
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
         ###self.plottingBaseTimer.start(0.025)
 
+        self.alarm_show = False
+        self.label_alarm.hide()
+        self.alarms:list = []
+        self.alarmTimer = QTimer()
+        self.alarmTimer.timeout.connect(self.ShowHideAlarm)
+        self.alarmTimer.start(1000)
+        self.lowp_alarm_enable = False
+        self.breathfail_alarm_enable = False
+
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
 
     flagStartPulse = False
+
+    def ShowHideAlarm(self):
+        if self.lowp_alarm_enable or self.breathfail_alarm_enable:
+            if self.alarm_show:
+                self.alarm_show = False
+                self.label_alarm.hide()
+            else:
+                self.alarm_show = True
+                self.label_alarm.show()
+        else:
+            self.label_alarm.hide()
 
     def BreathInOver(self):
         self.breathInState = False
@@ -389,6 +409,8 @@ class MainWindow(QMainWindow):
         self.label_alarm.setText("Alarm: Low Lung Pressure")
         self.wave.playBeep()
         self.lungtimer.setInterval(8000)
+        self.breathfail_alarm_enable = True
+
 
     
     
@@ -1274,6 +1296,13 @@ class MainWindow(QMainWindow):
         if len(self.lst) < 3:
             return
 
+        try:
+            lungpressure = float(self.lst[0])
+            deltaflow = float(self.lst[2])
+        except Exception as e:
+            print(data_stream)
+            return
+
         self.maxLen = 50  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
@@ -1603,6 +1632,7 @@ class MainWindow(QMainWindow):
                         if self.over_pressure_detection_delay == 0:
                             if self.lung_detector.peak_value > 5:
                                 self.label_alarm.setText("Alarm: ")
+                                self.lowp_alarm_enable = False
 
                         self.lungPeakPressure = self.lung_wave.GetMax()
                         if self.lungPeakPressure < 10:
@@ -1611,10 +1641,12 @@ class MainWindow(QMainWindow):
                             else:
                                 self.lungLowPressureDetected = True
                                 self.label_alarm.setText('Alarm : Low Pressure')
+                                self.lowp_alarm_enable = True
                         else:
                             self.lungLowPressureCount = 0
                             self.lungLowPressureDetected = False
                             self.lungtimer.setInterval(8000)
+                            self.breathfail_alarm_enable = False
 
                         ############################################################################
                         ## Auto adjust code for pressure or Bipap Mode
