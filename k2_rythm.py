@@ -1383,7 +1383,7 @@ class MainWindow(QMainWindow):
                 try:
                     #self.peak_lung.setText('Lung Peak: ' + '{:03.2f}'.format(self.lung_detector.peak_value) + 'mb')
                     #self.peak_lung.setText('{:03.2f}'.format(self.lung_wave.GetMax() ) + 'mb')
-                    self.peak_lung.setText('{:03.2f}'.format(self.epap ) + 'mb')
+                    self.peak_lung.setText('{:03.2f}'.format(self.ipap ) + 'mb')
                 except:
                     pass
                 #if self.lung_detector.peak_value > 5:
