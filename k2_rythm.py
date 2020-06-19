@@ -368,7 +368,7 @@ class MainWindow(QMainWindow):
         self.lowp_alarm_enable = False
         self.breathfail_alarm_enable = False
 
-        self.msgwindow = MessageWindow(['Low Pressure', 'Check Patient Tubing'])
+        self.msgwindow = MessageWindow(['ALARM', 'Low Pressure'])
 
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
@@ -1814,7 +1814,7 @@ class MessageWindow(QWidget):
     def __init__(self, messages, parent = None):
         super(MessageWindow, self).__init__(parent)
         vbox = QVBoxLayout()
-        label = QLabel("Alarms",  self)
+        ##label = QLabel("Alarms",  self)
         self.labels = []
         if len(messages) > 0:
             for text in messages:
