@@ -1643,9 +1643,13 @@ class MainWindow(QMainWindow):
                             if self.lungLowPressureCount < 2:
                                 self.lungLowPressureCount += 1
                             else:
-                                self.lungLowPressureDetected = True
-                                self.label_alarm.setText('Alarm : Low Pressure')
-                                self.lowp_alarm_enable = True
+                                if self.workerThreadCreated:
+                                    if not self.worker.flagStop:
+                                        self.lungLowPressureDetected = True
+                                        self.label_alarm.setText('Alarm : Low Pressure')
+                                        self.lowp_alarm_enable = True
+                                    else:
+                                        self.lowp_alarm_enable = False
                                 
                         else:
                             self.lungLowPressureCount = 0
