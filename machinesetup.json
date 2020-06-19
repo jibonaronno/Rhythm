@@ -1,1 +1,1 @@
-{"ACC": "1000", "xmax": "100", "xamb": "3", "xrect": "95", "xcon_offset": "2", "vtmax": "600", "motor_i_min":"650", "pre_step_mm":"80", "post_step_mm":"200", "home_sense":"8"}
+{"ACC": "1000", "xmax": "100", "xamb": "7", "xrect": "95", "xcon_offset": "2", "vtmax": "600", "motor_i_min":"650", "pre_step_mm":"80", "post_step_mm":"200", "home_sense":"8"}
