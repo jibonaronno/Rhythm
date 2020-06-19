@@ -53,7 +53,10 @@ class BipapInitializationThread(QObject):
                     #print(self.serialPort.readline().decode('ascii'))
                     lst = self.serialPort.readlines()
                     for itm in lst:
-                        jMessage += itm.decode('ascii')
+                        try:
+                            jMessage += itm.decode('ascii')
+                        except:
+                            pass
                         #jMessage += self.serialPort.readline().decode('ascii')
                     if "busy" in jMessage:
                         time.sleep(1)
@@ -145,7 +148,10 @@ class PrimaryThread(QObject):
                     #print(self.serialPort.readline().decode('ascii'))
                     lst = self.serialPort.readlines()
                     for itm in lst:
-                        jMessage += itm.decode('ascii')
+                        try:
+                            jMessage += itm.decode('ascii')
+                        except:
+                            pass
                         #jMessage += self.serialPort.readline().decode('ascii')
                     if "busy" in jMessage:
                         time.sleep(1)
@@ -265,11 +271,16 @@ class EncoderThread(QObject):
                 while in_waiting == 0:
                     time.sleep(0.05)
                     in_waiting = self.serialport.in_waiting
-                
-                lst = self.serialport.readlines()
+                try:
+                    lst = self.serialport.readlines()
+                except:
+                    pass
                 for itm in lst:
-                    jMessage = itm.decode('ascii')
-                    self.signal_pass_encoder.emit(jMessage)
+                    try:
+                        jMessage = itm.decode('ascii')
+                        self.signal_pass_encoder.emit(jMessage)
+                    except:
+                        pass
 
 '''
                 for char in self.serialport.read():
@@ -408,7 +419,10 @@ class WorkerThread(QObject):
                             print('Ex in sensor Thread readline() 392 : ' + str(e))
                 
                         if len(unit) > 0:
-                            itm += unit.decode('ascii')
+                            try:
+                                itm += unit.decode('ascii')
+                            except:
+                                pass
                         #else:
                         #    time.sleep(0.1)
 
@@ -475,7 +489,10 @@ class BipapWorkerThread(QObject):
                         while self.serialPort.in_waiting:
                             lst = self.serialPort.readlines()
                             for itm in lst:
-                                jMessage += itm.decode('ascii')
+                                try:
+                                    jMessage += itm.decode('ascii')
+                                except:
+                                    pass
                     self.signal.emit(str(line) + " - " + jMessage)
                     
             except serial.SerialException as ex:
@@ -530,7 +547,10 @@ class SensorThread(QObject):
                 print('Ex in sensor Thread readline() 527 : ' + str(e))
             
             if len(unit) > 0:
-                itm += unit.decode('ascii')
+                try:
+                    itm += unit.decode('ascii')
+                except:
+                    pass
 
             if b'\n' in unit:
                 jMessage = itm #.decode('ascii')
