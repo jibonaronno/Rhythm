@@ -79,6 +79,8 @@ class MainWindow(QMainWindow):
         self.rr = self.rrdial.value()
         self.fio2 = self.fiodial.value()
 
+        self.epap = 0.5
+
         self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2, self.vt_adjust)
 
         self.loadMachineSetup(self.generator)
@@ -1424,7 +1426,8 @@ class MainWindow(QMainWindow):
                         self.flow_detector.Cycle(0)
                     
                     try:
-                        self.peak_flow.setText('{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
+                        #self.peak_flow.setText('{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
+                        self.peak_flow.setText('{:03.2f}'.format(self.epap) + 'mb')
                     except:
                         pass
 
@@ -1618,6 +1621,9 @@ class MainWindow(QMainWindow):
                             self.lbl_rr.setText('{:03.2f}'.format(60 / self.tsnap)) # + ' E->E : {:f}'.format(self.tsnap))
                             self.ttick = time.perf_counter()
                             self.eptick = self.ttick
+
+                            if len(self.lungpressuredata) >= 3:
+                                self.epap = self.lungpressuredata[len(self.lungpressuredata) - 3]
 
                     
                     # To detect peak lung pressure at breath in time only
