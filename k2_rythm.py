@@ -1258,7 +1258,8 @@ class MainWindow(QMainWindow):
 
     sensorDataString = ''
 
-    lungPeakPressure = 0
+    lungPeakPressure = 0.0
+    lungPapPressure = 0.0
     lungLowPressureCount = 0
     lungLowPressureDetected = False
 
@@ -1674,8 +1675,8 @@ class MainWindow(QMainWindow):
                         if self.runMode == MachineRunModes.BiPAP:
                             if self.workerThreadCreated:
                                 if not self.worker.flagStop:
-                                    if self.lungPeakPressure < (self.ipapdial.value() - 1):
-                                        self.lpdiff = self.ipapdial.value() - self.lungPeakPressure
+                                    if (self.lungPeakPressure - self.epap) < (self.ipapdial.value() - 1):
+                                        self.lpdiff = self.ipapdial.value() - (self.lungPeakPressure - self.epap)
                                         self.changefactor = self.lpdiff * 0.5
                                         if self.changefactor < 1:
                                             self.changefactor = 1
@@ -1689,8 +1690,8 @@ class MainWindow(QMainWindow):
                                                 print('Adjusting Bipap ++ : ' + str(self.changefactor) + ' lpDiff-' + str(self.lpdiff))
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
-                                    elif self.lungPeakPressure > (self.ipapdial.value() + 1):
-                                        self.lpdiff = self.lungPeakPressure - self.ipapdial.value()
+                                    elif (self.lungPeakPressure - self.epap) > (self.ipapdial.value() + 1):
+                                        self.lpdiff = (self.lungPeakPressure - self.epap) - self.ipapdial.value()
                                         self.changefactor = self.lpdiff * 0.5
                                         if self.changefactor < 1:
                                             self.changefactor = 1
