@@ -69,7 +69,7 @@ class MainWindow(QMainWindow):
         # Setting up Runmode for BiPAP. Call a cyclic function in LungSensorData(...) BipapLookup.lookUp(pressure)
         # This function will return BipapReturns.Continue or BipapReturns.Stop
         self.runMode = MachineRunModes.CMV
-        self.ipap = 15.0
+        self.ipap = 0.0
         self.bipapReturns = BipapReturns.Continue
         self.bipapLookup = BipapLookup()
         self.lst = []
@@ -80,6 +80,7 @@ class MainWindow(QMainWindow):
         self.fio2 = self.fiodial.value()
 
         self.epap = 0.5
+        
 
         self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2, self.vt_adjust)
 
@@ -1381,7 +1382,8 @@ class MainWindow(QMainWindow):
                     #print(str(max(self.lung_wave.wvdata)))
                 try:
                     #self.peak_lung.setText('Lung Peak: ' + '{:03.2f}'.format(self.lung_detector.peak_value) + 'mb')
-                    self.peak_lung.setText('{:03.2f}'.format(self.lung_wave.GetMax() ) + 'mb')
+                    #self.peak_lung.setText('{:03.2f}'.format(self.lung_wave.GetMax() ) + 'mb')
+                    self.peak_lung.setText('{:03.2f}'.format(self.epap ) + 'mb')
                 except:
                     pass
                 #if self.lung_detector.peak_value > 5:
@@ -1650,6 +1652,7 @@ class MainWindow(QMainWindow):
                                 self.lowp_alarm_enable = False
 
                         self.lungPeakPressure = self.lung_wave.GetMax()
+                        self.ipap = self.lungPeakPressure - self.epap
                         if self.lungPeakPressure < 10:
                             if self.lungLowPressureCount < 2:
                                 self.lungLowPressureCount += 1
@@ -1675,8 +1678,8 @@ class MainWindow(QMainWindow):
                         if self.runMode == MachineRunModes.BiPAP:
                             if self.workerThreadCreated:
                                 if not self.worker.flagStop:
-                                    if (self.lungPeakPressure - self.epap) < (self.ipapdial.value() - 1):
-                                        self.lpdiff = self.ipapdial.value() - (self.lungPeakPressure - self.epap)
+                                    if self.ipap < (self.ipapdial.value() - 1):
+                                        self.lpdiff = self.ipapdial.value() - self.ipap
                                         self.changefactor = self.lpdiff * 0.5
                                         if self.changefactor < 1:
                                             self.changefactor = 1
@@ -1690,8 +1693,8 @@ class MainWindow(QMainWindow):
                                                 print('Adjusting Bipap ++ : ' + str(self.changefactor) + ' lpDiff-' + str(self.lpdiff))
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
-                                    elif (self.lungPeakPressure - self.epap) > (self.ipapdial.value() + 1):
-                                        self.lpdiff = (self.lungPeakPressure - self.epap) - self.ipapdial.value()
+                                    elif self.ipap > (self.ipapdial.value() + 1):
+                                        self.lpdiff = self.ipap - self.ipapdial.value()
                                         self.changefactor = self.lpdiff * 0.5
                                         if self.changefactor < 1:
                                             self.changefactor = 1

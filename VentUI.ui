@@ -2178,7 +2178,7 @@ background-color: rgb(255, 255, 0);</string>
                <string notr="true">color:rgb(0, 170, 0)</string>
               </property>
               <property name="text">
-               <string>LPeak</string>
+               <string>IPAP</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
