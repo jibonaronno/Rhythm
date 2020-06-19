@@ -112,7 +112,7 @@ class MainWindow(QMainWindow):
         self.plotter.getViewBox().setYRange(-2, 40)
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
         #self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
-        self.kalmanpen = pg.mkPen(20, 100, 20)
+        self.kalmanpen = pg.mkPen(100, 100, 100, 100)
         self.curve3 = self.plotter.plot(0,0, "kalman", pen = self.kalmanpen)
 
         self.pulsepen = pg.mkPen(255, 200, 0)
