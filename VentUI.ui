@@ -526,13 +526,13 @@
            <widget class="QStackedWidget" name="controlStack">
             <property name="minimumSize">
              <size>
-              <width>350</width>
+              <width>100</width>
               <height>140</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>550</width>
+              <width>100</width>
               <height>16777215</height>
              </size>
             </property>
@@ -2117,33 +2117,6 @@ background-color: rgb(255, 255, 0);</string>
                <set>Qt::AlignCenter</set>
               </property>
              </widget>
-             <widget class="QLabel" name="peak_vol">
-              <property name="geometry">
-               <rect>
-                <x>276</x>
-                <y>0</y>
-                <width>121</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="font">
-               <font>
-                <family>Consolas</family>
-                <pointsize>14</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 255, 0);</string>
-              </property>
-              <property name="text">
-               <string>0.0</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
              <widget class="QPushButton" name="btnShowHide">
               <property name="geometry">
                <rect>
@@ -2244,57 +2217,10 @@ background-color: rgba(255, 255, 255, 0);</string>
                </property>
               </widget>
              </widget>
-             <widget class="QWidget" name="lp_back_3" native="true">
-              <property name="geometry">
-               <rect>
-                <x>272</x>
-                <y>0</y>
-                <width>126</width>
-                <height>61</height>
-               </rect>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(55, 10, 20, 155), stop:1 rgba(255, 55, 35, 155));</string>
-              </property>
-              <widget class="QLabel" name="label_7">
-               <property name="geometry">
-                <rect>
-                 <x>16</x>
-                 <y>30</y>
-                 <width>101</width>
-                 <height>31</height>
-                </rect>
-               </property>
-               <property name="font">
-                <font>
-                 <family>Consolas</family>
-                 <pointsize>20</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color:rgb(0, 170, 0);
-background-color: rgba(255, 255, 255, 0);</string>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Plain</enum>
-               </property>
-               <property name="text">
-                <string>VPeak</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </widget>
              <widget class="QWidget" name="lp_back_4" native="true">
               <property name="geometry">
                <rect>
-                <x>398</x>
+                <x>382</x>
                 <y>0</y>
                 <width>111</width>
                 <height>61</height>
@@ -2341,7 +2267,7 @@ background-color: rgba(255, 255, 255, 0);</string>
              <widget class="QLabel" name="lbl_rr">
               <property name="geometry">
                <rect>
-                <x>400</x>
+                <x>382</x>
                 <y>0</y>
                 <width>111</width>
                 <height>31</height>
@@ -2369,7 +2295,7 @@ color: rgb(0, 255, 0);</string>
              <widget class="QWidget" name="lp_back_5" native="true">
               <property name="geometry">
                <rect>
-                <x>509</x>
+                <x>272</x>
                 <y>0</y>
                 <width>111</width>
                 <height>61</height>
@@ -2406,7 +2332,7 @@ background-color: rgba(255, 255, 255, 0);</string>
                 <enum>QFrame::Plain</enum>
                </property>
                <property name="text">
-                <string>E-&gt;P</string>
+                <string>I:E</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -2437,27 +2363,100 @@ background-color: rgba(255, 255, 255, 0);</string>
 color: rgb(0, 255, 0);</string>
                </property>
                <property name="text">
-                <string>0.0</string>
+                <string>1:0.0</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </widget>
-             <zorder>lp_back_3</zorder>
              <zorder>lp_back_2</zorder>
              <zorder>lp_back</zorder>
              <zorder>label_alarm</zorder>
              <zorder>peak_lung</zorder>
              <zorder>peak_flow</zorder>
-             <zorder>peak_vol</zorder>
              <zorder>btnShowHide</zorder>
              <zorder>peak_lung_2</zorder>
              <zorder>lp_back_4</zorder>
              <zorder>lbl_rr</zorder>
              <zorder>lp_back_5</zorder>
             </widget>
-            <widget class="QWidget" name="page_11"/>
+            <widget class="QWidget" name="page_11">
+             <widget class="QLabel" name="peak_vol">
+              <property name="geometry">
+               <rect>
+                <x>264</x>
+                <y>10</y>
+                <width>121</width>
+                <height>31</height>
+               </rect>
+              </property>
+              <property name="font">
+               <font>
+                <family>Consolas</family>
+                <pointsize>14</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 255, 0);</string>
+              </property>
+              <property name="text">
+               <string>0.0</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+             <widget class="QWidget" name="lp_back_3" native="true">
+              <property name="geometry">
+               <rect>
+                <x>260</x>
+                <y>10</y>
+                <width>126</width>
+                <height>61</height>
+               </rect>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(55, 10, 20, 155), stop:1 rgba(255, 55, 35, 155));</string>
+              </property>
+              <widget class="QLabel" name="label_7">
+               <property name="geometry">
+                <rect>
+                 <x>16</x>
+                 <y>30</y>
+                 <width>101</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Consolas</family>
+                 <pointsize>20</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color:rgb(0, 170, 0);
+background-color: rgba(255, 255, 255, 0);</string>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Plain</enum>
+               </property>
+               <property name="text">
+                <string>VPeak</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </widget>
+            </widget>
            </widget>
           </item>
           <item>

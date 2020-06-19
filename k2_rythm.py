@@ -1643,7 +1643,7 @@ class MainWindow(QMainWindow):
                     if self.breath_in_tick:
                         self.breath_in_tick = False
                         self.epsnap = time.perf_counter() - self.eptick
-                        self.lbl_ep.setText('{:02.2f}'.format(self.epsnap))
+                        self.lbl_ep.setText('1:{:02.2f}'.format(self.epsnap))
                         
                         ### Reset the over pressure alarm when next peak is detcted ###
                         if self.over_pressure_detection_delay == 0:
