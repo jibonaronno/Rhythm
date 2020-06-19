@@ -556,9 +556,7 @@ class MainWindow(QMainWindow):
                     if parts[0] == '4':
                         value = int(parts[1])
                         if value < 3:
-                            pass
-                            #self.changeFIOdial(value)
-                            #self.changeBipapdial(value)
+                            self.changePeakDial(value)
                         elif value == 3:
                             pass
                             ##self.show_hide_LeftPanel()
@@ -615,6 +613,10 @@ class MainWindow(QMainWindow):
 
     def emulateSpace(self):
         pyautogui.press(' ')
+
+    def changePeakDial(self, incr=1):
+        if self.peakdial.isEnabled():
+            self.changedial(incr, self.peakdial)
 
     def changeBipapdial(self, incr=1):
         if self.ipapdial.isEnabled():
@@ -683,6 +685,7 @@ class MainWindow(QMainWindow):
         self.rrdial.setEnabled(True)
         self.fiodial.setEnabled(True)
         self.ipapdial.setEnabled(True)
+        self.peakdial.setEnabled(True)
         self.btnchangeset.setText("Set")
         self.flagEditCmv = True
 
@@ -692,6 +695,7 @@ class MainWindow(QMainWindow):
         self.rrdial.setEnabled(False)
         self.fiodial.setEnabled(False)
         self.ipapdial.setEnabled(False)
+        self.peakdial.setEnabled(False)
         self.btnchangeset.setText("Change")
         self.flagEditCmv = False
 
