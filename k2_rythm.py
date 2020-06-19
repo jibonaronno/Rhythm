@@ -1683,7 +1683,7 @@ class MainWindow(QMainWindow):
                                         self.changefactor = self.lpdiff * 0.5
                                         if self.changefactor < 1:
                                             self.changefactor = 1
-                                        if self.generator.xavv < 20: #------------------
+                                        if self.generator.xavv < 35: #------------------
                                             if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
                                                 self.vt_unmatch_count += 1
                                             else:
@@ -1698,7 +1698,7 @@ class MainWindow(QMainWindow):
                                         self.changefactor = self.lpdiff * 0.5
                                         if self.changefactor < 1:
                                             self.changefactor = 1
-                                        if self.vt >= -20: #-------------------
+                                        if self.vt >= -35: #-------------------
                                             if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
                                                 self.vt_unmatch_count += 1
                                             else:
