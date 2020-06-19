@@ -108,8 +108,8 @@ class MainWindow(QMainWindow):
         self.plotter.showGrid(x=True, y=True, alpha=None)
         #self.plotter.setTitle("Pressure : mb")
         self.plotter.setLabel('left','Pressure : mb')
-        #self.plotter.getViewBox().enableAutoRange(axis='y', enable=True)
-        #self.plotter.getViewBox().setYRange(-0.3, 1)
+        self.plotter.getViewBox().enableAutoRange(axis='y', enable=False)
+        self.plotter.getViewBox().setYRange(-2, 40)
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
         #self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
         self.kalmanpen = pg.mkPen(20, 100, 20)
@@ -139,9 +139,9 @@ class MainWindow(QMainWindow):
         #self.flowplotter.setTitle("Flow L/M")
         self.flowplotter.setLabel('left', 'Flow L/M')
         #self.flowplotter
-        #self.flowplotter.getViewBox().enableAutoRange(axis='y', enable=True)
+        self.flowplotter.getViewBox().enableAutoRange(axis='y', enable=False)
         #self.flowplotter.getViewBox().setMinimumHeight(45)
-        #self.flowplotter.getViewBox().setYRange(-90, 45)
+        self.flowplotter.getViewBox().setYRange(-5, 5)
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
         self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
@@ -1307,7 +1307,7 @@ class MainWindow(QMainWindow):
             print(data_stream)
             return
 
-        self.maxLen = 50  # max number of data points to show on graph
+        self.maxLen = 100  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
                 self.lungpressuredata.popleft()  # remove oldest
