@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"ACC": "1000", "xmax": "120", "xamb": "8", "xrect": "115", "xcon_offset": "2", "vtmax": "600", "motor_i_min":"650", "pre_step_mm":"80", "post_step_mm":"200", "home_sense":"8"}
-=======
-{"ACC": "1000", "xmax": "150", "xamb": "8", "xrect": "130", "xcon_offset": "2", "vtmax": "600", "motor_i_min":"650", "pre_step_mm":"80", "post_step_mm":"200", "home_sense":"8"}
->>>>>>> 313951c8e59af5bef355a04890c2a3dfbfb28f51
+{"ACC": "1000", "xmax": "135", "xamb": "2", "xrect": "130", "xcon_offset": "2", "vtmax": "600", "motor_i_min":"650", "pre_step_mm":"80", "post_step_mm":"200", "home_sense":"8"}

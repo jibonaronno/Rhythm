@@ -13,6 +13,7 @@ import pyqtgraph as pg
 from collections import deque
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QPushButton
 
 import math
@@ -46,9 +47,21 @@ import pyautogui
 
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
+_listselect = join(dirname(abspath(__file__)), 'listselect.ui')
+
 class AlarmTypes(enum.Enum):
     NO_ALARM = 1
     PEAK_PRESSURE = 2
+
+class ListSelect(QWidget):
+    def __init__(self, parent=None):
+        super(ListSelect, self).__init__(parent)
+        self.widget = uic.loadUi(_listselect, self)
+        self.widget.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+
+    def closeEvent(self, event):
+        pass
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -58,6 +71,9 @@ class MainWindow(QMainWindow):
         
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
+
+        self.modeselectwidget = ListSelect()
+        
         window_title = "Rhythm"
         self.setWindowTitle(window_title)
         self.json = JsonSettings("settings.json")
@@ -749,9 +765,11 @@ class MainWindow(QMainWindow):
         if self.controls_show_hide:
             self.controlStack.hide()
             self.controls_show_hide = False
+            self.modeselectwidget.hide()
         else:
             self.controlStack.show()
             self.controls_show_hide = True
+            self.modeselectwidget.show()
 
         self.show_hide_LeftPanel()
 

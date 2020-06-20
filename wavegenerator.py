@@ -1,13 +1,5 @@
-import sys
-import struct
-import time
-import pprint
-from os.path import join, dirname, abspath
-from time import sleep
-from math import pi, sin
 from qtpy.QtCore import Slot, QTimer, QThread, Signal, QObject, Qt
 from PyQt5.QtCore import QBuffer, QByteArray, QIODevice, Qt
-from PyQt5.QtMultimedia import QAudio, QAudioDeviceInfo, QAudioFormat, QAudioOutput
 from PyQt5.QtMultimedia import QSound
 from collections import deque
 
