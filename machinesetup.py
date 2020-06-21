@@ -38,6 +38,7 @@ class MachineSetup(object):
         self.presmm = int(self.jsn.dict['pre_step_mm'])
         self.postsmm = int(self.jsn.dict['post_step_mm'])
         self.home_sense = int(self.jsn.dict['home_sense'])
+        self.ipap_tol = int(self.jsn.dict['ipap_tol'])
 
     def save(self):
         self.jsn.dict['ACC'] = str(self.ACC)

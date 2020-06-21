@@ -1326,7 +1326,7 @@ class MainWindow(QMainWindow):
     
     breath_in_min_time = 1.8
 
-    lpdiff = 0.0 ## Lung Pressure Diff from Target Pressure ipapdial
+    ipap_deviation = 0.0 ## Lung Pressure Diff from Target Pressure ipapdial
     changefactor = 0.0
 
     def sensorData(self, data_stream):
@@ -1334,6 +1334,15 @@ class MainWindow(QMainWindow):
 
     def splitSensorData(self, data_stream):
         pass
+
+    
+    def GetChangeFactorFromDeviation(self, deviation):
+        if deviation <= 2:
+            return 1
+        elif deviation <=3:
+            return 2
+        else:
+            return 10
 
     def LungSensorData(self, data_stream):
         #print(data_stream)
@@ -1659,6 +1668,9 @@ class MainWindow(QMainWindow):
                 print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
             '''
 
+            ipap_band_plus = self.ipapdial.value() + self.generator.ipap_tol
+            ipap_band_minus = self.ipapdial.value() - self.generator.ipap_tol
+
             try:
                 
                 if self.flow_offseted > 0.5:
@@ -1735,34 +1747,36 @@ class MainWindow(QMainWindow):
                         if self.runMode == MachineRunModes.BiPAP:
                             if self.workerThreadCreated:
                                 if not self.worker.flagStop:
-                                    if self.ipap < (self.ipapdial.value() - 1):
-                                        self.lpdiff = self.ipapdial.value() - self.ipap
-                                        self.changefactor = self.lpdiff * 0.5
+                                    if self.ipap < (self.ipapdial.value() - self.generator.ipap_tol):
+                                        self.ipap_deviation = self.ipapdial.value() - self.ipap
+                                        #self.changefactor = self.ipap_deviation * 0.5
+                                        self.changefactor = self.GetChangeFactorFromDeviation(self.ipap_deviation)
                                         if self.changefactor < 1:
                                             self.changefactor = 1
-                                        if self.generator.xavv < 35: #------------------
+                                        if (self.generator.xav + self.generator.xavv) < self.generator.xmax: #------------------
                                             if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
                                                 self.vt_unmatch_count += 1
                                             else:
                                                 self.vt_adjust += self.changefactor #----------------
                                                 self.vt_unmatch_count = 0
                                                 self.generator.xavv = self.vt_adjust
-                                                print('Adjusting Bipap ++ : ' + str(self.changefactor) + ' lpDiff-' + str(self.lpdiff))
+                                                print('Adjusting Bipap ++ : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
-                                    elif self.ipap > (self.ipapdial.value() + 1):
-                                        self.lpdiff = self.ipap - self.ipapdial.value()
-                                        self.changefactor = self.lpdiff * 0.5
+                                    elif self.ipap > (self.ipapdial.value() + self.generator.ipap_tol):
+                                        self.ipap_deviation = self.ipap - self.ipapdial.value()
+                                        #self.changefactor = self.ipap_deviation * 0.5
+                                        self.changefactor = self.GetChangeFactorFromDeviation(self.ipap_deviation)
                                         if self.changefactor < 1:
                                             self.changefactor = 1
-                                        if self.vt >= -35: #-------------------
+                                        if (self.generator.xav - self.generator.xavv) > self.generator.Dt: #-------------------
                                             if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
                                                 self.vt_unmatch_count += 1
                                             else:
                                                 self.vt_adjust -= self.changefactor #---------------------
                                                 self.vt_unmatch_count = 0
                                                 self.generator.xavv = self.vt_adjust
-                                                print('Adjusting Bipap -- : ' + str(self.changefactor) + ' lpDiff-' + str(self.lpdiff))
+                                                print('Adjusting Bipap -- : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
                                                 #self.settings_dict[r"vt"] = str(self.vt)
                                                 self.SaveSettings()
                                     else:

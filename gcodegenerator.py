@@ -34,6 +34,7 @@ class GcodeGenerator(object):
         self.presmm = self.machinesetup.presmm
         self.postsmm = self.machinesetup.postsmm
         self.home_sense = self.machinesetup.home_sense
+        self.ipap_tol = self.machinesetup.ipap_tol
         print(str(self.ACC) + "," + str(self.xmax) + "," + str(self.xamb) + "," + str(self.xrect) + "," + str(self.xcon_offset) + "," + str(self.vtmax))
         #self.calib_dict = {250:63.0, 300:68.0, 350:71.0, 400:73.0, 450:77.0, 500:86.0, 550:100.0}
 
