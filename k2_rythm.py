@@ -62,6 +62,10 @@ class ListSelect(QWidget):
     def closeEvent(self, event):
         pass
 
+try:
+    import RPi.GPIO as GPIO
+except:
+    print('RPi.GPIO Platform Missmatch')
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -389,10 +393,37 @@ class MainWindow(QMainWindow):
 
         self.msgwindow = MessageWindow(['ALARM', 'Low Pressure'])
 
+        self.blinkpin = 23
+
+        try:
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(self.blinkpin, GPIO.OUT)
+        except:
+            print('GPIO.setmode(GPIO.BCM) Platform Missmatch')
+
+        self.flagBlinkState = False
+        self.watchdogtimer = QTimer()
+        self.watchdogtimer.timeout.connect(self.blink)
+        self.watchdogtimer.start(500)
+
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
 
     flagStartPulse = False
+
+    def blink(self):
+        if self.flagBlinkState:
+            self.flagBlinkState = False
+            try:
+                GPIO.output(ledPin, GPIO.HIGH)
+            except:
+                pass
+        else:
+            self.flagBlinkState = True
+            try:
+                GPIO.output(ledPin, GPIO.LOW)
+            except:
+                pass
 
     def ShowHideAlarm(self):
         if self.lowp_alarm_enable or self.breathfail_alarm_enable:
@@ -765,11 +796,11 @@ class MainWindow(QMainWindow):
         if self.controls_show_hide:
             self.controlStack.hide()
             self.controls_show_hide = False
-            self.modeselectwidget.hide()
+            #self.modeselectwidget.hide()
         else:
             self.controlStack.show()
             self.controls_show_hide = True
-            self.modeselectwidget.show()
+            #self.modeselectwidget.show()
 
         self.show_hide_LeftPanel()
 
