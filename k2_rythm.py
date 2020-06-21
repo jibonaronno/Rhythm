@@ -416,14 +416,20 @@ class MainWindow(QMainWindow):
             self.flagBlinkState = False
             try:
                 GPIO.output(self.blinkpin, GPIO.HIGH)
-            except:
-                pass
+            except Exception as e:
+                print('Exception GPIO.output(HIGH) ' + str(e))
+            finally:
+                print("clean up1") 
+                GPIO.cleanup() # cleanup all GPIO 
         else:
             self.flagBlinkState = True
             try:
                 GPIO.output(self.blinkpin, GPIO.LOW)
-            except:
-                pass
+            except Exception as e:
+                print('Exception GPIO.output(LOW) ' + str(e))
+            finally:
+                print("clean up2") 
+                GPIO.cleanup() # cleanup all GPIO 
 
     def ShowHideAlarm(self):
         if self.lowp_alarm_enable or self.breathfail_alarm_enable:
