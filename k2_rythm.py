@@ -396,7 +396,7 @@ class MainWindow(QMainWindow):
         self.blinkpin = 23
 
         try:
-            GPIO.setmode(GPIO.BCM)
+            GPIO.setmode(GPIO.BOARD)
             GPIO.setup(self.blinkpin, GPIO.OUT)
         except:
             print('GPIO.setmode(GPIO.BCM) Platform Missmatch')
