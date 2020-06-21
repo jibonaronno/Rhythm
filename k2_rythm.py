@@ -415,13 +415,13 @@ class MainWindow(QMainWindow):
         if self.flagBlinkState:
             self.flagBlinkState = False
             try:
-                GPIO.output(ledPin, GPIO.HIGH)
+                GPIO.output(self.blinkpin, GPIO.HIGH)
             except:
                 pass
         else:
             self.flagBlinkState = True
             try:
-                GPIO.output(ledPin, GPIO.LOW)
+                GPIO.output(self.blinkpin, GPIO.LOW)
             except:
                 pass
 
