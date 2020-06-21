@@ -393,7 +393,7 @@ class MainWindow(QMainWindow):
 
         self.msgwindow = MessageWindow(['ALARM', 'Low Pressure'])
 
-        self.blinkpin = 23
+        self.blinkpin = 16
 
         try:
             GPIO.setmode(GPIO.BOARD)
