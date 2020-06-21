@@ -420,7 +420,7 @@ class MainWindow(QMainWindow):
                 print('Exception GPIO.output(HIGH) ' + str(e))
             finally:
                 print("clean up1") 
-                GPIO.cleanup() # cleanup all GPIO 
+                #GPIO.cleanup() # cleanup all GPIO 
         else:
             self.flagBlinkState = True
             try:
@@ -429,7 +429,7 @@ class MainWindow(QMainWindow):
                 print('Exception GPIO.output(LOW) ' + str(e))
             finally:
                 print("clean up2") 
-                GPIO.cleanup() # cleanup all GPIO 
+                #GPIO.cleanup() # cleanup all GPIO 
 
     def ShowHideAlarm(self):
         if self.lowp_alarm_enable or self.breathfail_alarm_enable:
