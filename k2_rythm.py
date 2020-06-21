@@ -404,7 +404,7 @@ class MainWindow(QMainWindow):
         self.flagBlinkState = False
         self.watchdogtimer = QTimer()
         self.watchdogtimer.timeout.connect(self.blink)
-        self.watchdogtimer.start(500)
+        self.watchdogtimer.start(3000)
 
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
