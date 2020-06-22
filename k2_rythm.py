@@ -616,7 +616,7 @@ class MainWindow(QMainWindow):
                         if value < 3:
                             self.changePeakDial(value)
                         elif value == 3:
-                            pass
+                            self.modeselectwidget.show()
                             ##self.show_hide_LeftPanel()
                     if parts[0] == '5':
                         value = int(parts[1])
@@ -1784,6 +1784,12 @@ class MainWindow(QMainWindow):
                                                 self.SaveSettings()
                                     else:
                                         self.vt_unmatch_count = 0
+
+                        elif self.runMode == MachineRunModes.CMV:
+                            if self.workerThreadCreated:
+                                if not self.worker.flagStop:
+                                    pass
+                                
 
                         
                 else:
