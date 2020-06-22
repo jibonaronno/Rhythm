@@ -33,7 +33,7 @@
        <property name="font">
         <font>
          <family>Cordia New</family>
-         <pointsize>20</pointsize>
+         <pointsize>48</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
