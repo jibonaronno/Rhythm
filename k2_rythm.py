@@ -59,6 +59,11 @@ class ListSelect(QWidget):
         self.widget = uic.loadUi(_listselect, self)
         self.widget.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
+    def changeSelection(self):
+        cnt = self.lstOptions.count()
+        idx = 0
+        print(str(self.lstOptions.currentitem()))
+
     def closeEvent(self, event):
         pass
 
@@ -76,9 +81,10 @@ class MainWindow(QMainWindow):
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
 
+        self.modeSelectionVisible = False
         self.modeselectwidget = ListSelect()
-        self.modeselectwidget.lstOptions.append('BiPAP')
-        self.modeselectwidget.lstOptions.append('CMV')
+        self.modeselectwidget.lstOptions.addItem('BiPAP')
+        self.modeselectwidget.lstOptions.addItem('CMV')
         
         window_title = "Rhythm"
         self.setWindowTitle(window_title)
@@ -616,9 +622,17 @@ class MainWindow(QMainWindow):
                     if parts[0] == '4':
                         value = int(parts[1])
                         if value < 3:
-                            self.changePeakDial(value)
+                            if not self.modeSelectionVisible:
+                                self.changePeakDial(value)
+                            else:
+                                self.modeselectwidget.changeSelection()
                         elif value == 3:
-                            self.modeselectwidget.show()
+                            if self.modeSelectionVisible:
+                                self.modeselectwidget.hide()
+                                self.modeSelectionVisible = False
+                            else:
+                                self.modeselectwidget.show()
+                                self.modeSelectionVisible = True
                             ##self.show_hide_LeftPanel()
                     if parts[0] == '5':
                         value = int(parts[1])
@@ -806,12 +820,12 @@ class MainWindow(QMainWindow):
         if self.controls_show_hide:
             self.controlStack.hide()
             self.controls_show_hide = False
-            #self.modeselectwidget.hide()
+            self.modeselectwidget.hide()
         else:
             self.controlStack.show()
             self.controls_show_hide = True
-            self.infoStack.hide()
-            #self.modeselectwidget.show()
+            #self.infoStack.hide()
+            self.modeselectwidget.show()
 
         self.show_hide_LeftPanel()
 
