@@ -132,7 +132,7 @@ class MainWindow(QMainWindow):
         #self.plotter.setTitle("Pressure : mb")
         self.plotter.setLabel('left','Pressure : mb')
         self.plotter.getViewBox().enableAutoRange(axis='y', enable=False)
-        self.plotter.getViewBox().setYRange(-2, 40)
+        self.plotter.getViewBox().setYRange(-2, 30)
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
         #self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
         self.kalmanpen = pg.mkPen(100, 100, 100, 100)
@@ -404,7 +404,7 @@ class MainWindow(QMainWindow):
         self.flagBlinkState = False
         self.watchdogtimer = QTimer()
         self.watchdogtimer.timeout.connect(self.blink)
-        self.watchdogtimer.start(90)
+        #self.watchdogtimer.start(90)
 
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
@@ -808,6 +808,7 @@ class MainWindow(QMainWindow):
         else:
             self.controlStack.show()
             self.controls_show_hide = True
+            self.infoStack.hide()
             #self.modeselectwidget.show()
 
         self.show_hide_LeftPanel()
@@ -1359,6 +1360,7 @@ class MainWindow(QMainWindow):
         if self.over_pressure_detection_delay > 0:
             self.over_pressure_detection_delay -= 1
         
+        
         try:
             self.dataList.append(data_stream)
             self.log_interval_count += 1
@@ -1368,6 +1370,7 @@ class MainWindow(QMainWindow):
                 self.dataList.clear()
         except Exception as e:
             print('Exception in Log: ' + str(e))
+        
         
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")

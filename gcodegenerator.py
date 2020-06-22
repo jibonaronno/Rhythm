@@ -185,9 +185,79 @@ class GcodeGenerator(object):
         self.Vi = self.ViAvg
         self.VhAvg = self.vhmax* 60
         self.Vh = self.VhAvg
+
+
+    def ComputeCMV2(self):
+        self.xavv = self.x_adj
+        self.Dt = self.xmax - self.xrect
+        initial_x = self.calib_dict[450]
+        #self.xav = self.calib_dict[self.vt]
+        #self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
+        try:
+            self.xav = initial_x + self.xavv
+            print('Dict : ' + str(initial_x))
+        except Exception as e:
+            print('ComputeCMV - ' + str(e))
+            #self.xav = self.xavv
+
+        #if self.xavv != 0:
+            #self.xav = self.xrect * ((self.vt + self.x_adj) / self.vtmax) * self.vtfactor
         
+        #Previous Dp self.Dp = self.Dt + self.xav
+        self.Dp = self.xav
+        self.TDMS = 0.5
+
+        self.Kie =  1/self.ie
+        self.BCT = 60*(1-0.0) / self.rr
+        self.Ti = self.BCT / (1 + (1 / self.Kie))
+        self.Th = self.BCT - self.Ti
+
+        print('Ti-{:f} Th-{:f} BCT-{:f}'.format(self.Ti, self.Th, self.BCT))
+        
+        self.midpart_ti=(1-self.ACC*self.Ti*self.Ti)/2
+        self.lastpart_ti=self.xav*self.xav/4
+        self.identifier_ti=math.sqrt(self.midpart_ti*self.midpart_ti-4*self.lastpart_ti)
+        self.sol1_ti=(-1*self.midpart_ti+self.identifier_ti)/2
+        self.sol2_ti=(-1*self.midpart_ti-self.identifier_ti)/2
+
+        if self.sol1_ti > self.xav:
+            if self.sol2_ti > self.xav:
+                self.dsmall_ti=0.1
+            else:
+                self.dsmall_ti=self.sol2_ti
+        else:
+            self.dsmall_ti=self.sol1_ti  
+               
+        #print(self.identifier_ti)
+        self.midpart_th=(1-self.ACC*self.Th*self.Th)/2
+        self.lastpart_th=self.xav*self.xav/4
+        self.identifier_th=math.sqrt(self.midpart_th*self.midpart_th-4*self.lastpart_th)
+        self.sol1_th=(-1*self.midpart_th+self.identifier_th)/2
+        self.sol2_th=(-1*self.midpart_th-self.identifier_th)/2
+
+        if self.sol1_th>self.xav:
+            if self.sol2_th>self.xav:
+                self.dsmall_th=0.1
+            else:
+                self.dsmall_th=self.sol2_th
+        else:
+            self.dsmall_th=self.sol1_th 
+
+        #self.ACC_inhale = (4 * self.xav) / (self.Ti * self.Ti)
+        #self.ACC_exhale = (4 * self.xav) / (self.Th * self.Th)
+        #self.Vi = self.ACC_inhale * (self.Ti / 2) * 60
+        #self.Vh = self.ACC_exhale * (self.Th / 2) * 60
+        self.vimax=math.sqrt(2*self.dsmall_ti*self.ACC)
+        self.vhmax=math.sqrt(2*self.dsmall_th*self.ACC)
+        self.ViAvg = self.vimax * 60
+        #print(self.ViAvg)
+        self.Vi = self.ViAvg
+        self.VhAvg = self.vhmax* 60
+        self.Vh = self.VhAvg
+
+
     def GenerateCMV(self):
-        self.ComputeCMV()
+        self.ComputeCMV2()
         self.gcodeinit = "G21\r\nG80\r\nG90\r\nM92 X" + str(self.presmm) +" Y"+ str(self.presmm) +"\r\nG28 X0Y0 F500\r\nM92 X" + str(self.postsmm) + " Y" + str(self.postsmm) + "\r\nM906 X"+ str(self.motor_i_min) + " Y" + str(self.motor_i_min) +"\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC)
         self.gcodeprimary = "G21\r\nG80\r\nG90\r\nM92 X"+ str(self.presmm) +" Y"+ str(self.presmm) + "\r\nM914 X" + str(self.home_sense) + " Y" + str(self.home_sense) +"\r\nG28 X0Y0 F500\r\nM92 X"+ str(self.postsmm) +" Y"+ str(self.postsmm) + "\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC) + "\r\nM906 X"+ str(self.motor_i_min) + " Y" + str(self.motor_i_min) + "\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
         #self.gcodeprimary = "G21\r\nG80\r\nG90\r\nM92 X"+ str(self.presmm) +" Y"+ str(self.presmm) +"\r\nG28 X0Y0 F500\r\nM92 X"+ str(self.postsmm) +" Y"+ str(self.postsmm) + "\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC) + "\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
