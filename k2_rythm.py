@@ -419,7 +419,7 @@ class MainWindow(QMainWindow):
         self.flagBlinkState = False
         self.watchdogtimer = QTimer()
         self.watchdogtimer.timeout.connect(self.blink)
-        #self.watchdogtimer.start(90)
+        self.watchdogtimer.start(90)
 
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
@@ -1584,6 +1584,8 @@ class MainWindow(QMainWindow):
                         self.flowprocess.sum_of_volume = vol_base
                         self.flowprocess.sum_of_rmsVolume = vol_base
 
+                        print('{:f}'.format(vol_base))
+
                     self.kalmandata.append(vol_base)
                     self.voldata.append(vol_base)
                     #if vol_base < 0:
@@ -1743,7 +1745,7 @@ class MainWindow(QMainWindow):
                 
                 if self.flow_offseted > 0.5:
                     if not self.breathInState:
-                        self.breath_in_min_time = ((60 / self.rr) / self.ie) * 1000
+                        self.breath_in_min_time = ((60 / (self.rr * 1.2)) / (1 + self.ie)) * 1000
                         self.breathInState = True
                         self.breathInMinTimer.start(self.breath_in_min_time)
                     
