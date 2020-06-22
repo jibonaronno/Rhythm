@@ -2133,7 +2133,7 @@ background-color: rgb(255, 255, 0);</string>
                <string>S / H</string>
               </property>
              </widget>
-             <widget class="QLabel" name="peak_lung_2">
+             <widget class="QLabel" name="lblPressure">
               <property name="geometry">
                <rect>
                 <x>38</x>
@@ -2185,7 +2185,7 @@ background-color: rgb(255, 255, 0);</string>
               <property name="styleSheet">
                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(55, 10, 20, 155), stop:1 rgba(255, 55, 35, 155));</string>
               </property>
-              <widget class="QLabel" name="label">
+              <widget class="QLabel" name="lblPeep">
                <property name="geometry">
                 <rect>
                  <x>16</x>
@@ -2379,7 +2379,7 @@ color: rgb(0, 255, 0);</string>
              <zorder>peak_lung</zorder>
              <zorder>peak_flow</zorder>
              <zorder>btnShowHide</zorder>
-             <zorder>peak_lung_2</zorder>
+             <zorder>lblPressure</zorder>
              <zorder>lp_back_4</zorder>
              <zorder>lbl_rr</zorder>
              <zorder>lp_back_5</zorder>
