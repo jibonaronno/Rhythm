@@ -424,12 +424,28 @@ class MainWindow(QMainWindow):
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
         self.labelSelectedMode()
+        self.auxMode = MachineRunModes.BiPAP
 
+    #On Mode Changed
     def labelSelectedMode(self):
         if 'BiPAP' in self.modeselectwidget.Mode:
             self.lblMode.setText('BiPAP')
+            self.auxMode = MachineRunModes.BiPAP
+            self.show_hide_vtdial(False)
         elif 'CMV' in self.modeselectwidget.Mode:
             self.lblMode.setText('CMV')
+            self.auxMode = MachineRunModes.CMV
+            self.show_hide_vtdial(True)
+
+    def show_hide_vtdial(self, sh):
+        if sh:
+            self.vtdial.show()
+            self.vtlcd.show()
+            self.lblvt.show()
+        else:
+            self.vtdial.hide()
+            self.vtlcd.hide()
+            self.lblvt.hide()
 
 
     flagStartPulse = False
@@ -602,7 +618,8 @@ class MainWindow(QMainWindow):
                     if parts[0] == '1':
                         value = int(parts[1])
                         if value < 3:
-                            self.changeVTdial(value)
+                            if self.auxMode == MachineRunModes.CMV:
+                                self.changeVTdial(value)
                         elif value == 3:
                             if self.workerThreadCreated:
                                 if self.worker.flagStop:
@@ -616,6 +633,9 @@ class MainWindow(QMainWindow):
                                     #self.pulse_state = False
                                     #self.flagStartPulse = False
                             else:
+                                self.modeselectwidget.hide()
+                                self.modeSelectionVisible = False
+                                self.labelSelectedMode()
                                 if self.runloop.isEnabled():
                                     self.on_runloop_clicked()
                     if parts[0] == '2':
@@ -623,6 +643,9 @@ class MainWindow(QMainWindow):
                         if value < 3:
                             self.changeIEdial(value)
                         elif value == 3:
+                            self.modeselectwidget.hide()
+                            self.modeSelectionVisible = False
+                            self.labelSelectedMode()
                             self.on_btninit_clicked()
                     if parts[0] == '3':
                         value = int(parts[1])
@@ -646,7 +669,7 @@ class MainWindow(QMainWindow):
                                 self.modeselectwidget.hide()
                                 self.modeSelectionVisible = False
                                 self.labelSelectedMode()
-                            else:
+                            elif not self.workerThreadCreated:
                                 self.modeselectwidget.show()
                                 self.modeSelectionVisible = True
                             ##self.show_hide_LeftPanel()
