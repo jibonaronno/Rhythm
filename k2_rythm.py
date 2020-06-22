@@ -432,20 +432,30 @@ class MainWindow(QMainWindow):
             self.lblMode.setText('BiPAP')
             self.auxMode = MachineRunModes.BiPAP
             self.show_hide_vtdial(False)
+            self.lblPressure.setText('IPAP')
+            self.lblPeep.setText('EPAP')
         elif 'CMV' in self.modeselectwidget.Mode:
             self.lblMode.setText('CMV')
             self.auxMode = MachineRunModes.CMV
             self.show_hide_vtdial(True)
+            self.lblPressure.setText('LPeak')
+            self.lblPeep.setText('PEEP')
 
     def show_hide_vtdial(self, sh):
         if sh:
             self.vtdial.show()
             self.vtlcd.show()
             self.lblVt.show()
+            self.labelipap.hide()
+            self.ipapdial.hide()
+            self.ipaplcd.hide()
         else:
             self.vtdial.hide()
             self.vtlcd.hide()
             self.lblVt.hide()
+            self.labelipap.show()
+            self.ipapdial.show()
+            self.ipaplcd.show()
 
 
     flagStartPulse = False
@@ -1802,7 +1812,7 @@ class MainWindow(QMainWindow):
                         ## Auto adjust code for pressure or Bipap Mode
                         ############################################################################
 
-                        if self.runMode == MachineRunModes.BiPAP:
+                        if self.auxMode == MachineRunModes.BiPAP:
                             if self.workerThreadCreated:
                                 if not self.worker.flagStop:
                                     if self.ipap < (self.ipapdial.value() - self.generator.ipap_tol):
@@ -1840,7 +1850,7 @@ class MainWindow(QMainWindow):
                                     else:
                                         self.vt_unmatch_count = 0
 
-                        elif self.runMode == MachineRunModes.CMV:
+                        elif self.auxMode == MachineRunModes.CMV:
                             if self.workerThreadCreated:
                                 if not self.worker.flagStop:
                                     pass
