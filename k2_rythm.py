@@ -441,11 +441,11 @@ class MainWindow(QMainWindow):
         if sh:
             self.vtdial.show()
             self.vtlcd.show()
-            self.lblvt.show()
+            self.lblVt.show()
         else:
             self.vtdial.hide()
             self.vtlcd.hide()
-            self.lblvt.hide()
+            self.lblVt.hide()
 
 
     flagStartPulse = False
@@ -1195,7 +1195,7 @@ class MainWindow(QMainWindow):
 
 
     def childrenMakeMouseTransparen(self):
-        self.label_13.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.lblVt.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.vtlcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.ilcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.ielcd.setAttribute(Qt.WA_TransparentForMouseEvents, True)
