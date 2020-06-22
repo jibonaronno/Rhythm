@@ -58,16 +58,18 @@ class ListSelect(QWidget):
         super(ListSelect, self).__init__(parent)
         self.widget = uic.loadUi(_listselect, self)
         self.widget.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.Mode = 'BiPAP'
 
     def changeSelection(self):
         cnt = self.lstOptions.count()
         idx = self.lstOptions.row(self.lstOptions.currentItem())
+        idx += 1
         if idx < cnt:
-            idx += 1
+            pass
         else:
             idx = 0
         self.lstOptions.setCurrentRow(idx)
-        print(str(self.lstOptions.row(self.lstOptions.currentItem())))
+        self.Mode = self.lstOptions.currentItem().text()
 
     def closeEvent(self, event):
         pass
@@ -101,7 +103,7 @@ class MainWindow(QMainWindow):
         
         # Setting up Runmode for BiPAP. Call a cyclic function in LungSensorData(...) BipapLookup.lookUp(pressure)
         # This function will return BipapReturns.Continue or BipapReturns.Stop
-        self.runMode = MachineRunModes.CMV
+        self.runMode = MachineRunModes.BiPAP
         self.ipap = 0.0
         self.bipapReturns = BipapReturns.Continue
         self.bipapLookup = BipapLookup()
@@ -421,6 +423,14 @@ class MainWindow(QMainWindow):
 
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
+        self.labelSelectedMode()
+
+    def labelSelectedMode(self):
+        if 'BiPAP' in self.modeselectwidget.Mode:
+            self.lblMode.setText('BiPAP')
+        elif 'CMV' in self.modeselectwidget.Mode:
+            self.lblMode.setText('CMV')
+
 
     flagStartPulse = False
 
@@ -635,6 +645,7 @@ class MainWindow(QMainWindow):
                             if self.modeSelectionVisible:
                                 self.modeselectwidget.hide()
                                 self.modeSelectionVisible = False
+                                self.labelSelectedMode()
                             else:
                                 self.modeselectwidget.show()
                                 self.modeSelectionVisible = True
