@@ -61,8 +61,13 @@ class ListSelect(QWidget):
 
     def changeSelection(self):
         cnt = self.lstOptions.count()
-        idx = 0
-        print(str(self.lstOptions.currentItem().text()))
+        idx = self.lstOptions.row(self.lstOptions.currentItem())
+        if idx < cnt:
+            idx += 1
+        else:
+            idx = 0
+        self.lstOptions.setCurrentItem(idx)
+        print(str(self.lstOptions.row(self.lstOptions.currentItem())))
 
     def closeEvent(self, event):
         pass
