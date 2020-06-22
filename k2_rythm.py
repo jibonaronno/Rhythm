@@ -77,6 +77,8 @@ class MainWindow(QMainWindow):
         self.widget = uic.loadUi(_UI, self)
 
         self.modeselectwidget = ListSelect()
+        self.modeselectwidget.lstOptions.append('BiPAP')
+        self.modeselectwidget.lstOptions.append('CMV')
         
         window_title = "Rhythm"
         self.setWindowTitle(window_title)
