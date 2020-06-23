@@ -1645,8 +1645,8 @@ class MainWindow(QMainWindow):
                     ####self.volpeakdata.append(500.0)
                     #self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
                     
-                    #self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.moving_average)  + 'ml')
-                    self.peak_vol.setText('{:03.2f}'.format(self.vol_peak)  + 'ml')
+                    self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.moving_average)  + 'ml')
+                    #self.peak_vol.setText('{:03.2f}'.format(self.vol_peak)  + 'ml')
 
 
 

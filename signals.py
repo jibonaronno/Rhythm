@@ -37,6 +37,7 @@ class SignalDetector(object):
             return self.moving_average
         except Exception as e:
             print('Exception : ' + str(e))
+            return 0
 
 
     def Cycle(self, element):
