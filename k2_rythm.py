@@ -1624,7 +1624,8 @@ class MainWindow(QMainWindow):
                     ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
                     ####vol_base = self.kalman.Estimate(float(self.lst[0]))
                     if self.flow_for_volume != 0:
-                        vol_base = self.flowprocess.rootVolume(self.flow_offseted)
+                        #vol_base = self.flowprocess.rootVolume(self.flow_offseted)
+                        vol_base = self.flowprocess.Volume(self.flow_offseted)
                     else:
                         if vol_base > 50:
                             vol_base -= 50
