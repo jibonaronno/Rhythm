@@ -1564,7 +1564,10 @@ class MainWindow(QMainWindow):
                 try:
                     #self.peak_lung.setText('Lung Peak: ' + '{:03.2f}'.format(self.lung_detector.peak_value) + 'mb')
                     #self.peak_lung.setText('{:03.2f}'.format(self.lung_wave.GetMax() ) + 'mb')
-                    self.peak_lung.setText('{:03.2f}'.format(self.ipap ) + 'mb')
+                    if self.auxMode == MachineRunModes.BiPAP:
+                        self.peak_lung.setText('{:03.2f}'.format(self.ipap ) + 'mb')
+                    else:
+                        self.peak_lung.setText('{:03.2f}'.format(self.lungPeakPressure ) + 'mb')
                 except:
                     pass
                 #if self.lung_detector.peak_value > 5:
@@ -1574,7 +1577,7 @@ class MainWindow(QMainWindow):
                 deltaflow = float(self.lst[2])
 
                 ##dflow = self.flowprocess.CalculateFlowConst(deltaflow)
-                dflow = self.flowprocess.CalculateFlow(deltaflow * 100000000)
+                dflow = self.flowprocess.CalculateFlow(deltaflow)
                 ##dflow = float(self.lst[1]) - self.flow_average
 
                 print('Delta P : ' + str(deltaflow))

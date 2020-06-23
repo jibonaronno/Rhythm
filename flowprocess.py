@@ -44,7 +44,7 @@ class FlowProcess(object):
             #if(deltap > 0):
             if True:
                 #return self.CDD * self.Korifice * math.sqrt(deltap * 100)
-                result = (self.CDD ** 2) * (self.Korifice ** 2) * (deltap * 100)
+                result = (self.CDD ** 2) * (self.Korifice ** 2) * (deltap * 100) * 60
                 if result > 0:
                     self.flow = math.sqrt(result)
                     self.Volume(self.flow)
