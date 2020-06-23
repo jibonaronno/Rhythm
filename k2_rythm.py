@@ -49,9 +49,31 @@ _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
 _listselect = join(dirname(abspath(__file__)), 'listselect.ui')
 
+_volumes = join(dirname(abspath(__file__)), 'volumes.ui')
+
 class AlarmTypes(enum.Enum):
     NO_ALARM = 1
     PEAK_PRESSURE = 2
+
+class liveVolumeTable(QWidget):
+    def __init__(self, parent=None):
+        super(liveVolumeTable, self).__init__(parent)
+        self.widget = uic.loadUi(_volumes, self)
+        self.widget.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.table.setRowCount(1)
+        self.table.setColumnCount(2)
+        self.vols = JsonSettings('volumes.json')
+        self.load_json()
+
+    def load_json(self, file='volumes.json'):
+        idx = 0
+        for key,value in self.vols.dict.items():
+            self.table.setItem(idx, 0, QTableWidgetItem(str(key)))
+            self.table.setItem(idx, 1, QTableWidgetItem(str(value)))
+            
+            idx += 1
+            self.table.insertRow(idx)
+        pass
 
 class ListSelect(QWidget):
     def __init__(self, parent=None):
@@ -92,6 +114,8 @@ class MainWindow(QMainWindow):
         self.modeselectwidget = ListSelect()
         self.modeselectwidget.lstOptions.addItem('BiPAP')
         self.modeselectwidget.lstOptions.addItem('CMV')
+
+        self.volstable = liveVolumeTable()
         
         window_title = "Rhythm"
         self.setWindowTitle(window_title)
@@ -146,7 +170,7 @@ class MainWindow(QMainWindow):
         self.plotter.showGrid(x=True, y=True, alpha=None)
         #self.plotter.setTitle("Pressure : mb")
         self.plotter.setLabel('left','Pressure : mb')
-        self.plotter.getViewBox().enableAutoRange(axis='y', enable=False)
+        #self.plotter.getViewBox().enableAutoRange(axis='y', enable=False)
         self.plotter.getViewBox().setYRange(-2, 30)
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
         #self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
@@ -406,7 +430,7 @@ class MainWindow(QMainWindow):
         self.lowp_alarm_enable = False
         self.breathfail_alarm_enable = False
 
-        self.msgwindow = MessageWindow(['ALARM', 'Low Pressure'])
+        self.msgwindow = MessageWindow(['ALARM', ''])
 
         self.blinkpin = 16
 
@@ -517,7 +541,7 @@ class MainWindow(QMainWindow):
                 self.pulsegencounter += 1
 
     def lungtimeout(self):
-        self.label_alarm.setText("Alarm: Low Lung Pressure")
+        self.label_alarm.setText("Alarm: Flow Sequence Missing")
         self.wave.playBeep()
         self.lungtimer.setInterval(8000)
         self.breathfail_alarm_enable = True
@@ -863,6 +887,12 @@ class MainWindow(QMainWindow):
             self.controlStack.show()
             self.infoStack.hide()
             self.controls_show_hide = True
+
+            
+    @Slot()
+    def on_btnVols_clicked(self):
+        self.volstable.show()
+        pass
 
     @Slot()
     def on_btnShowHide_clicked(self):
@@ -1584,8 +1614,6 @@ class MainWindow(QMainWindow):
                         self.flowprocess.sum_of_volume = vol_base
                         self.flowprocess.sum_of_rmsVolume = vol_base
 
-                        print('{:f}'.format(vol_base))
-
                     self.kalmandata.append(vol_base)
                     self.voldata.append(vol_base)
                     #if vol_base < 0:
@@ -1740,6 +1768,9 @@ class MainWindow(QMainWindow):
 
             ipap_band_plus = self.ipapdial.value() + self.generator.ipap_tol
             ipap_band_minus = self.ipapdial.value() - self.generator.ipap_tol
+
+            rising_edge_detection = False
+
 
             try:
                 

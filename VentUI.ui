@@ -2019,6 +2019,19 @@
                <set>Qt::AlignCenter</set>
               </property>
              </widget>
+             <widget class="QPushButton" name="btnVols">
+              <property name="geometry">
+               <rect>
+                <x>110</x>
+                <y>60</y>
+                <width>51</width>
+                <height>31</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Volumes</string>
+              </property>
+             </widget>
             </widget>
             <widget class="QWidget" name="page_13"/>
            </widget>
