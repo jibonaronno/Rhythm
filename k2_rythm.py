@@ -1474,7 +1474,7 @@ class MainWindow(QMainWindow):
 
         try:
             lungpressure = float(self.lst[0])
-            deltaflow = float(self.lst[1])
+            deltaflow = float(self.lst[2])
         except Exception as e:
             print(data_stream)
             return
@@ -1554,7 +1554,7 @@ class MainWindow(QMainWindow):
                     #self.lungtimer.setInterval(3000)
                 ''' Commented for testing '''
 
-                deltaflow = float(self.lst[1])
+                deltaflow = float(self.lst[2])
 
                 dflow = self.flowprocess.CalculateFlowConst(deltaflow)
                 ##dflow = float(self.lst[1]) - self.flow_average
