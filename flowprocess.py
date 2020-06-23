@@ -55,8 +55,8 @@ class FlowProcess(object):
                     self.Volume(self.flow)
                     return -math.sqrt(d_result)
                 else:
-                    self.flow = 0
-                    return 0
+                    self.flow = 0.0
+                    return 0.0
             else:
                 return 0.0
         except Exception as e:
