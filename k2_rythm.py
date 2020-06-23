@@ -201,9 +201,9 @@ class MainWindow(QMainWindow):
         #self.flowplotter.setTitle("Flow L/M")
         self.flowplotter.setLabel('left', 'Flow L/M')
         #self.flowplotter
-        self.flowplotter.getViewBox().enableAutoRange(axis='y', enable=False)
+        #self.flowplotter.getViewBox().enableAutoRange(axis='y', enable=False)
         #self.flowplotter.getViewBox().setMinimumHeight(45)
-        self.flowplotter.getViewBox().setYRange(-5, 5)
+        #self.flowplotter.getViewBox().setYRange(-5, 5)
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
         self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
@@ -890,7 +890,11 @@ class MainWindow(QMainWindow):
             self.infoStack.hide()
             self.controls_show_hide = True
 
-            
+
+    @Slot()
+    def on_btnInfo_clicked(self):
+        self.controlStack.hide()
+
     @Slot()
     def on_btnVols_clicked(self):
         self.volstable.show()
@@ -1601,7 +1605,7 @@ class MainWindow(QMainWindow):
                     deltaflowoffset = self.deltaflowsum / self.flowavgcount
                 
                 #print('Flow : ' + str(self.flow_offseted))
-                if self.flow_offseted < 0.5 and self.flow_offseted > -0.5:
+                if (self.flow_offseted < 0.5 and self.flow_offseted > -0.5) or not self.breathInState:
                     if self.zero_flow_count < 3:
                         self.zero_flow_count += 1
                     else:
@@ -1631,8 +1635,11 @@ class MainWindow(QMainWindow):
                     ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
                     ####vol_base = self.kalman.Estimate(float(self.lst[0]))
                     if self.flow_for_volume != 0:
-                        vol_base = self.flowprocess.rootVolume(self.flow_offseted)
-                        #vol_base = self.flowprocess.Volume(self.flow_offseted)
+                        #vol_base = self.flowprocess.rootVolume(self.flow_offseted)
+                        vol_base = self.flowprocess.Volume(self.flow_offseted)
+                        if vol_base < 0:
+                            vol_base = 0
+
                     else:
                         if vol_base > 50:
                             vol_base -= 50
@@ -1853,7 +1860,8 @@ class MainWindow(QMainWindow):
                     if self.breath_in_tick:
                         self.breath_in_tick = False
                         self.epsnap = time.perf_counter() - self.eptick
-                        self.lbl_ep.setText('1:{:02.2f}'.format(self.epsnap))
+                        #self.lbl_ep.setText('1:{:02.2f}'.format(self.epsnap))
+                        self.lbl_ep.setText('1:{:d}'.format(self.ie))
                         
                         ### Reset the over pressure alarm when next peak is detcted ###
                         if self.over_pressure_detection_delay == 0:

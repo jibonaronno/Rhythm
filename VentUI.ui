@@ -2022,14 +2022,27 @@
              <widget class="QPushButton" name="btnVols">
               <property name="geometry">
                <rect>
-                <x>110</x>
+                <x>120</x>
                 <y>60</y>
-                <width>51</width>
+                <width>31</width>
                 <height>31</height>
                </rect>
               </property>
               <property name="text">
-               <string>Volumes</string>
+               <string>VT</string>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="btnInfo">
+              <property name="geometry">
+               <rect>
+                <x>120</x>
+                <y>90</y>
+                <width>31</width>
+                <height>31</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>I/O</string>
               </property>
              </widget>
             </widget>
