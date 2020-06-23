@@ -230,7 +230,7 @@ class MainWindow(QMainWindow):
         self.verticalLayout_2.addWidget(self.volplotter)
         #self.plotter.hide()
         #self.flowplotter.hide()
-        self.volplotter.hide()
+        #self.volplotter.hide()
 
         self.show_hide_LeftPanel()
         #self.infoStack.hide()
