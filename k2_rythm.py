@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
         self.pulsepen = pg.mkPen(255, 200, 0)
         self.pulseCurve = self.plotter.plot(0,0, "pulsecurve", pen=self.pulsepen)
 
-        self.derivative_pen = pg.mkPen(70,90,100, 100)
+        self.derivative_pen = pg.mkPen(0,200,200, 100)
         self.derivative_pen_in = pg.mkPen(10, 200, 10)
         self.derivative_pen_out = pg.mkPen(10, 200, 200)
         #self.dvcurve = self.plotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
