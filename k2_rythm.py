@@ -490,7 +490,8 @@ class MainWindow(QMainWindow):
             try:
                 GPIO.output(self.blinkpin, GPIO.HIGH)
             except Exception as e:
-                print('Exception GPIO.output(HIGH) ' + str(e))
+                pass
+                #print('Exception GPIO.output(HIGH) ' + str(e))
             finally:
                 pass
                 #print("clean up1") 
@@ -500,7 +501,8 @@ class MainWindow(QMainWindow):
             try:
                 GPIO.output(self.blinkpin, GPIO.LOW)
             except Exception as e:
-                print('Exception GPIO.output(LOW) ' + str(e))
+                pass
+                #print('Exception GPIO.output(LOW) ' + str(e))
             finally:
                 pass
                 #print("clean up2") 
@@ -1472,7 +1474,7 @@ class MainWindow(QMainWindow):
         if self.over_pressure_detection_delay > 0:
             self.over_pressure_detection_delay -= 1
         
-        
+        '''
         try:
             self.dataList.append(data_stream)
             self.log_interval_count += 1
@@ -1482,7 +1484,7 @@ class MainWindow(QMainWindow):
                 self.dataList.clear()
         except Exception as e:
             print('Exception in Log: ' + str(e))
-        
+        '''
         
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
@@ -1580,8 +1582,8 @@ class MainWindow(QMainWindow):
                 dflow = self.flowprocess.CalculateFlow(deltaflow)
                 ##dflow = float(self.lst[1]) - self.flow_average
 
-                print('Delta P : ' + str(deltaflow))
-                print('dflow : ' + str(dflow))
+                #print('Delta P : ' + str(deltaflow))
+                #print('dflow : ' + str(dflow))
                 
                 if self.flowavgcount < 100:
                     self.flow_sum += dflow
