@@ -526,13 +526,13 @@
            <widget class="QStackedWidget" name="controlStack">
             <property name="minimumSize">
              <size>
-              <width>330</width>
+              <width>100</width>
               <height>140</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>550</width>
+              <width>100</width>
               <height>16777215</height>
              </size>
             </property>
@@ -2386,23 +2386,11 @@ color: rgb(0, 255, 0);</string>
                </property>
               </widget>
              </widget>
-             <zorder>lp_back_2</zorder>
-             <zorder>lp_back</zorder>
-             <zorder>label_alarm</zorder>
-             <zorder>peak_lung</zorder>
-             <zorder>peak_flow</zorder>
-             <zorder>btnShowHide</zorder>
-             <zorder>lblPressure</zorder>
-             <zorder>lp_back_4</zorder>
-             <zorder>lbl_rr</zorder>
-             <zorder>lp_back_5</zorder>
-            </widget>
-            <widget class="QWidget" name="page_11">
              <widget class="QLabel" name="peak_vol">
               <property name="geometry">
                <rect>
-                <x>264</x>
-                <y>10</y>
+                <x>494</x>
+                <y>0</y>
                 <width>121</width>
                 <height>31</height>
                </rect>
@@ -2428,8 +2416,8 @@ color: rgb(0, 255, 0);</string>
              <widget class="QWidget" name="lp_back_3" native="true">
               <property name="geometry">
                <rect>
-                <x>260</x>
-                <y>10</y>
+                <x>490</x>
+                <y>0</y>
                 <width>126</width>
                 <height>61</height>
                </rect>
@@ -2472,7 +2460,20 @@ background-color: rgba(255, 255, 255, 0);</string>
                </property>
               </widget>
              </widget>
+             <zorder>lp_back_2</zorder>
+             <zorder>lp_back</zorder>
+             <zorder>label_alarm</zorder>
+             <zorder>peak_lung</zorder>
+             <zorder>peak_flow</zorder>
+             <zorder>btnShowHide</zorder>
+             <zorder>lblPressure</zorder>
+             <zorder>lp_back_4</zorder>
+             <zorder>lbl_rr</zorder>
+             <zorder>lp_back_5</zorder>
+             <zorder>peak_vol</zorder>
+             <zorder>lp_back_3</zorder>
             </widget>
+            <widget class="QWidget" name="page_11"/>
            </widget>
           </item>
           <item>
