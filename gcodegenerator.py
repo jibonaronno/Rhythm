@@ -37,9 +37,9 @@ class GcodeGenerator(object):
         self.ipap_tol = self.machinesetup.ipap_tol
         self.vol_tol = self.machinesetup.vol_tol
         print(str(self.ACC) + "," + str(self.xmax) + "," + str(self.xamb) + "," + str(self.xrect) + "," + str(self.xcon_offset) + "," + str(self.vtmax))
-        #self.calib_dict = {250:63.0, 300:68.0, 350:71.0, 400:73.0, 450:77.0, 500:86.0, 550:100.0}
+        self.calib_dict = {250:63.0, 300:68.0, 350:71.0, 400:73.0, 450:77.0, 500:86.0, 550:100.0}
 
-        self.calib_dict = {250:103.0, 300:108.0, 350:111.0, 400:113.0, 450:125.0, 500:126.0, 550:140.0}
+        #self.calib_dict = {250:103.0, 300:108.0, 350:111.0, 400:113.0, 450:125.0, 500:126.0, 550:140.0}
 
     def getAxisdistanceFromIpap(self, pparr, ipap):
         try:
