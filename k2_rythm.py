@@ -1573,11 +1573,12 @@ class MainWindow(QMainWindow):
 
                 deltaflow = float(self.lst[2])
 
-                print('Delta P : ' + str(deltaflow))
-
                 ##dflow = self.flowprocess.CalculateFlowConst(deltaflow)
                 dflow = self.flowprocess.CalculateFlow(deltaflow)
                 ##dflow = float(self.lst[1]) - self.flow_average
+
+                print('Delta P : ' + str(deltaflow))
+                print('dflow : ' + str(dflow))
                 
                 if self.flowavgcount < 100:
                     self.flow_sum += dflow
