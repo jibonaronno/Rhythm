@@ -1425,6 +1425,9 @@ class MainWindow(QMainWindow):
     ipap_deviation = 0.0 ## Lung Pressure Diff from Target Pressure ipapdial
     changefactor = 0.0
 
+    vol_deviation = 0.0
+    vol_changefactor = 0.0
+
     def sensorData(self, data_stream):
         self.sensorDataString = data_stream
 
@@ -1439,6 +1442,17 @@ class MainWindow(QMainWindow):
             return 2
         else:
             return 10
+
+    def GetChangeFactorFromVolDeviation(self, deviation):
+        if deviation <= 10:
+            return 5
+        elif deviation <=15:
+            return 8
+        else:
+            return 12
+
+    volume_band_plus = 0
+    volume_band_minus = 0
 
     def LungSensorData(self, data_stream):
         #print(data_stream)
@@ -1619,8 +1633,12 @@ class MainWindow(QMainWindow):
                     #if vol_base < 0:
                     #    vol_base = 0
                     self.vol_detector.Cycle(vol_base)
+                    self.vol_detector.moving_average_cycle(vol_base)
                     ####self.volpeakdata.append(500.0)
-                    self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
+                    #self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
+                    self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.moving_average)  + 'ml')
+
+
 
                     if lungpressure >= 0:
                         self.kalmanofpressuredata.append(self.kalmanpressure.Estimate(lungpressure ** 1.0))
@@ -1886,10 +1904,34 @@ class MainWindow(QMainWindow):
                         elif self.auxMode == MachineRunModes.CMV:
                             if self.workerThreadCreated:
                                 if not self.worker.flagStop:
-                                    pass
-                                
+                                    self.volume_band_plus = self.vt + self.generator.vol_tol
+                                    self.volume_band_minus = self.vt - self.generator.vol_tol
 
-                        
+                                    if self.vol_detector.moving_average < self.volume_band_minus:
+                                        self.vol_deviation = self.vt - self.vol_detector.moving_average
+                                        self.vol_changefactor = self.GetChangeFactorFromVolDeviation(self.vol_deviation)
+                                        
+                                        if (self.generator.xav + self.generator.xavv) < self.generator.xmax:
+                                            self.vt_adjust += self.changefactor #----------------
+                                            self.generator.xavv = self.vt_adjust
+                                            print('Adjusting Vol ++ : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
+                                            #self.settings_dict[r"vt"] = str(self.vt)
+                                            self.SaveSettings()
+                                    
+                                    elif self.vol_detector.moving_average > self.volume_band_plus:
+                                        self.vol_deviation = self.vol_detector.moving_average - self.vt
+                                        self.vol_changefactor = self.GetChangeFactorFromVolDeviation(self.vol_deviation)
+
+                                        if (self.generator.xav - self.generator.xavv) > self.generator.Dt:
+                                            self.vt_adjust -= self.changefactor #---------------------
+                                            self.generator.xavv = self.vt_adjust
+                                            print('Adjusting Bipap -- : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
+                                            #self.settings_dict[r"vt"] = str(self.vt)
+                                            self.SaveSettings()
+                                    else:
+                                        pass
+
+
                 else:
                     if not self.flag_idle:
                         self.idle_count += 1

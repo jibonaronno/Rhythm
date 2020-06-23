@@ -40,6 +40,8 @@ class MachineSetup(object):
         self.home_sense = int(self.jsn.dict['home_sense'])
         self.ipap_tol = int(self.jsn.dict['ipap_tol'])
 
+        self.vol_tol = int(self.jsn.dict['vol_total'])
+
     def save(self):
         self.jsn.dict['ACC'] = str(self.ACC)
         self.jsn.dict['xmax'] = str(self.xmax)

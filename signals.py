@@ -28,6 +28,17 @@ class SignalDetector(object):
             self.dque.append(element)
             self.deriv_points.append(element)
 
+    moving_average = 0
+
+    def moving_average_cycle(self, element):
+        try:
+            pre_avg = element + self.moving_average
+            self.moving_average = pre_avg / 2
+            return self.moving_average
+        except Exception as e:
+            print('Exception : ' + str(e))
+
+
     def Cycle(self, element):
         self.Append(element)
         if len(self.deriv_points) >= 6:
