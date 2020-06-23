@@ -76,7 +76,7 @@ class FlowProcess(object):
         self.flow_arr.append(flow)
         if len(self.flow_arr) > 2:
             self.flow_arr.popleft()
-            rmsVolume = math.sqrt((((self.flow_arr[0] + self.flow_arr[1]) / 2) ** 2) * 0.1)
+            rmsVolume = math.sqrt((((self.flow_arr[0] + self.flow_arr[1]) / 2) ** 2) * 6.25)
 
             if self.flow_arr[0] < 0:
                 self.sum_of_rmsVolume -= rmsVolume

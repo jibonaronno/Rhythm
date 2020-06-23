@@ -1389,6 +1389,7 @@ class MainWindow(QMainWindow):
     over_pressure_detection_delay = 0
     dataList = []
     lung_wave = WaveShape()
+    vol_wave = WaveShape()
 
     vtsnap = 0.0
     vtpick = 0.0
@@ -1424,6 +1425,8 @@ class MainWindow(QMainWindow):
 
     ipap_deviation = 0.0 ## Lung Pressure Diff from Target Pressure ipapdial
     changefactor = 0.0
+
+    vol_peak = 0.0
 
     vol_deviation = 0.0
     vol_changefactor = 0.0
@@ -1632,8 +1635,8 @@ class MainWindow(QMainWindow):
                     self.voldata.append(vol_base)
                     #if vol_base < 0:
                     #    vol_base = 0
-                    self.vol_detector.Cycle(vol_base)
-                    self.vol_detector.moving_average_cycle(vol_base)
+                    #self.vol_detector.Cycle(vol_base)
+                    #self.vol_detector.moving_average_cycle(vol_base)
                     ####self.volpeakdata.append(500.0)
                     #self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
                     self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.moving_average)  + 'ml')
@@ -1813,6 +1816,9 @@ class MainWindow(QMainWindow):
                             self.ttick = time.perf_counter()
                             self.eptick = self.ttick
 
+                            self.vol_wave.StartWave()
+
+
                             if len(self.lungpressuredata) >= 3:
                                 self.epap = self.lungpressuredata[len(self.lungpressuredata) - 3]
 
@@ -1821,6 +1827,10 @@ class MainWindow(QMainWindow):
                     self.lung_detector.Cycle(lungpressure)
                     self.lung_wave.Cycle(lungpressure)
                     self.lung_wave.zero_count = 0
+
+                    self.vol_detector.Cycle(vol_base)
+                    #self.vol_detector.moving_average_cycle(vol_base)
+                    self.vol_wave.Cycle(self.vol_detector.moving_average)
                 
                 elif self.flow_offseted <= 0.5  and not self.breathInState:
                     self.curve1.setPen(self.derivative_pen_out)
@@ -1838,6 +1848,9 @@ class MainWindow(QMainWindow):
                             if self.lung_detector.peak_value > 5:
                                 self.label_alarm.setText("Alarm: ")
                                 self.lowp_alarm_enable = False
+
+                        self.vol_peak = self.vol_wave.GetMax()
+                        self.vol_detector.moving_average_cycle(self.vol_peak)
 
                         self.lungPeakPressure = self.lung_wave.GetMax()
                         self.ipap = self.lungPeakPressure - self.epap
@@ -1904,6 +1917,8 @@ class MainWindow(QMainWindow):
                         elif self.auxMode == MachineRunModes.CMV:
                             if self.workerThreadCreated:
                                 if not self.worker.flagStop:
+                                    pass
+                                    '''
                                     self.volume_band_plus = self.vt + self.generator.vol_tol
                                     self.volume_band_minus = self.vt - self.generator.vol_tol
 
@@ -1930,6 +1945,7 @@ class MainWindow(QMainWindow):
                                             self.SaveSettings()
                                     else:
                                         pass
+                                    '''
 
 
                 else:
