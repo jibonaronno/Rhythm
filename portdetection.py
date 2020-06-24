@@ -77,6 +77,8 @@ class DetectDevices(object):
         skip_loop = False
         self.listUsbPorts()
         print(f"Number of USB Ports : {len(self.usbports)}")
+        print('waiting 5 seconds')
+        time.sleep(5)
         if len(self.usbports) > 0:
             for port in self.usbports:
                 uart_lines = self.connectAndRead(port)
@@ -126,6 +128,7 @@ class DetectDevices(object):
         
         except Exception as e:
             print(f"Error Connect Or Reading Serial Port:{port[0]} " + str(e))
+            return None
 
 class AutoDetectMarlin(QObject):
     def __init__(self):
