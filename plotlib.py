@@ -84,4 +84,4 @@ class PlotLib(object):
                         self.cntr = 0
                         print('{:f} :: {:f}'.format(lungpressure, deltaflow))
                 else:
-                    print('sensor data stream length missmatch : ' + str(len(self.lst)))
+                    pass #print('sensor data stream length missmatch : ' + str(len(self.lst)))
