@@ -43,7 +43,8 @@ import struct
 #import RPi.GPIO as GPIO
 from time import sleep
 import pyautogui
-
+from scipy.signal import butter,filtfilt
+from filterlp import LowpassFilter
 
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
@@ -106,6 +107,8 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
 
         #startdlg = StartDialog(None)
+
+        self.lpf = LowpassFilter()
         
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
@@ -165,9 +168,12 @@ class MainWindow(QMainWindow):
 
         pg.setConfigOptions(antialias=True)
 
+        self.inf1 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':1.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+
         self.lungpressure_line_pen = pg.mkPen(200, 100, 0)
         self.plotter = PlotWidget()
         self.plotter.showGrid(x=True, y=True, alpha=None)
+        self.plotter.addItem(self.inf1)
         #self.plotter.setTitle("Pressure : mb")
         self.plotter.setLabel('left','Pressure : mb')
         #self.plotter.getViewBox().enableAutoRange(axis='y', enable=False)
@@ -936,7 +942,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_btnstream_clicked(self):
-        self.streamer = Backfeed('log4.txt')
+        self.streamer = Backfeed('log3.txt')
         self.streamer.setCallback(self.getStreamData)
         self.streamer.Start(100)
         self.lungtimer.start(8000)
@@ -1472,6 +1478,8 @@ class MainWindow(QMainWindow):
 
         lungpressure:float = 0.0
 
+        filtered = []
+
         if not self.plot_run:
             return
 
@@ -1505,7 +1513,12 @@ class MainWindow(QMainWindow):
         self.maxLen = 100  # max number of data points to show on graph
         if(len(self.lst) > 2):
             if len(self.lungpressuredata) > self.maxLen:
+                filtered = self.lpf.butter_lowpass_filter(self.lungpressuredata)
                 self.lungpressuredata.popleft()  # remove oldest
+                self.inf1.setPos([2,2])
+            else:
+                filtered.append(0)
+
             if len(self.lungpressurepeakdata) > self.maxLen:
                 self.lungpressurepeakdata.popleft()
             if len(self.dvdata) > self.maxLen:
@@ -1986,7 +1999,8 @@ class MainWindow(QMainWindow):
             self.tic = time.perf_counter()
 
             try:
-                self.curve1.setData(self.tfdata, self.lungpressuredata)
+                #self.curve1.setData(self.tfdata, self.lungpressuredata)
+                self.curve1.setData(self.tfdata, filtered)
                 #self.curve2.setData(self.tfdata, self.lungpressurepeakdata)
                 self.curve3.setData(self.tfdata, self.kalmanofpressuredata)
             except Exception as e:
