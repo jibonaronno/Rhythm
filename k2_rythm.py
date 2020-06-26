@@ -429,7 +429,7 @@ class MainWindow(QMainWindow):
 
         self.plottingBaseTimer = QTimer()
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
-        ###self.plottingBaseTimer.start(0.025)
+        self.plottingBaseTimer.start(0.1)
 
         self.alarm_show = False
         self.label_alarm.hide()
