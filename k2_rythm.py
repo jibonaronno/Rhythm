@@ -533,8 +533,8 @@ class MainWindow(QMainWindow):
 
     def plotTimer(self):
         if self.sensorDataString != '':
-            pass
-            #self.LungSensorData(self.sensorDataString, 0.025)
+            #pass
+            self.LungSensorData(self.sensorDataString, 0.025)
 
     def pulseGen(self):
         if self.flagStartPulse:
@@ -1512,42 +1512,6 @@ class MainWindow(QMainWindow):
 
         self.maxLen = 100  # max number of data points to show on graph
         if(len(self.lst) > 2):
-            if len(self.lungpressuredata) > self.maxLen:
-                filtered = self.lpf.butter_lowpass_filter(self.lungpressuredata)
-                self.lungpressuredata.popleft()  # remove oldest
-                self.inf1.setPos([2,2])
-            else:
-                filtered.append(0)
-
-            if len(self.lungpressurepeakdata) > self.maxLen:
-                self.lungpressurepeakdata.popleft()
-            if len(self.dvdata) > self.maxLen:
-                self.dvdata.popleft()
-            if len(self.dvdata_compressed) > self.maxLen:
-                self.dvdata_compressed.popleft()
-            if len(self.kalmandata) > self.maxLen:
-                self.kalmandata.popleft()
-            if len(self.volpeakdata) > self.maxLen:
-                self.volpeakdata.popleft()
-            if len(self.voldata) > self.maxLen:
-                self.voldata.popleft()
-            if len(self.flowdata) > self.maxLen:
-                self.flowdata.popleft()
-            if len(self.flowpeakdata) > self.maxLen:
-                self.flowpeakdata.popleft()
-            if len(self.pulseData) > self.maxLen:
-                self.pulseData.popleft()
-            if len(self.kalmanofpressuredata) > self.maxLen:
-                self.kalmanofpressuredata.popleft()
-            #if len(self.tfdata) > self.maxLen:
-            #    self.tfdata.popleft()
-
-            if len(self.tfdata) > self.maxLen:
-                pass
-                #self.tfdata.popleft()
-            else:
-                self.ttm += 0.1 ###incr
-                self.tfdata.append(self.ttm)
 
             try:
                 lungpressure = float(self.lst[0])
@@ -1997,6 +1961,43 @@ class MainWindow(QMainWindow):
                 print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
 
             self.tic = time.perf_counter()
+
+            if len(self.lungpressuredata) > self.maxLen:
+                filtered = self.lpf.butter_lowpass_filter(self.lungpressuredata)
+                self.lungpressuredata.popleft()  # remove oldest
+                self.inf1.setPos([2,2])
+            else:
+                filtered.append(0)
+
+            if len(self.lungpressurepeakdata) > self.maxLen:
+                self.lungpressurepeakdata.popleft()
+            if len(self.dvdata) > self.maxLen:
+                self.dvdata.popleft()
+            if len(self.dvdata_compressed) > self.maxLen:
+                self.dvdata_compressed.popleft()
+            if len(self.kalmandata) > self.maxLen:
+                self.kalmandata.popleft()
+            if len(self.volpeakdata) > self.maxLen:
+                self.volpeakdata.popleft()
+            if len(self.voldata) > self.maxLen:
+                self.voldata.popleft()
+            if len(self.flowdata) > self.maxLen:
+                self.flowdata.popleft()
+            if len(self.flowpeakdata) > self.maxLen:
+                self.flowpeakdata.popleft()
+            if len(self.pulseData) > self.maxLen:
+                self.pulseData.popleft()
+            if len(self.kalmanofpressuredata) > self.maxLen:
+                self.kalmanofpressuredata.popleft()
+            #if len(self.tfdata) > self.maxLen:
+            #    self.tfdata.popleft()
+
+            if len(self.tfdata) > self.maxLen:
+                pass
+                #self.tfdata.popleft()
+            else:
+                self.ttm += 0.1 ###incr
+                self.tfdata.append(self.ttm)
 
             try:
                 self.curve1.setData(self.tfdata, self.lungpressuredata)
