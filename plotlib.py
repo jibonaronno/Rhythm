@@ -78,7 +78,7 @@ class PlotLib(object):
                     except Exception as e:
                         print(data_stream + ' : ' + str(e))
 
-                    if self.cntr < 10:
+                    if self.cntr < 100:
                         self.cntr += 1
                     else:
                         self.cntr = 0
