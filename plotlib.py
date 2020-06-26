@@ -66,4 +66,15 @@ class PlotLib(object):
             return
         self.lines = data_stream.split('\n')
         if len(self.lines) > 0:
+            print('---------------- Multiple Lines START-----------------')
             pprint.pprint(data_stream)
+            print('---------------- Multiple Lines  END-----------------')
+        self.lst = data_stream.split(',')
+        if len(self.lst) >= 3:
+            try:
+                lungpressure = float(self.lst[0])
+                deltaflow = float(self.lst[2])
+            except Exception as e:
+                print(data_stream + ' : ' + str(e))
+        else:
+            print('sensor data stream length missmatch : ' + str(len(self.lst)))
