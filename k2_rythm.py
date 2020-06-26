@@ -1999,8 +1999,8 @@ class MainWindow(QMainWindow):
             self.tic = time.perf_counter()
 
             try:
-                #self.curve1.setData(self.tfdata, self.lungpressuredata)
-                self.curve1.setData(self.tfdata, filtered)
+                self.curve1.setData(self.tfdata, self.lungpressuredata)
+                #self.curve1.setData(self.tfdata, filtered)
                 #self.curve2.setData(self.tfdata, self.lungpressurepeakdata)
                 self.curve3.setData(self.tfdata, self.kalmanofpressuredata)
             except Exception as e:
