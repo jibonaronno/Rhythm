@@ -57,11 +57,14 @@ class PlotLib(object):
     plot_run = True
     lst = []
     lines = []
+    cntr = 0
 
     def __init__(self, step_duration):
         self.stepDuration = step_duration
 
     def push(self, data_stream):
+        lungpressure = 0.0
+        deltaflow = 0.0
         if not self.plot_run:
             return
         self.lines = data_stream.split('\n')
@@ -76,5 +79,11 @@ class PlotLib(object):
                 deltaflow = float(self.lst[2])
             except Exception as e:
                 print(data_stream + ' : ' + str(e))
+
+            if self.cntr < 10:
+                self.cntr += 1
+            else:
+                self.cntr = 0
+                print('{:f} :: {:f}'.format(lungpressure, deltaflow))
         else:
             print('sensor data stream length missmatch : ' + str(len(self.lst)))
