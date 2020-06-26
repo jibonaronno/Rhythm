@@ -46,6 +46,8 @@ import pyautogui
 from scipy.signal import butter,filtfilt
 from filterlp import LowpassFilter
 
+from plotlib import PlotLib
+
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
 _listselect = join(dirname(abspath(__file__)), 'listselect.ui')
@@ -109,6 +111,8 @@ class MainWindow(QMainWindow):
         #startdlg = StartDialog(None)
 
         self.lpf = LowpassFilter()
+
+        self.plotLib = PlotLib(0.1)
         
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
@@ -534,7 +538,8 @@ class MainWindow(QMainWindow):
     def plotTimer(self):
         if self.sensorDataString != '':
             #pass
-            self.LungSensorData(self.sensorDataString, 0.025)
+            #self.LungSensorData(self.sensorDataString, 0.025)
+            self.plotLib.push(self.sensorDataString)
 
     def pulseGen(self):
         if self.flagStartPulse:
@@ -1470,6 +1475,8 @@ class MainWindow(QMainWindow):
     volume_band_minus = 0
 
     def LungSensorData(self, data_stream):
+        self.sensorData(data_stream)
+        return
         #print(data_stream)
         #Logging the data @ 100 data received
         vol_base = 0.0
