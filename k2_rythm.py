@@ -1628,7 +1628,7 @@ class MainWindow(QMainWindow):
         self.maxLen = 100  # max number of data points to show on graph
         if(len(self.lst) >= 3):
             self.lungpressuredata.append(lungpressure + float(self.peepdial.value()))
-            if len(self.lungpressuredata) > self.maxlen:
+            if len(self.lungpressuredata) > self.maxLen:
                 self.lungpressuredata.popleft()
 
             self.vtsnap = time.perf_counter() - self.vtsnap
