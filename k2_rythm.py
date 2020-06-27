@@ -1595,8 +1595,10 @@ class MainWindow(QMainWindow):
             self.flowcurve.setData(self.streamdata.tfdata, self.streamdata.flow_stream)
             self.volcurve.setData(self.streamdata.tfdata, self.streamdata.volume_stream)
 
-    def LungSensorData(self, data_stream, lungpressure=0.0, deltaflow=0.0):
+    def LungSensorData(self, data_stream, in_vol=0.0, ex_vol=0.0, lungpressure=0.0, deltaflow=0.0, volume=0.0):
         self.PlotData(data_stream)
+        self.peak_vol.setText('{:03.2f}'.format(self.streamdata.involume)  + 'ml')
+        self.ex_vol.setText('{:03.2f}'.format(self.streamdata.exvolume)  + 'ml')
         return
         #print(data_stream)
         #Logging the data @ 100 data received
@@ -1613,6 +1615,13 @@ class MainWindow(QMainWindow):
                 
         self.sensorwatchtimer.setInterval(500)
 
+        self.lst.append(lungpressure)
+        self.lst.append(0.0)
+        self.lst.append(deltaflow)
+        self.lst.append(0.0)
+        self.lst.append(0.0)
+        self.lst.append(volume)
+
         self.maxLen = 100  # max number of data points to show on graph
         if(len(self.lst) >= 3):
             try:
@@ -1624,12 +1633,6 @@ class MainWindow(QMainWindow):
                 self.lungpressurepeakdata.append(float(self.peakdial.value()))
                 self.lungpressuredata.append(lungpressure + float(self.peepdial.value()))
 
-                try:
-                    self.pulseGen()
-                    self.pulseData.append(self.pulse_state * 20)
-                except Exception as e:
-                    print('Exception : pulseData.append()')
-
                 self.vtsnap = time.perf_counter() - self.vtsnap
                 self.tf = self.vtsnap
 
@@ -1637,6 +1640,7 @@ class MainWindow(QMainWindow):
 
             if self.lung_wave.wave_in_buffer:
                 pass
+
             try:
                 #self.peak_lung.setText('{:03.2f}'.format(self.lung_wave.GetMax() ) + 'mb')
                 if self.auxMode == MachineRunModes.BiPAP:
@@ -1646,8 +1650,7 @@ class MainWindow(QMainWindow):
             except:
                 pass
 
-        deltaflow = float(self.lst[2])
-        dflow = self.flowprocess.CalculateFlow(deltaflow)
+        dflow = deltaflow
         
         if self.flowavgcount < 100:
             self.flow_sum += dflow

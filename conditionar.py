@@ -71,6 +71,8 @@ class StreamData(object):
         self.lungpressure = 0.0
         self.deltaflow = 0.0
         self.volume = 0.0
+        self.involume = 0.0
+        self.exvolume = 0.0
 
     def push(self, data_stream):
         
@@ -80,11 +82,13 @@ class StreamData(object):
         if len(self.lines) > 0:
             for line in self.lines:
                 self.lst = line.split(',')
-                if len(self.lst) >= 3:
+                if len(self.lst) >= 5:
                     try:
                         self.lungpressure = float(self.lst[0])
                         self.deltaflow = float(self.lst[2])
-                        self.volume = float(self.lst[5])
+                        self.volume = float(self.lst[3])
+                        self.involume = float(self.lst[5])
+                        self.exvolume = float(self.lst[6])
                         self.pressure_stream.append(self.lungpressure)
                         self.flow_stream.append(self.deltaflow)
                         self.volume_stream.append(self.volume)
