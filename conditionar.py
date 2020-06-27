@@ -70,6 +70,7 @@ class StreamData(object):
         self.filtered = []
         self.lungpressure = 0.0
         self.deltaflow = 0.0
+        self.volume = 0.0
 
     def push(self, data_stream):
         
@@ -83,14 +84,17 @@ class StreamData(object):
                     try:
                         self.lungpressure = float(self.lst[0])
                         self.deltaflow = float(self.lst[2])
+                        self.volume = float(self.lst[5])
                         self.pressure_stream.append(self.lungpressure)
                         self.flow_stream.append(self.deltaflow)
+                        self.volume_stream.append(self.volume)
                         
 
                         if len(self.pressure_stream) > self.maxlength:
                             self.pressure_stream.popleft()
                             self.flow_stream.popleft()
                             self.filtered = self.lpf.butter_lowpass_filter(self.pressure_stream, cutoff=1, fs=10, order=2)
+                            self.volume_stream.popleft()
 
                         if len(self.tfdata) < self.maxlength:
                             self.ttm += self.stepDuration
