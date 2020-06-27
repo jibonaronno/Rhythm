@@ -269,7 +269,7 @@ class MainWindow(QMainWindow):
         self.verticalLayout_2.addWidget(self.volplotter)
         #self.plotter.hide()
         #self.flowplotter.hide()
-        #self.volplotter.hide()
+        self.volplotter.hide()
 
         self.show_hide_LeftPanel()
         #self.infoStack.hide()
@@ -1663,95 +1663,6 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e) + ' - ' + data_stream)
 
-            
-                
-            '''
-            try:
-                if len(self.deriv_points) >= 3:
-                    if lungpressure > 0.2 and self.flag_breath_in_ready:
-                        self.curve1.setPen(self.derivative_pen_in)
-                        self.flag_breath_in_ready = False
-                        self.lpzerocount = 0
-                        if not self.breath_in_tick:
-                            
-                            if not self.flagStartPulse:
-                                ##self.plottingBaseTimer.start(0.025)
-                                self.pulse_state = 1
-                                self.flagStartPulse = True
-
-                            self.breath_in_tick = True
-                            self.wave.playin()
-                            self.lungtimer.setInterval(8000)
-                            self.lung_wave.StartWave()
-                            self.tsnap = time.perf_counter() - self.ttick
-                            self.lbl_rr.setText('RR  : ' + '{:02f}'.format(60 / self.tsnap) + ' E->E : {:f}'.format(self.tsnap))
-                            self.ttick = time.perf_counter()
-                            self.eptick = self.ttick
-                    elif self.dvdata[-1] < -10:
-                        self.curve1.setPen(self.derivative_pen_out)
-                        self.exhale_t_count += 1
-                        #self.markerPeakPressure.setPos(self.ttm, lungpressure)
-                        if self.breath_in_tick:
-                            self.breath_in_tick = False
-                            self.epsnap = time.perf_counter() - self.eptick
-                            self.lbl_ep.setText('E->P: ' + '{:f}'.format(self.epsnap))
-                            ###Reset the over pressure alarm when next peak is detcted###
-                            if self.over_pressure_detection_delay == 0:
-                                if self.lung_detector.peak_value > 5:
-                                    self.label_alarm.setText("Alarm: ")
-
-                    if lungpressure < 0.2:
-                        if self.lpzerocount < 3:
-                            self.lpzerocount += 1
-                        else:
-                            self.flag_breath_in_ready = True
-
-            except Exception as e:
-                print('Exception In Breath in / Breath out detection L-1319 : ' + str(e))
-            '''
-            '''
-            try:
-                if(len(self.deriv_points) >= 3):
-                    if self.dvdata[-1] > 1:
-                        self.curve1.setPen(self.derivative_pen_in)
-                        self.inhale_t_count += 1
-                        self.flag_idle = False
-                        self.idle_count = 0
-                        if not self.breath_in_tick:
-                            self.breath_in_tick = True
-                            self.wave.playin()
-                            self.lungtimer.setInterval(8000)
-                            self.lung_wave.StartWave()
-                            self.tsnap = time.perf_counter() - self.ttick
-                            self.lbl_rr.setText('RR  : ' + '{:02f}'.format(60 / self.tsnap) + ' E->E : {:f}'.format(self.tsnap))
-                            self.ttick = time.perf_counter()
-                            self.eptick = self.ttick
-                    elif self.dvdata[-1] < -10:
-                        self.curve1.setPen(self.derivative_pen_out)
-                        self.exhale_t_count += 1
-                        self.flag_idle = False
-                        self.idle_count = 0
-                        self.sumofvolume = 0.0
-                        if self.breath_in_tick:
-                            self.breath_in_tick = False
-                            self.epsnap = time.perf_counter() - self.eptick
-                            self.lbl_ep.setText('E->P: ' + '{:f}'.format(self.epsnap))
-                            ### Reset the over pressure alarm when next peak is detcted ###
-                            if self.over_pressure_detection_delay == 0:
-                                if self.lung_detector.peak_value > 5:
-                                    self.label_alarm.setText("Alarm: ")
-                    else:
-                        if not self.flag_idle:
-                            self.idle_count += 1
-                            if self.idle_count > 2:
-                                ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
-                                self.flag_idle = True
-                                self.idle_count = 3
-                                self.inhale_t_count = 0
-                                self.exhale_t_count = 0
-            except Exception as e:
-                print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
-            '''
 
             ipap_band_plus = self.ipapdial.value() + self.generator.ipap_tol
             ipap_band_minus = self.ipapdial.value() - self.generator.ipap_tol
@@ -1929,84 +1840,6 @@ class MainWindow(QMainWindow):
 
             except Exception as e:
                 print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
-
-            self.tic = time.perf_counter()
-
-            if len(self.lungpressuredata) > self.maxLen:
-                filtered = self.lpf.butter_lowpass_filter(self.lungpressuredata)
-                self.lungpressuredata.popleft()  # remove oldest
-                self.inf1.setPos([2,2])
-            else:
-                filtered.append(0)
-
-            if len(self.lungpressurepeakdata) > self.maxLen:
-                self.lungpressurepeakdata.popleft()
-            if len(self.dvdata) > self.maxLen:
-                self.dvdata.popleft()
-            if len(self.dvdata_compressed) > self.maxLen:
-                self.dvdata_compressed.popleft()
-            if len(self.kalmandata) > self.maxLen:
-                self.kalmandata.popleft()
-            if len(self.volpeakdata) > self.maxLen:
-                self.volpeakdata.popleft()
-            if len(self.voldata) > self.maxLen:
-                self.voldata.popleft()
-            if len(self.flowdata) > self.maxLen:
-                self.flowdata.popleft()
-            if len(self.flowpeakdata) > self.maxLen:
-                self.flowpeakdata.popleft()
-            if len(self.pulseData) > self.maxLen:
-                self.pulseData.popleft()
-            if len(self.kalmanofpressuredata) > self.maxLen:
-                self.kalmanofpressuredata.popleft()
-            #if len(self.tfdata) > self.maxLen:
-            #    self.tfdata.popleft()
-
-            if len(self.tfdata) > self.maxLen:
-                pass
-                #self.tfdata.popleft()
-            else:
-                self.ttm += 0.1 ###incr
-                self.tfdata.append(self.ttm)
-
-            try:
-                self.curve1.setData(self.tfdata, self.lungpressuredata)
-                #self.curve1.setData(self.tfdata, filtered)
-                #self.curve2.setData(self.tfdata, self.lungpressurepeakdata)
-                self.curve3.setData(self.tfdata, self.kalmanofpressuredata)
-            except Exception as e:
-                print('Exception SetData curve1 curve3 : ' + str(e))
-                
-            try:
-                '''Assign volume data to volume plotter curve'''
-                #(originally kalman data) self.volcurve.setData(self.kalmandata)
-                self.volcurve.setData(self.tfdata, self.voldata)
-                ###self.volpeakcurve.setData(self.tfdata, self.volpeakdata)
-            except Exception as e:
-                print('Exception SetData volcurve : ' + str(e))
-
-            try:
-                '''Assign Flowdata to flow plotter curve & dvdata to dvcurve'''
-                self.flowcurve.setData(self.tfdata, self.flowdata)
-            except Exception as e:
-                print('Exception SetData flowcurve : ' + str(e))
-
-            try:
-                self.dvcurve.setData(self.tfdata, self.dvdata_compressed)
-            except Exception as e:
-                print('Exception SetData dvcurve : ' + str(e))
-
-            try:
-                self.flowpeakcurve.setData(self.tfdata, self.flowpeakdata)
-            except Exception as e:
-                print('Exception SetData flowpeakcurve : ' + str(e))
-
-
-            try:
-                '''Assign pulsedata to pulse curve'''
-                self.pulseCurve.setData(self.tfdata, self.pulseData)
-            except Exception as e:
-                print('Exception SetData pulseCurve')
             
             try:
                 if (lungpressure > float(self.peakdial.value())):
@@ -2014,8 +1847,6 @@ class MainWindow(QMainWindow):
                         self.wave.playfile()
                         self.label_alarm.setText("Alarm: Over Pressure")
                         self.over_pressure_detection_delay = 10
-                
-                        #self.sensor.beep()
             except Exception as e:
                 print("Exception section 0x06 : " + str(e) + ' - ' + data_stream)
 
