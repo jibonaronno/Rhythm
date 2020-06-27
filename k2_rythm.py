@@ -1615,37 +1615,36 @@ class MainWindow(QMainWindow):
 
         self.maxLen = 100  # max number of data points to show on graph
         if(len(self.lst) >= 3):
-
-        try:
-            self.deriv_points.append([lungpressure, self.timesnap])
-        except Exception as e:
-            print('Exception : deriv_points.append()')
-
-        if len(self.deriv_points) >= 0:
-            self.lungpressurepeakdata.append(float(self.peakdial.value()))
-            self.lungpressuredata.append(lungpressure + float(self.peepdial.value()))
-
             try:
-                self.pulseGen()
-                self.pulseData.append(self.pulse_state * 20)
+                self.deriv_points.append([lungpressure, self.timesnap])
             except Exception as e:
-                print('Exception : pulseData.append()')
+                print('Exception : deriv_points.append()')
 
-            self.vtsnap = time.perf_counter() - self.vtsnap
-            self.tf = self.vtsnap
+            if len(self.deriv_points) >= 0:
+                self.lungpressurepeakdata.append(float(self.peakdial.value()))
+                self.lungpressuredata.append(lungpressure + float(self.peepdial.value()))
 
-            self.vtsnap = time.perf_counter()
+                try:
+                    self.pulseGen()
+                    self.pulseData.append(self.pulse_state * 20)
+                except Exception as e:
+                    print('Exception : pulseData.append()')
 
-        if self.lung_wave.wave_in_buffer:
-            pass
-        try:
-            #self.peak_lung.setText('{:03.2f}'.format(self.lung_wave.GetMax() ) + 'mb')
-            if self.auxMode == MachineRunModes.BiPAP:
-                self.peak_lung.setText('{:03.2f}'.format(self.ipap ) + 'mb')
-            else:
-                self.peak_lung.setText('{:03.2f}'.format(self.lungPeakPressure ) + 'mb')
-        except:
-            pass
+                self.vtsnap = time.perf_counter() - self.vtsnap
+                self.tf = self.vtsnap
+
+                self.vtsnap = time.perf_counter()
+
+            if self.lung_wave.wave_in_buffer:
+                pass
+            try:
+                #self.peak_lung.setText('{:03.2f}'.format(self.lung_wave.GetMax() ) + 'mb')
+                if self.auxMode == MachineRunModes.BiPAP:
+                    self.peak_lung.setText('{:03.2f}'.format(self.ipap ) + 'mb')
+                else:
+                    self.peak_lung.setText('{:03.2f}'.format(self.lungPeakPressure ) + 'mb')
+            except:
+                pass
 
         deltaflow = float(self.lst[2])
         dflow = self.flowprocess.CalculateFlow(deltaflow)
