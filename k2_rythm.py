@@ -978,6 +978,7 @@ class MainWindow(QMainWindow):
         self.controlStack.hide()
         for dx in range(12):
             self.plotter.removeItem(self.vlines[dx])
+            self.flowplotter.removeItem(self.fvlines[dx])
         self.mark_counter = 0
 
     @Slot()
