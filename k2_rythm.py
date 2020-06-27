@@ -608,6 +608,7 @@ class MainWindow(QMainWindow):
                     self.plotter.addItem(self.vlines[self.mark_counter])
                     self.flowplotter.addItem(self.fvlines[self.mark_counter])
                     self.vlines[self.mark_counter].setPos([12-self.mark_counter, 0])
+                    self.fvlines[self.mark_counter].setPos([12-self.mark_counter, 0])
                     self.mark_counter += 1
                 self.clk = 5
 
