@@ -1599,14 +1599,15 @@ class MainWindow(QMainWindow):
         self.PlotData(data_stream)
         self.peak_vol.setText('{:03.2f}'.format(self.streamdata.involume)  + 'ml')
         self.ex_vol.setText('{:03.2f}'.format(self.streamdata.exvolume)  + 'ml')
-        return
+        
         #print(data_stream)
         #Logging the data @ 100 data received
         vol_base = 0.0
         deltaflowoffset:float = 0.0
 
-        #deltaflow:float = 0.0
-        #lungpressure:float = 0.0
+        lungpressure = self.streamdata.lungpressure
+        deltaflow = self.streamdata.deltaflow
+
 
         filtered = []
 
@@ -1650,7 +1651,7 @@ class MainWindow(QMainWindow):
             except:
                 pass
 
-        dflow = deltaflow
+        dflow = self.streamdata.deltaflow
         
         if self.flowavgcount < 100:
             self.flow_sum += dflow
@@ -1667,7 +1668,7 @@ class MainWindow(QMainWindow):
 
             deltaflowoffset = self.deltaflowsum / self.flowavgcount
         
-        if (self.flow_offseted < 0.5 and self.flow_offseted > -0.5) or not self.breathInState:
+        if (self.flow_offseted < 0.3 and self.flow_offseted > -0.3) or not self.breathInState:
             if self.zero_flow_count < 3:
                 self.zero_flow_count += 1
             else:
@@ -1689,31 +1690,6 @@ class MainWindow(QMainWindow):
             except:
                 pass
 
-            self.flowpeakdata.append(1)
-            if self.flow_for_volume != 0:
-                vol_base = self.flowprocess.Volume(self.flow_offseted)
-                if vol_base < 0:
-                    vol_base = 0
-            else:
-                if vol_base > 50:
-                    vol_base -= 50
-                else:
-                    vol_base = 0
-                self.flowprocess.sum_of_volume = vol_base
-                self.flowprocess.sum_of_rmsVolume = vol_base
-
-            self.kalmandata.append(vol_base)
-            self.voldata.append(vol_base)
-            
-            self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.moving_average)  + 'ml')
-
-            if lungpressure >= 0:
-                self.kalmanofpressuredata.append(self.kalmanpressure.Estimate(lungpressure ** 1.0))
-            else:
-                lungpressure = -lungpressure
-                self.kalmanofpressuredata.append(self.kalmanpressure.Estimate(lungpressure ** 1.0))
-
-
             ipap_band_plus = self.ipapdial.value() + self.generator.ipap_tol
             ipap_band_minus = self.ipapdial.value() - self.generator.ipap_tol
 
@@ -1722,7 +1698,7 @@ class MainWindow(QMainWindow):
 
             try:
                 
-                if self.flow_offseted > 0.5:
+                if self.flow_offseted > 0.3:
                     if not self.breathInState:
                         self.breath_in_min_time = ((60 / (self.rr * 1.2)) / (1 + self.ie)) * 1000
                         self.breathInState = True
@@ -1759,7 +1735,7 @@ class MainWindow(QMainWindow):
                     #self.vol_detector.moving_average_cycle(vol_base)
                     self.vol_wave.Cycle(vol_base)
                 
-                elif self.flow_offseted <= 0.5  and not self.breathInState:
+                elif self.flow_offseted <= 0.3  and not self.breathInState:
                     self.curve1.setPen(self.derivative_pen_out)
                     self.exhale_t_count += 1
                     self.flag_idle = False
