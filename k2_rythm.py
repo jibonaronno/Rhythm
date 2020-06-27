@@ -1611,6 +1611,8 @@ class MainWindow(QMainWindow):
 
         filtered = []
 
+        self.lst.clear()
+
         if self.over_pressure_detection_delay > 0:
             self.over_pressure_detection_delay -= 1
                 
@@ -1625,25 +1627,16 @@ class MainWindow(QMainWindow):
 
         self.maxLen = 100  # max number of data points to show on graph
         if(len(self.lst) >= 3):
-            try:
-                self.deriv_points.append([lungpressure, self.timesnap])
-            except Exception as e:
-                print('Exception : deriv_points.append()')
+            self.lungpressuredata.append(lungpressure + float(self.peepdial.value()))
+            if len(self.lungpressuredata) > self.maxlen:
+                self.lungpressuredata.popleft()
 
-            if len(self.deriv_points) >= 0:
-                self.lungpressurepeakdata.append(float(self.peakdial.value()))
-                self.lungpressuredata.append(lungpressure + float(self.peepdial.value()))
+            self.vtsnap = time.perf_counter() - self.vtsnap
+            self.tf = self.vtsnap
 
-                self.vtsnap = time.perf_counter() - self.vtsnap
-                self.tf = self.vtsnap
-
-                self.vtsnap = time.perf_counter()
-
-            if self.lung_wave.wave_in_buffer:
-                pass
+            self.vtsnap = time.perf_counter()
 
             try:
-                #self.peak_lung.setText('{:03.2f}'.format(self.lung_wave.GetMax() ) + 'mb')
                 if self.auxMode == MachineRunModes.BiPAP:
                     self.peak_lung.setText('{:03.2f}'.format(self.ipap ) + 'mb')
                 else:
@@ -1676,205 +1669,200 @@ class MainWindow(QMainWindow):
         else:
             self.zero_flow_count = 0
         
-        if len(self.deriv_points) >= 0: #useless logic
-            self.flowdata.append(self.flow_offseted)
-            
-            if self.flow_offseted > 0:
-                self.flow_detector.Cycle(self.flow_offseted)
-            else:
-                self.flow_detector.Cycle(0)
-            
-            try:
-                #self.peak_flow.setText('{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
-                self.peak_flow.setText('{:03.2f}'.format(self.epap) + 'mb')
-            except:
-                pass
+        if self.flow_offseted > 0:
+            self.flow_detector.Cycle(self.flow_offseted)
+        else:
+            self.flow_detector.Cycle(0)
+        
+        try:
+            #self.peak_flow.setText('{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
+            self.peak_flow.setText('{:03.2f}'.format(self.epap) + 'mb')
+        except:
+            pass
 
-            ipap_band_plus = self.ipapdial.value() + self.generator.ipap_tol
-            ipap_band_minus = self.ipapdial.value() - self.generator.ipap_tol
+        ipap_band_plus = self.ipapdial.value() + self.generator.ipap_tol
+        ipap_band_minus = self.ipapdial.value() - self.generator.ipap_tol
 
-            rising_edge_detection = False
+        rising_edge_detection = False
 
-
-            try:
+        try:                
+            if self.flow_offseted > 0.3:
+                if not self.breathInState:
+                    self.breath_in_min_time = ((60 / (self.rr * 1.2)) / (1 + self.ie)) * 1000
+                    self.breathInState = True
+                    self.breathInMinTimer.start(self.breath_in_min_time)
                 
-                if self.flow_offseted > 0.3:
-                    if not self.breathInState:
-                        self.breath_in_min_time = ((60 / (self.rr * 1.2)) / (1 + self.ie)) * 1000
-                        self.breathInState = True
-                        self.breathInMinTimer.start(self.breath_in_min_time)
-                    
-                        self.curve1.setPen(self.derivative_pen_in)
-                        self.inhale_t_count += 1
-                        self.flag_idle = False
-                        self.idle_count = 0
-
-                        if not self.breath_in_tick:
-                            self.breath_in_tick = True
-                            self.wave.playin()
-                            #self.lungtimer.setInterval(8000)
-                            self.lung_wave.StartWave()
-                            self.tsnap = time.perf_counter() - self.ttick
-                            self.lbl_rr.setText('{:03.2f}'.format(60 / self.tsnap)) # + ' E->E : {:f}'.format(self.tsnap))
-                            self.ttick = time.perf_counter()
-                            self.eptick = self.ttick
-
-                            self.vol_wave.StartWave()
-
-
-                            if len(self.lungpressuredata) >= 3:
-                                self.epap = self.lungpressuredata[len(self.lungpressuredata) - 3]
-
-                    
-                    # To detect peak lung pressure at breath in time only
-                    self.lung_detector.Cycle(lungpressure)
-                    self.lung_wave.Cycle(lungpressure)
-                    self.lung_wave.zero_count = 0
-
-                    self.vol_detector.Cycle(vol_base)
-                    #self.vol_detector.moving_average_cycle(vol_base)
-                    self.vol_wave.Cycle(vol_base)
-                
-                elif self.flow_offseted <= 0.3  and not self.breathInState:
-                    self.curve1.setPen(self.derivative_pen_out)
-                    self.exhale_t_count += 1
+                    self.curve1.setPen(self.derivative_pen_in)
+                    self.inhale_t_count += 1
                     self.flag_idle = False
                     self.idle_count = 0
-                    self.sumofvolume = 0.0
-                    if self.breath_in_tick:
-                        self.breath_in_tick = False
-                        self.epsnap = time.perf_counter() - self.eptick
-                        #self.lbl_ep.setText('1:{:02.2f}'.format(self.epsnap))
-                        self.lbl_ep.setText('1:{:d}'.format(self.ie))
-                        
-                        ### Reset the over pressure alarm when next peak is detcted ###
-                        if self.over_pressure_detection_delay == 0:
-                            if self.lung_detector.peak_value > 5:
-                                self.label_alarm.setText("Alarm: ")
-                                self.lowp_alarm_enable = False
 
-                        self.vol_peak = self.vol_wave.GetMax()
-                        self.vol_detector.moving_average_cycle(self.vol_peak)
+                    if not self.breath_in_tick:
+                        self.breath_in_tick = True
+                        self.wave.playin()
+                        #self.lungtimer.setInterval(8000)
+                        self.lung_wave.StartWave()
+                        self.tsnap = time.perf_counter() - self.ttick
+                        self.lbl_rr.setText('{:03.2f}'.format(60 / self.tsnap)) # + ' E->E : {:f}'.format(self.tsnap))
+                        self.ttick = time.perf_counter()
+                        self.eptick = self.ttick
 
-                        self.lungPeakPressure = self.lung_wave.GetMax()
-                        self.ipap = self.lungPeakPressure - self.epap
-                        if self.lungPeakPressure < 10:
-                            if self.lungLowPressureCount < 2:
-                                self.lungLowPressureCount += 1
-                            else:
-                                if self.workerThreadCreated:
-                                    if not self.worker.flagStop:
-                                        self.lungLowPressureDetected = True
-                                        self.label_alarm.setText('Alarm : Low Pressure')
-                                        self.lowp_alarm_enable = True
-                                    else:
-                                        self.lowp_alarm_enable = False
-                                
+                        self.vol_wave.StartWave()
+
+
+                        if len(self.lungpressuredata) >= 3:
+                            self.epap = self.lungpressuredata[len(self.lungpressuredata) - 3]
+
+                
+                # To detect peak lung pressure at breath in time only
+                self.lung_detector.Cycle(lungpressure)
+                self.lung_wave.Cycle(lungpressure)
+                self.lung_wave.zero_count = 0
+
+                self.vol_detector.Cycle(vol_base)
+                #self.vol_detector.moving_average_cycle(vol_base)
+                self.vol_wave.Cycle(vol_base)
+            
+            elif self.flow_offseted <= 0.3  and not self.breathInState:
+                self.curve1.setPen(self.derivative_pen_out)
+                self.exhale_t_count += 1
+                self.flag_idle = False
+                self.idle_count = 0
+                self.sumofvolume = 0.0
+                if self.breath_in_tick:
+                    self.breath_in_tick = False
+                    self.epsnap = time.perf_counter() - self.eptick
+                    #self.lbl_ep.setText('1:{:02.2f}'.format(self.epsnap))
+                    self.lbl_ep.setText('1:{:d}'.format(self.ie))
+                    
+                    ### Reset the over pressure alarm when next peak is detcted ###
+                    if self.over_pressure_detection_delay == 0:
+                        if self.lung_detector.peak_value > 5:
+                            self.label_alarm.setText("Alarm: ")
+                            self.lowp_alarm_enable = False
+
+                    self.vol_peak = self.vol_wave.GetMax()
+                    self.vol_detector.moving_average_cycle(self.vol_peak)
+
+                    self.lungPeakPressure = self.lung_wave.GetMax()
+                    self.ipap = self.lungPeakPressure - self.epap
+                    if self.lungPeakPressure < 10:
+                        if self.lungLowPressureCount < 2:
+                            self.lungLowPressureCount += 1
                         else:
-                            self.lungLowPressureCount = 0
-                            self.lungLowPressureDetected = False
-                            self.lungtimer.setInterval(8000)
-                            self.breathfail_alarm_enable = False
-
-                        ############################################################################
-                        ## Auto adjust code for pressure or Bipap Mode
-                        ############################################################################
-
-                        if self.auxMode == MachineRunModes.BiPAP:
                             if self.workerThreadCreated:
                                 if not self.worker.flagStop:
-                                    if self.ipap < (self.ipapdial.value() - self.generator.ipap_tol):
-                                        self.ipap_deviation = self.ipapdial.value() - self.ipap
-                                        #self.changefactor = self.ipap_deviation * 0.5
-                                        self.changefactor = self.GetChangeFactorFromDeviation(self.ipap_deviation)
-                                        if self.changefactor < 1:
-                                            self.changefactor = 1
-                                        if (self.generator.xav + self.generator.xavv) < self.generator.xmax: #------------------
-                                            if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
-                                                self.vt_unmatch_count += 1
-                                            else:
-                                                self.vt_adjust += self.changefactor #----------------
-                                                self.vt_unmatch_count = 0
-                                                self.generator.xavv = self.vt_adjust
-                                                print('Adjusting Bipap ++ : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
-                                                #self.settings_dict[r"vt"] = str(self.vt)
-                                                self.SaveSettings()
-                                    elif self.ipap > (self.ipapdial.value() + self.generator.ipap_tol):
-                                        self.ipap_deviation = self.ipap - self.ipapdial.value()
-                                        #self.changefactor = self.ipap_deviation * 0.5
-                                        self.changefactor = self.GetChangeFactorFromDeviation(self.ipap_deviation)
-                                        if self.changefactor < 1:
-                                            self.changefactor = 1
-                                        if (self.generator.xav - self.generator.xavv) > self.generator.Dt: #-------------------
-                                            if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
-                                                self.vt_unmatch_count += 1
-                                            else:
-                                                self.vt_adjust -= self.changefactor #---------------------
-                                                self.vt_unmatch_count = 0
-                                                self.generator.xavv = self.vt_adjust
-                                                print('Adjusting Bipap -- : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
-                                                #self.settings_dict[r"vt"] = str(self.vt)
-                                                self.SaveSettings()
-                                    else:
-                                        self.vt_unmatch_count = 0
+                                    self.lungLowPressureDetected = True
+                                    self.label_alarm.setText('Alarm : Low Pressure')
+                                    self.lowp_alarm_enable = True
+                                else:
+                                    self.lowp_alarm_enable = False
+                            
+                    else:
+                        self.lungLowPressureCount = 0
+                        self.lungLowPressureDetected = False
+                        self.lungtimer.setInterval(8000)
+                        self.breathfail_alarm_enable = False
 
-                        elif self.auxMode == MachineRunModes.CMV:
-                            if self.workerThreadCreated:
-                                if not self.worker.flagStop:
-                                    pass
-                                    '''
-                                    self.volume_band_plus = self.vt + self.generator.vol_tol
-                                    self.volume_band_minus = self.vt - self.generator.vol_tol
+                    ############################################################################
+                    ## Auto adjust code for pressure or Bipap Mode
+                    ############################################################################
 
-                                    if self.vol_detector.moving_average < self.volume_band_minus:
-                                        self.vol_deviation = self.vt - self.vol_detector.moving_average
-                                        self.vol_changefactor = self.GetChangeFactorFromVolDeviation(self.vol_deviation)
-                                        
-                                        if (self.generator.xav + self.generator.xavv) < self.generator.xmax:
+                    if self.auxMode == MachineRunModes.BiPAP:
+                        if self.workerThreadCreated:
+                            if not self.worker.flagStop:
+                                if self.ipap < (self.ipapdial.value() - self.generator.ipap_tol):
+                                    self.ipap_deviation = self.ipapdial.value() - self.ipap
+                                    #self.changefactor = self.ipap_deviation * 0.5
+                                    self.changefactor = self.GetChangeFactorFromDeviation(self.ipap_deviation)
+                                    if self.changefactor < 1:
+                                        self.changefactor = 1
+                                    if (self.generator.xav + self.generator.xavv) < self.generator.xmax: #------------------
+                                        if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
+                                            self.vt_unmatch_count += 1
+                                        else:
                                             self.vt_adjust += self.changefactor #----------------
+                                            self.vt_unmatch_count = 0
                                             self.generator.xavv = self.vt_adjust
-                                            print('Adjusting Vol ++ : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
+                                            print('Adjusting Bipap ++ : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
                                             #self.settings_dict[r"vt"] = str(self.vt)
                                             self.SaveSettings()
-                                    
-                                    elif self.vol_detector.moving_average > self.volume_band_plus:
-                                        self.vol_deviation = self.vol_detector.moving_average - self.vt
-                                        self.vol_changefactor = self.GetChangeFactorFromVolDeviation(self.vol_deviation)
-
-                                        if (self.generator.xav - self.generator.xavv) > self.generator.Dt:
+                                elif self.ipap > (self.ipapdial.value() + self.generator.ipap_tol):
+                                    self.ipap_deviation = self.ipap - self.ipapdial.value()
+                                    #self.changefactor = self.ipap_deviation * 0.5
+                                    self.changefactor = self.GetChangeFactorFromDeviation(self.ipap_deviation)
+                                    if self.changefactor < 1:
+                                        self.changefactor = 1
+                                    if (self.generator.xav - self.generator.xavv) > self.generator.Dt: #-------------------
+                                        if self.vt_unmatch_count < 0: ##Disable this logic. Pass to else:
+                                            self.vt_unmatch_count += 1
+                                        else:
                                             self.vt_adjust -= self.changefactor #---------------------
+                                            self.vt_unmatch_count = 0
                                             self.generator.xavv = self.vt_adjust
                                             print('Adjusting Bipap -- : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
                                             #self.settings_dict[r"vt"] = str(self.vt)
                                             self.SaveSettings()
-                                    else:
-                                        pass
-                                    '''
+                                else:
+                                    self.vt_unmatch_count = 0
+
+                    elif self.auxMode == MachineRunModes.CMV:
+                        if self.workerThreadCreated:
+                            if not self.worker.flagStop:
+                                pass
+                                '''
+                                self.volume_band_plus = self.vt + self.generator.vol_tol
+                                self.volume_band_minus = self.vt - self.generator.vol_tol
+
+                                if self.vol_detector.moving_average < self.volume_band_minus:
+                                    self.vol_deviation = self.vt - self.vol_detector.moving_average
+                                    self.vol_changefactor = self.GetChangeFactorFromVolDeviation(self.vol_deviation)
+                                    
+                                    if (self.generator.xav + self.generator.xavv) < self.generator.xmax:
+                                        self.vt_adjust += self.changefactor #----------------
+                                        self.generator.xavv = self.vt_adjust
+                                        print('Adjusting Vol ++ : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
+                                        #self.settings_dict[r"vt"] = str(self.vt)
+                                        self.SaveSettings()
+                                
+                                elif self.vol_detector.moving_average > self.volume_band_plus:
+                                    self.vol_deviation = self.vol_detector.moving_average - self.vt
+                                    self.vol_changefactor = self.GetChangeFactorFromVolDeviation(self.vol_deviation)
+
+                                    if (self.generator.xav - self.generator.xavv) > self.generator.Dt:
+                                        self.vt_adjust -= self.changefactor #---------------------
+                                        self.generator.xavv = self.vt_adjust
+                                        print('Adjusting Bipap -- : ' + str(self.changefactor) + ' lpDiff-' + str(self.ipap_deviation))
+                                        #self.settings_dict[r"vt"] = str(self.vt)
+                                        self.SaveSettings()
+                                else:
+                                    pass
+                                '''
 
 
-                else:
-                    if not self.flag_idle:
-                        self.idle_count += 1
-                        if self.idle_count > 2:
-                            ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
-                            self.flag_idle = True
-                            self.idle_count = 3
-                            self.inhale_t_count = 0
-                            self.exhale_t_count = 0
+            else:
+                if not self.flag_idle:
+                    self.idle_count += 1
+                    if self.idle_count > 2:
+                        ###print(f"Inhale {(self.inhale_t_count * 100) / 1000} :: Exhale {(self.exhale_t_count * 100) / 1000}")
+                        self.flag_idle = True
+                        self.idle_count = 3
+                        self.inhale_t_count = 0
+                        self.exhale_t_count = 0
 
-                ### Low Pressure Detection
+            ### Low Pressure Detection
 
-            except Exception as e:
-                print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
-            
-            try:
-                if (lungpressure > float(self.peakdial.value())):
-                    if self.sensorThreadCreated:
-                        self.wave.playfile()
-                        self.label_alarm.setText("Alarm: Over Pressure")
-                        self.over_pressure_detection_delay = 10
-            except Exception as e:
-                print("Exception section 0x06 : " + str(e) + ' - ' + data_stream)
+        except Exception as e:
+            print("Exception Section:0X02 : " + str(e) + ' - ' + data_stream)
+        
+        try:
+            if (lungpressure > float(self.peakdial.value())):
+                if self.sensorThreadCreated:
+                    self.wave.playfile()
+                    self.label_alarm.setText("Alarm: Over Pressure")
+                    self.over_pressure_detection_delay = 10
+        except Exception as e:
+            print("Exception section 0x06 : " + str(e) + ' - ' + data_stream)
 
 
     def write_info(self, data_stream):
