@@ -186,7 +186,23 @@ class MainWindow(QMainWindow):
         self.inf12 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
         self.inf13 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
 
+    
+        self.inf14 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf15 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf16 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf17 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf18 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf19 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf20 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf21 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf22 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf23 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf24 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf25 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf26 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+
         self.vlines = []
+        self.fvlines = []
 
         self.vlines.append(self.inf1)
         self.vlines.append(self.inf2)
@@ -201,6 +217,20 @@ class MainWindow(QMainWindow):
         self.vlines.append(self.inf11)
         self.vlines.append(self.inf12)
         self.vlines.append(self.inf13)
+
+        self.fvlines.append(self.inf14)
+        self.fvlines.append(self.inf15)
+        self.fvlines.append(self.inf16)
+        self.fvlines.append(self.inf17)
+        self.fvlines.append(self.inf18)
+        self.fvlines.append(self.inf19)
+        self.fvlines.append(self.inf20)
+        self.fvlines.append(self.inf21)
+        self.fvlines.append(self.inf22)
+        self.fvlines.append(self.inf23)
+        self.fvlines.append(self.inf24)
+        self.fvlines.append(self.inf25)
+        self.fvlines.append(self.inf26)
 
 
         self.lungpressure_line_pen = pg.mkPen(200, 100, 0)
@@ -576,7 +606,7 @@ class MainWindow(QMainWindow):
             else:
                 if self.mark_counter < 12:
                     self.plotter.addItem(self.vlines[self.mark_counter])
-                    self.flowplotter.addItem(self.vlines[self.mark_counter])
+                    self.flowplotter.addItem(self.fvlines[self.mark_counter])
                     self.vlines[self.mark_counter].setPos([12-self.mark_counter, 0])
                     self.mark_counter += 1
                 self.clk = 5
