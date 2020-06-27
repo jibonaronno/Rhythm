@@ -68,10 +68,11 @@ class StreamData(object):
         self.tfdata = deque()
         self.lpf = LowpassFilter()
         self.filtered = []
+        self.lungpressure = 0.0
+        self.deltaflow = 0.0
 
     def push(self, data_stream):
-        lungpressure = 0.0
-        deltaflow = 0.0
+        
         if not self.plot_run:
             return
         self.lines = data_stream.split('\n')
@@ -80,10 +81,10 @@ class StreamData(object):
                 self.lst = line.split(',')
                 if len(self.lst) >= 3:
                     try:
-                        lungpressure = float(self.lst[0])
-                        deltaflow = float(self.lst[2])
-                        self.pressure_stream.append(lungpressure)
-                        self.flow_stream.append(deltaflow)
+                        self.lungpressure = float(self.lst[0])
+                        self.deltaflow = float(self.lst[2])
+                        self.pressure_stream.append(self.lungpressure)
+                        self.flow_stream.append(self.deltaflow)
                         
 
                         if len(self.pressure_stream) > self.maxlength:
@@ -102,6 +103,6 @@ class StreamData(object):
                         self.cntr += 1
                     else:
                         self.cntr = 0
-                        print('{:f} :: {:f}'.format(lungpressure, deltaflow))
+                        print('{:f} :: {:f}'.format(self.lungpressure, self.deltaflow))
                 else:
                     pass #print('sensor data stream length missmatch : ' + str(len(self.lst)))
