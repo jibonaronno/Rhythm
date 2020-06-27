@@ -1464,7 +1464,7 @@ class MainWindow(QMainWindow):
     volume_band_minus = 0
 
     def LungSensorData(self, data_stream):
-        #print(data_stream)
+        print(data_stream)
         #Logging the data @ 100 data received
         vol_base = 0.0
         deltaflow:float = 0.0
