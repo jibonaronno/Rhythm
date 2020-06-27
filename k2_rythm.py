@@ -1472,6 +1472,8 @@ class MainWindow(QMainWindow):
 
         lungpressure:float = 0.0
 
+        volume:float = 0.0
+
         if not self.plot_run:
             return
 
@@ -1498,6 +1500,7 @@ class MainWindow(QMainWindow):
         try:
             lungpressure = float(self.lst[0])
             deltaflow = float(self.lst[2])
+            volume = float(self.lst[5])
         except Exception as e:
             print(data_stream)
             return
@@ -1657,7 +1660,8 @@ class MainWindow(QMainWindow):
                     ####self.volpeakdata.append(500.0)
                     #self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
                     
-                    self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.moving_average)  + 'ml')
+                    self.peak_vol.setText('{:03.2f}'.format(volume)  + 'ml')
+                    #self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.moving_average)  + 'ml')
                     #self.peak_vol.setText('{:03.2f}'.format(self.vol_peak)  + 'ml')
 
 
