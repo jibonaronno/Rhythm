@@ -47,13 +47,12 @@ import pyautogui
 from scipy.signal import butter,filtfilt
 from filterlp import LowpassFilter
 
-class PlotLib(object):
+class StreamData(object):
 
     vol_base = 0.0
     deltaflow:float = 0.0
     deltaflowoffset:float = 0.0
     lungpressure:float = 0.0
-    filtered = []
     plot_run = True
     lst = []
     lines = []
@@ -61,6 +60,14 @@ class PlotLib(object):
 
     def __init__(self, step_duration):
         self.stepDuration = step_duration
+        self.maxlength = 500
+        self.pressure_stream = deque()
+        self.flow_stream = deque()
+        self.volume_stream = deque()
+        self.ttm = 0.0
+        self.tfdata = deque()
+        self.lpf = LowpassFilter()
+        self.filtered = []
 
     def push(self, data_stream):
         lungpressure = 0.0
@@ -75,10 +82,23 @@ class PlotLib(object):
                     try:
                         lungpressure = float(self.lst[0])
                         deltaflow = float(self.lst[2])
+                        self.pressure_stream.append(lungpressure)
+                        self.flow_stream.append(deltaflow)
+                        
+
+                        if len(self.pressure_stream) > self.maxlength:
+                            self.pressure_stream.popleft()
+                            self.flow_stream.popleft()
+                            self.filtered = self.lpf.butter_lowpass_filter(self.pressure_stream, cutoff=1, fs=10, order=2)
+
+                        if len(self.tfdata) < self.maxlength:
+                            self.ttm += self.stepDuration
+                            self.tfdata.append(self.ttm)
+
                     except Exception as e:
                         print(data_stream + ' : ' + str(e))
 
-                    if self.cntr < 100:
+                    if self.cntr < 10:
                         self.cntr += 1
                     else:
                         self.cntr = 0

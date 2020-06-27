@@ -12,7 +12,7 @@ class LowpassFilter(object):
         self.data = []
 
     def butter_lowpass_filter(self, data, cutoff=2, fs=10, order=2):
-        normal_cutoff = self.cutoff / self.nyq
+        normal_cutoff = self.cutoff / (0.5 * fs)
         # Get the filter coefficients 
         b, a = butter(self.order, normal_cutoff, btype='low', analog=False)
         y = filtfilt(b, a, data)

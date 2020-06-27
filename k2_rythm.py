@@ -46,7 +46,7 @@ import pyautogui
 from scipy.signal import butter,filtfilt
 from filterlp import LowpassFilter
 
-from plotlib import PlotLib
+from conditionar import StreamData
 
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
@@ -112,7 +112,7 @@ class MainWindow(QMainWindow):
 
         self.lpf = LowpassFilter()
 
-        self.plotLib = PlotLib(0.1)
+        self.streamdata = StreamData(0.025)
         
         self.tableHeaders = ['VT', 'I:E', 'RR', 'FIO2']
         self.widget = uic.loadUi(_UI, self)
@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
         
         # Setting up Runmode for BiPAP. Call a cyclic function in LungSensorData(...) BipapLookup.lookUp(pressure)
         # This function will return BipapReturns.Continue or BipapReturns.Stop
-        self.runMode = MachineRunModes.BiPAP
+        self.runMode = MachineRunModes.CMV
         self.ipap = 0.0
         self.bipapReturns = BipapReturns.Continue
         self.bipapLookup = BipapLookup()
@@ -172,18 +172,47 @@ class MainWindow(QMainWindow):
 
         pg.setConfigOptions(antialias=True)
 
-        self.inf1 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':1.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf1 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf2 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf3 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf4 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf5 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf6 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf7 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf8 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf9 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf10 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf11 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf12 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf13 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+
+        self.vlines = []
+
+        self.vlines.append(self.inf1)
+        self.vlines.append(self.inf2)
+        self.vlines.append(self.inf3)
+        self.vlines.append(self.inf4)
+        self.vlines.append(self.inf5)
+        self.vlines.append(self.inf6)
+        self.vlines.append(self.inf7)
+        self.vlines.append(self.inf8)
+        self.vlines.append(self.inf9)
+        self.vlines.append(self.inf10)
+        self.vlines.append(self.inf11)
+        self.vlines.append(self.inf12)
+        self.vlines.append(self.inf13)
+
 
         self.lungpressure_line_pen = pg.mkPen(200, 100, 0)
         self.plotter = PlotWidget()
         self.plotter.showGrid(x=True, y=True, alpha=None)
-        self.plotter.addItem(self.inf1)
+        #self.plotter.addItem(self.inf1)
         #self.plotter.setTitle("Pressure : mb")
         self.plotter.setLabel('left','Pressure : mb')
         #self.plotter.getViewBox().enableAutoRange(axis='y', enable=False)
         self.plotter.getViewBox().setYRange(-2, 30)
         self.curve1 = self.plotter.plot(0,0,"lungpressure", 'b')
-        #self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
+        self.curve2 = self.plotter.plot(0,0,"peakpressure", pen = self.lungpressure_line_pen)
         self.kalmanpen = pg.mkPen(100, 100, 100, 100)
         self.curve3 = self.plotter.plot(0,0, "kalman", pen = self.kalmanpen)
 
@@ -429,7 +458,7 @@ class MainWindow(QMainWindow):
 
         self.plottingBaseTimer = QTimer()
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
-        self.plottingBaseTimer.start(0.1)
+        self.plottingBaseTimer.start(25)
 
         self.alarm_show = False
         self.label_alarm.hide()
@@ -453,7 +482,7 @@ class MainWindow(QMainWindow):
         self.flagBlinkState = False
         self.watchdogtimer = QTimer()
         self.watchdogtimer.timeout.connect(self.blink)
-        self.watchdogtimer.start(90)
+        ##self.watchdogtimer.start(90)
 
         #self.markerPeakPressure = pg.TextItem(html='<div style="text-align: center"><span style="color: #FFF;">This is the</span><br><span style="color: #FF0; font-size: 16pt;">PEAK</span></div>', anchor=(-0.3,0.5), angle=45, border='w', fill=(0, 0, 255, 100))
 
@@ -539,7 +568,17 @@ class MainWindow(QMainWindow):
         if self.sensorDataString != '':
             #pass
             #self.LungSensorData(self.sensorDataString, 0.025)
-            self.plotLib.push(self.sensorDataString)
+            self.streamdata.push(self.sensorDataString)
+        
+        if len(self.streamdata.filtered) >= self.streamdata.maxlength:
+            if self.clk < 40:
+                self.clk += 1
+            else:
+                if self.mark_counter < 12:
+                    self.plotter.addItem(self.vlines[self.mark_counter])
+                    self.vlines[self.mark_counter].setPos([12-self.mark_counter, 0])
+                    self.mark_counter += 1
+                self.clk = 5
 
     def pulseGen(self):
         if self.flagStartPulse:
@@ -905,6 +944,9 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_btnInfo_clicked(self):
         self.controlStack.hide()
+        for dx in range(12):
+            self.plotter.removeItem(self.vlines[dx])
+        self.mark_counter = 0
 
     @Slot()
     def on_btnVols_clicked(self):
@@ -949,7 +991,7 @@ class MainWindow(QMainWindow):
     def on_btnstream_clicked(self):
         self.streamer = Backfeed('log3.txt')
         self.streamer.setCallback(self.getStreamData)
-        self.streamer.Start(100)
+        self.streamer.Start(50)
         self.lungtimer.start(8000)
         #self.plotter.addItem(self.markerPeakPressure)
 
@@ -1088,12 +1130,12 @@ class MainWindow(QMainWindow):
                 self.worker.moveToThread(self.workerThread)
                 self.workerThread.start()
                 self.workerThreadCreated = True
-                self.lungtimer.start(8000)
+                #-self.lungtimer.start(8000)
                 print("Starting Worker Thread")
 
             elif self.workerThreadCreated:
                 self.worker.Resume()
-                self.lungtimer.start(8000)
+                #-self.lungtimer.start(8000)
 
     @Slot()
     def on_btnstopcmv_clicked(self):
@@ -1474,8 +1516,21 @@ class MainWindow(QMainWindow):
     volume_band_plus = 0
     volume_band_minus = 0
 
-    def LungSensorData(self, data_stream):
+    mark_counter = 0
+    clk = 0
+
+    def PlotData(self, data_stream):
+        if not self.plot_run:
+            return
         self.sensorData(data_stream)
+        
+        #self.curve1.setData(self.streamdata.tfdata, self.streamdata.pressure_stream)
+        if len(self.streamdata.filtered) >= self.streamdata.maxlength:
+            self.curve2.setData(self.streamdata.tfdata, self.streamdata.filtered)
+            self.flowcurve.setData(self.streamdata.tfdata, self.streamdata.flow_stream)
+
+    def LungSensorData(self, data_stream):
+        self.PlotData(data_stream)
         return
         #print(data_stream)
         #Logging the data @ 100 data received
@@ -1492,19 +1547,7 @@ class MainWindow(QMainWindow):
 
         if self.over_pressure_detection_delay > 0:
             self.over_pressure_detection_delay -= 1
-        
-        '''
-        try:
-            self.dataList.append(data_stream)
-            self.log_interval_count += 1
-            if self.log_interval_count >= 100:
-                self.log_interval_count = 0
-                self.datalogger.writeBlock(self.dataList)
-                self.dataList.clear()
-        except Exception as e:
-            print('Exception in Log: ' + str(e))
-        '''
-        
+                
         self.sensorwatchtimer.setInterval(500)
         self.lst = data_stream.split(",")
         if len(self.lst) < 3:
@@ -1530,10 +1573,6 @@ class MainWindow(QMainWindow):
                 if len(self.deriv_points) >= 0:
                     self.lungpressurepeakdata.append(float(self.peakdial.value()))
                     self.lungpressuredata.append(lungpressure + float(self.peepdial.value()))
-                    
-                    ## Shift below 2 lines in breath in only logic
-                    #self.lung_detector.Cycle(lungpressure)
-                    #self.lung_wave.Cycle(lungpressure)
 
                     try:
                         self.pulseGen()
@@ -1543,16 +1582,12 @@ class MainWindow(QMainWindow):
 
                     self.vtsnap = time.perf_counter() - self.vtsnap
                     self.tf = self.vtsnap
-                    #self.tfdata.append(time.perf_counter()) #self.tf * 100)
 
                     self.vtsnap = time.perf_counter()
 
                 if self.lung_wave.wave_in_buffer:
                     pass
-                    #pprint.pprint(self.lung_wave.wvdata)
-                    #print(str(max(self.lung_wave.wvdata)))
                 try:
-                    #self.peak_lung.setText('Lung Peak: ' + '{:03.2f}'.format(self.lung_detector.peak_value) + 'mb')
                     #self.peak_lung.setText('{:03.2f}'.format(self.lung_wave.GetMax() ) + 'mb')
                     if self.auxMode == MachineRunModes.BiPAP:
                         self.peak_lung.setText('{:03.2f}'.format(self.ipap ) + 'mb')
@@ -1560,18 +1595,9 @@ class MainWindow(QMainWindow):
                         self.peak_lung.setText('{:03.2f}'.format(self.lungPeakPressure ) + 'mb')
                 except:
                     pass
-                #if self.lung_detector.peak_value > 5:
-                    #self.lungtimer.setInterval(3000)
-                ''' Commented for testing '''
 
                 deltaflow = float(self.lst[2])
-
-                ##dflow = self.flowprocess.CalculateFlowConst(deltaflow)
                 dflow = self.flowprocess.CalculateFlow(deltaflow)
-                ##dflow = float(self.lst[1]) - self.flow_average
-
-                #print('Delta P : ' + str(deltaflow))
-                #print('dflow : ' + str(dflow))
                 
                 if self.flowavgcount < 100:
                     self.flow_sum += dflow
@@ -1588,7 +1614,6 @@ class MainWindow(QMainWindow):
 
                     deltaflowoffset = self.deltaflowsum / self.flowavgcount
                 
-                #print('Flow : ' + str(self.flow_offseted))
                 if (self.flow_offseted < 0.5 and self.flow_offseted > -0.5) or not self.breathInState:
                     if self.zero_flow_count < 3:
                         self.zero_flow_count += 1
@@ -1598,8 +1623,7 @@ class MainWindow(QMainWindow):
                     self.zero_flow_count = 0
                 
                 if len(self.deriv_points) >= 0: #useless logic
-                    self.flowdata.append(self.flow_offseted) # * 1000 * 60)
-                    #self.flowdata.append(deltaflow - deltaflowoffset)
+                    self.flowdata.append(self.flow_offseted)
                     
                     if self.flow_offseted > 0:
                         self.flow_detector.Cycle(self.flow_offseted)
@@ -1613,17 +1637,10 @@ class MainWindow(QMainWindow):
                         pass
 
                     self.flowpeakdata.append(1)
-
-                    '''Volume data came from kalman of lungpressure'''
-                    '''Now volume coming from flowprocess.Volume'''
-                    ###self.kalmandata.append(self.kalman.Estimate(float(self.lst[0]) + float(self.peepdial.value())))
-                    ####vol_base = self.kalman.Estimate(float(self.lst[0]))
                     if self.flow_for_volume != 0:
-                        #vol_base = self.flowprocess.rootVolume(self.flow_offseted)
                         vol_base = self.flowprocess.Volume(self.flow_offseted)
                         if vol_base < 0:
                             vol_base = 0
-
                     else:
                         if vol_base > 50:
                             vol_base -= 50
@@ -1634,17 +1651,8 @@ class MainWindow(QMainWindow):
 
                     self.kalmandata.append(vol_base)
                     self.voldata.append(vol_base)
-                    #if vol_base < 0:
-                    #    vol_base = 0
-                    #self.vol_detector.Cycle(vol_base)
-                    #self.vol_detector.moving_average_cycle(vol_base)
-                    ####self.volpeakdata.append(500.0)
-                    #self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.peak_value)  + 'ml')
                     
                     self.peak_vol.setText('{:03.2f}'.format(self.vol_detector.moving_average)  + 'ml')
-                    #self.peak_vol.setText('{:03.2f}'.format(self.vol_peak)  + 'ml')
-
-
 
                     if lungpressure >= 0:
                         self.kalmanofpressuredata.append(self.kalmanpressure.Estimate(lungpressure ** 1.0))
@@ -1655,52 +1663,7 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print("Exception in LungSensorData(...) : " + str(e) + ' - ' + data_stream)
 
-            if len(self.deriv_points) == 0:
-                self.timesnap = 0.0
-            else:
-                self.timesnap = time.perf_counter() - self.tic
-
-            try:
-                #self.deriv_points.append([(float(self.lst[0]) + float(self.peepdial.value())), self.timesnap])
-                #self.deriv_points.append([(float(self.kalman.Estimate(float(self.lst[0])))), self.timesnap])
-
-                lungpressure = float(self.lst[0])
-
-                if len(self.deriv_points) > 3:
-                    self.deriv_points.popleft()
-                    '''
-                    cannot remember its effect. seems not feasible output in case of peak detection could be delayed a bit.
-                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / ((self.deriv_points[2][1] - self.deriv_points[0][1]) * 10000)))
-                    '''
-                    '''
-                    Working code for derivative data from lung pressure data.
-                    '''
-                    self.dvdata.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (0.2)))
-                    self.dvdata_compressed.append(((self.deriv_points[2][0] - self.deriv_points[0][0]) / (1)))
-
-                    '''
-                    Following instruction will derive the data from the kalman of lung pressure.
-                    '''
-                    ''' Working code commented to see speed '''
-                    #self.dvdata.append(((self.kalmandata[2] - self.kalmandata[0]) / (0.2)))
-
-                    #self.dvdata.append(float(self.lst[1]))
-                    
-                    #self.dvdata.append(self.flowprocess.CalculateFlow(float(self.lst[1])))
-                    #print("Flow -- " + str(dflow * 1000000))
-                    #self.dvdata.append(dflow * 1000000)
-
-                    ''' Working Code commented to check speed '''
-                    
-                    #self.voldata.append(self.flowprocess.sum_of_volume)
-                    #self.dvdata.append(dflow)
-                    #self.sumofvolume += self.flowprocess.CalculateFlow(float(self.lst[2]))
-                    #self.voldata.append(self.sumofvolume)
-                else:
-                    self.dvdata.append(0.0)
-                    self.dvdata_compressed.append(0.0)
-            except Exception as e:
-                print("Exception Section 0x05" + str(e) + ' - ' + data_stream)
+            
                 
             '''
             try:
