@@ -1609,7 +1609,7 @@ class MainWindow(QMainWindow):
                     deltaflowoffset = self.deltaflowsum / self.flowavgcount
                 
                 #print('Flow : ' + str(self.flow_offseted))
-                if (self.flow_offseted < 0.5 and self.flow_offseted > -0.5) or not self.breathInState:
+                if (self.flow_offseted < 0.3 and self.flow_offseted > -0.3) or not self.breathInState:
                     if self.zero_flow_count < 3:
                         self.zero_flow_count += 1
                     else:
