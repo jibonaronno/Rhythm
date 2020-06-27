@@ -576,7 +576,7 @@ class MainWindow(QMainWindow):
             else:
                 if self.mark_counter < 12:
                     self.plotter.addItem(self.vlines[self.mark_counter])
-                    self.flowplotter.addItem(self.vlies[self.mark_counter])
+                    self.flowplotter.addItem(self.vlines[self.mark_counter])
                     self.vlines[self.mark_counter].setPos([12-self.mark_counter, 0])
                     self.mark_counter += 1
                 self.clk = 5
