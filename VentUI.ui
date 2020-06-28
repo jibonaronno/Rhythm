@@ -2053,13 +2053,13 @@
            <widget class="QStackedWidget" name="infoStack">
             <property name="minimumSize">
              <size>
-              <width>100</width>
+              <width>330</width>
               <height>100</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>100</width>
+              <width>1000</width>
               <height>16777215</height>
              </size>
             </property>
