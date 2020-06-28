@@ -111,6 +111,6 @@ class StreamData(object):
                         self.cntr += 1
                     else:
                         self.cntr = 0
-                        print('{:f} :: {:f}'.format(self.lungpressure, self.deltaflow))
+                        #print('{:f} :: {:f}'.format(self.lungpressure, self.deltaflow))
                 else:
                     pass #print('sensor data stream length missmatch : ' + str(len(self.lst)))

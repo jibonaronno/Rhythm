@@ -204,9 +204,9 @@ class GcodeGenerator(object):
         #if self.xavv != 0:
             #self.xav = self.xrect * ((self.vt + self.x_adj) / self.vtmax) * self.vtfactor
         
-        self.Dp = self.Dt + self.xav
+        self.Dp = self.xav # self.Dt + self.xav
         # Mod self.Dp = self.xav
-        self.TDMS = 0.5
+        self.TDMS = 50
 
         self.Kie =  1/self.ie
         #self.BCT = 60*(1-(-0.5)) / self.rr
