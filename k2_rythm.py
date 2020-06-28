@@ -1650,6 +1650,8 @@ class MainWindow(QMainWindow):
                     self.peak_lung.setText('{:03.2f}'.format(self.ipap ) + 'mb')
                 else:
                     self.peak_lung.setText('{:03.2f}'.format(self.lungPeakPressure ) + 'mb')
+
+                self.lbl_volume.setText('{:03.2f}'.format((self.ipap * self.generator.Dp)/5.55))
             except:
                 pass
 
