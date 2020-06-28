@@ -1607,9 +1607,18 @@ class MainWindow(QMainWindow):
 
         lungpressure = self.streamdata.lungpressure
         deltaflow = self.streamdata.deltaflow
-
-
         filtered = []
+
+        try:
+            self.dataList.append(data_stream)
+            self.log_interval_count += 1
+            if self.log_interval_count >= 400:
+                self.log_interval_count = 0
+                self.datalogger.writeBlock(self.dataList)
+                self.dataList.clear()
+        except Exception as e:
+            print('../..')
+            #print('Exception in Log: ' + str(e))
 
         self.lst.clear()
 
