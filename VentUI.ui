@@ -923,7 +923,7 @@
                 <x>300</x>
                 <y>90</y>
                 <width>121</width>
-                <height>71</height>
+                <height>31</height>
                </rect>
               </property>
               <property name="font">
@@ -937,7 +937,7 @@
                <string notr="true">color: rgb(152, 142, 255);</string>
               </property>
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;PEAK&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;PRESSURE&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;PEAK&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -2053,13 +2053,13 @@
            <widget class="QStackedWidget" name="infoStack">
             <property name="minimumSize">
              <size>
-              <width>300</width>
+              <width>100</width>
               <height>100</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>1000</width>
+              <width>100</width>
               <height>16777215</height>
              </size>
             </property>
