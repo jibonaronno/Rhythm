@@ -48,6 +48,8 @@ from filterlp import LowpassFilter
 
 from conditionar import StreamData
 
+from fftx import FFTx
+
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
 _listselect = join(dirname(abspath(__file__)), 'listselect.ui')
@@ -305,6 +307,7 @@ class MainWindow(QMainWindow):
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
         self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
+        self.flowcurve_filt = self.flowplotter.plot(0,0,"flowcurve_filt", 'b')
         self.flowpeakcurve = self.flowplotter.plot(0,0,"flowpeakcurve", pen = self.derivative_pen)
         
 
@@ -320,6 +323,7 @@ class MainWindow(QMainWindow):
         ##self.volplotter.getViewBox().enableAutoRange(axis='y', enable=False)
         ##self.volplotter.getViewBox().setYRange(-10, 500)
         self.volcurve = self.volplotter.plot(0,0,"volcurve", self.volplotter_pen)
+        self.volcurve_filt = self.volplotter.plot(0,0,"volcurve_filt", 'b')
         self.volpeakcurve = self.volplotter.plot(0,0,"volpeakcurve", self.volplotter_pen)
         
         ###self.CalculateSettings()
@@ -935,9 +939,9 @@ class MainWindow(QMainWindow):
         #print(line)
         self.LungSensorData(line)
         #self.sensorData(line)
-        elements = line.split('\t')
-        if len(elements) > 2:
-            print(str(elements[1]))
+        #elements = line.split('\t')
+        #if len(elements) > 2:
+            #print(str(elements[1]))
 
     flagEditCmv = False
 
@@ -1054,9 +1058,9 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def on_btnstream_clicked(self):
-        self.streamer = Backfeed('log3.txt')
+        self.streamer = Backfeed('log6.4.txt')
         self.streamer.setCallback(self.getStreamData)
-        self.streamer.Start(50)
+        self.streamer.Start(100)
         self.lungtimer.start(8000)
         #self.plotter.addItem(self.markerPeakPressure)
 
@@ -1584,16 +1588,48 @@ class MainWindow(QMainWindow):
     mark_counter = 0
     clk = 0
 
+    @Slot()
+    def on_btnHist_clicked(self):
+        strm = deque()
+        ftx = FFTx(self.streamdata.flow_stream)
+        for dta in self.streamdata.flow_stream:
+            if dta <= 0:
+                dta = 0
+                strm.append(dta)
+            else:
+                strm.append(dta)
+        
+        ftx.Periodogram(np.array(strm))
+        #ftx.fft(np.array(strm))
+        #ftx.Histogram(np.array(strm))
+        #ftx.Spectogram(np.array(strm))
+
+    @Slot()
+    def on_btnHistFilt_clicked(self):
+        strm = deque()
+        ftx = FFTx(self.streamdata.flow_filt_stream)
+        for dta in self.streamdata.flow_filt_stream:
+            if dta <= 0:
+                dta = 0
+                strm.append(dta)
+            else:
+                strm.append(dta)
+        
+        ftx.Periodogram(np.array(strm))
+
     def PlotData(self, data_stream):
         if not self.plot_run:
             return
         self.sensorData(data_stream)
         
-        #self.curve1.setData(self.streamdata.tfdata, self.streamdata.pressure_stream)
         if len(self.streamdata.filtered) >= self.streamdata.maxlength:
+            self.curve1.setData(self.streamdata.tfdata, self.streamdata.pressure_stream)
             self.curve2.setData(self.streamdata.tfdata, self.streamdata.filtered)
+            #self.curve2.setData(self.streamdata.tfdata, self.streamdata.pressure_stream)
+            self.flowcurve_filt.setData(self.streamdata.tfdata, self.streamdata.flow_filt_stream)
             self.flowcurve.setData(self.streamdata.tfdata, self.streamdata.flow_stream)
             self.volcurve.setData(self.streamdata.tfdata, self.streamdata.volume_stream)
+            self.volcurve_filt.setData(self.streamdata.tfdata, self.streamdata.vol_filt_stream)
 
     def LungSensorData(self, data_stream, in_vol=0.0, ex_vol=0.0, lungpressure=0.0, deltaflow=0.0, volume=0.0):
         self.PlotData(data_stream)
