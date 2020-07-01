@@ -7,6 +7,7 @@ import queue
 from queue import Queue
 from os.path import join, dirname, abspath
 from qtpy.QtCore import Slot, QTimer, QThread, Signal, QObject, Qt, QMutex
+from timerthread import TimerThread
 
 class Backfeed(QObject):
     feeder = Signal(str)
@@ -18,6 +19,7 @@ class Backfeed(QObject):
         self.timer.timeout.connect(self.timeout)
         self.gidx = 2
         self.loadFile(file)
+        self.timerthread = None
 
     def timeout(self):
         self.feeder.emit(self.array[self.gidx])
@@ -31,11 +33,13 @@ class Backfeed(QObject):
             self.feeder.emit(item)
 
     def Start(self, time):
-        self.timer.start(time)
+        #self.timer.start(time)
+        self.timerthread.Start()
 
     def setCallback(self, callback):
         if callback:
             self.feeder.connect(callback)
+            self.timerthread = TimerThread(self.timeout, 200)
 
     def loadFile(self, file):
         with open(file, "r") as reader:

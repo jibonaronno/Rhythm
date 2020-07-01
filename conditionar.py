@@ -98,7 +98,7 @@ class StreamData(object):
                         if len(self.pressure_stream) > self.maxlength:
                             self.pressure_stream.popleft()
                             self.flow_stream.popleft()
-                            self.flow_filt_stream = self.lpf.butter_lowpass_filter(self.flow_stream, cutoff=79, fs=20, order=1)
+                            self.flow_filt_stream = self.lpf.butter_lowpass_filter(self.flow_stream, cutoff=10, fs=40, order=1)
 
                             self.filtered = self.lpf.butter_lowpass_filter(self.pressure_stream, cutoff=79, fs=20, order=1)
                             self.volume_stream.popleft()

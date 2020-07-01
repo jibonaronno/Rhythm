@@ -50,6 +50,8 @@ from conditionar import StreamData
 
 from fftx import FFTx
 
+from timerthread import TimerThread
+
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
 
 _listselect = join(dirname(abspath(__file__)), 'listselect.ui')
@@ -111,6 +113,8 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
 
         #startdlg = StartDialog(None)
+
+        self.timerthread = TimerThread(self.tick, 25)
 
         self.lpf = LowpassFilter()
 
@@ -521,7 +525,7 @@ class MainWindow(QMainWindow):
 
         self.plottingBaseTimer = QTimer()
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
-        self.plottingBaseTimer.start(25)
+        ##MOD self.plottingBaseTimer.start(25)
 
         self.alarm_show = False
         self.label_alarm.hide()
@@ -551,6 +555,11 @@ class MainWindow(QMainWindow):
 
         self.labelSelectedMode()
         self.auxMode = MachineRunModes.BiPAP
+
+        self.timerthread.Start()
+
+    def tick(self):
+        self.plotTimer()
 
     #On Mode Changed
     def labelSelectedMode(self):
@@ -645,7 +654,7 @@ class MainWindow(QMainWindow):
                     self.fvlines[self.mark_counter].setPos([12-self.mark_counter, 0])
                     self.vvlines[self.mark_counter].setPos([12-self.mark_counter, 0])
                     self.mark_counter += 1
-                self.clk = 5
+                self.clk = 1
 
     def pulseGen(self):
         if self.flagStartPulse:
