@@ -736,6 +736,8 @@ class MainWindow(QMainWindow):
 
     def pauseVentilator(self):
         if self.workerThreadCreated:
+            self.KillMotion()
+            time.sleep(0.5)
             self.worker.Stop()
 
     def resumeVentilator(self):
@@ -1212,6 +1214,7 @@ class MainWindow(QMainWindow):
                 print("Starting Worker Thread")
 
             elif self.workerThreadCreated:
+                self.SaveSettings()
                 self.worker.Resume()
                 #-self.lungtimer.start(8000)
 
@@ -1320,6 +1323,11 @@ class MainWindow(QMainWindow):
             self.worker.updateGcode(self.generator)
         pprint.pprint(self.generator.gcodestr)
         #self.CalculateSettings()
+
+    def KillMotion(self):
+        self.generator.gcodestr = "M18\r\n"
+        if self.workerThreadCreated:
+            self.worker.updateGcode(self.generator, 1)
 
     @Slot()
     def on_alarm_clicked(self):

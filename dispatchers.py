@@ -360,6 +360,8 @@ class WorkerThread(QObject):
         self.linecount = len(self.codelist)
         self.flagexit = False
         self.flagStop = False
+        self.cycleToRun = 0
+        self.cycleCount = -1
         super().__init__()
         self.respondQue = Queue()
 
@@ -369,7 +371,8 @@ class WorkerThread(QObject):
     def Resume(self):
         self.flagStop = False
 
-    def updateGcode(self, codegen):
+    def updateGcode(self, codegen, cycleToRun=0):
+        self.cycleToRun = cycleToRun
         self.codegen = codegen
         self.codelist = self.codegen.gcodestr.splitlines()
 
@@ -389,6 +392,12 @@ class WorkerThread(QObject):
                 if self.commandque.get() == "exit":
                     self.flagexit = True
                     break
+
+            if self.cycleToRun > 0:
+                self.cycleCount += 1
+                if (self.cycleCount >= self.cycleToRun):
+                    continue
+
             try:
                 for line in self.codelist:
                     self.serialport.write((str(line)+"\r\n").encode('utf-8'))
