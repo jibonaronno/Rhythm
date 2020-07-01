@@ -1331,6 +1331,7 @@ class MainWindow(QMainWindow):
             self.worker.updateGcode(self.generator, 1)
 
     def RestoreMotion(self):
+        self.worker.cycleCount = -1
         self.SaveSettings()
 
     @Slot()
