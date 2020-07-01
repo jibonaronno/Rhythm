@@ -394,9 +394,11 @@ class WorkerThread(QObject):
                     break
 
             if self.cycleToRun > 0:
-                self.cycleCount += 1
+                print( self.codegen.gcodestr + ' :: cycleToRun : ' + str(self.cycleToRun))
                 if (self.cycleCount >= self.cycleToRun):
                     continue
+                else:
+                    self.cycleCount += 1
 
             try:
                 for line in self.codelist:
