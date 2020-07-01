@@ -742,6 +742,7 @@ class MainWindow(QMainWindow):
 
     def resumeVentilator(self):
         if self.workerThreadCreated:
+            self.RestoreMotion()
             self.worker.Resume()
 
     def loadMachineSetup(self, generator):
@@ -1325,9 +1326,12 @@ class MainWindow(QMainWindow):
         #self.CalculateSettings()
 
     def KillMotion(self):
-        self.generator.gcodestr = "M18\r\n"
+        self.generator.gcodestr = "M84\r\n"
         if self.workerThreadCreated:
             self.worker.updateGcode(self.generator, 1)
+
+    def RestoreMotion(self):
+        self.SaveSettings()
 
     @Slot()
     def on_alarm_clicked(self):
