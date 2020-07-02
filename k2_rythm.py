@@ -772,6 +772,7 @@ class MainWindow(QMainWindow):
 
     def onEncoderValue(self, msg):
         if self.runMode == MachineRunModes.BiPAP:
+            print('onEncoderValue : Mode - BiPAP')
             parts = None
             value = 2
             if len(msg) <= 7:
@@ -783,6 +784,11 @@ class MainWindow(QMainWindow):
                             if self.auxMode == MachineRunModes.CMV:
                                 self.changeVTdial(value)
                         elif value == 3:
+                            if self.runMode == MachineRunModes.BiPAP:
+                                print('Mode - BiPAP')
+                            elif self.runMode == MachineRunModes.CMV:
+                                print('Mode - CMV')
+
                             if self.workerThreadCreated:
                                 if self.worker.flagStop:
                                     self.on_runloop_clicked()
@@ -847,6 +853,7 @@ class MainWindow(QMainWindow):
                             self.show_hide_LeftPanel()
 
         elif self.runMode == MachineRunModes.CMV:
+            print('onEncoderValue : Mode - CMV')
             parts = None
             value = 2
             if len(msg) <= 7:
@@ -1672,7 +1679,7 @@ class MainWindow(QMainWindow):
                 self.datalogger.writeBlock(self.dataList)
                 self.dataList.clear()
         except Exception as e:
-            print('../..')
+            print('../.. LOG..')
             #print('Exception in Log: ' + str(e))
 
         self.lst.clear()
@@ -1938,7 +1945,7 @@ class MainWindow(QMainWindow):
         #self.txrxtable.scrollToBottom()
         #self.txrxtable.resizeColumnsToContents()
         #self.txrxtable.resizeRowsToContents()
-        print(data_stream)
+        #print(data_stream)
         if data_stream == "StoppedOK":
             if self.primaryThreadCreated:
                 self.primaryThread.exit()
