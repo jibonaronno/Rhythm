@@ -45,11 +45,8 @@ from time import sleep
 import pyautogui
 from scipy.signal import butter,filtfilt
 from filterlp import LowpassFilter
-
 from conditionar import StreamData
-
 from fftx import FFTx
-
 from timerthread import TimerThread
 
 _UI = join(dirname(abspath(__file__)), 'VentUI.ui')
