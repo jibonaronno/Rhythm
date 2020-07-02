@@ -387,9 +387,12 @@ class WorkerThread(QObject):
             if self.cycleToRun > 0:
                 #print( self.codegen.gcodestr + ' :: cycleToRun : ' + str(self.cycleToRun))
                 if (self.cycleCount >= self.cycleToRun):
+                    time.sleep(1)
                     continue
                 else:
                     self.cycleCount += 1
+                    if self.cycleCount == self.cycleToRun:
+                        print( self.codegen.gcodestr + ' :: cycleToRun : ' + str(self.cycleToRun))
 
             if self.flagStop:
                 time.sleep(1)
