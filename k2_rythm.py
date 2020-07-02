@@ -1416,6 +1416,7 @@ class MainWindow(QMainWindow):
         self.rrlcd_bp.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 
     def modeselectionchanged(self):
+        print('Mode Selection Changed')
         if "BiPAP" in self.modecombobox.currentText():
             self.buttonstack.setCurrentIndex(0)
             self.controlStack.setCurrentIndex(0)
