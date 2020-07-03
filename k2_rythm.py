@@ -522,7 +522,7 @@ class MainWindow(QMainWindow):
 
         self.plottingBaseTimer = QTimer()
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
-        ##MOD self.plottingBaseTimer.start(25)
+        self.plottingBaseTimer.start(25)
 
         self.alarm_show = False
         self.label_alarm.hide()
@@ -553,7 +553,7 @@ class MainWindow(QMainWindow):
         self.labelSelectedMode()
         self.auxMode = MachineRunModes.BiPAP
 
-        self.timerthread.Start()
+        ##self.timerthread.Start()
 
     def tick(self):
         self.plotTimer()
@@ -772,7 +772,7 @@ class MainWindow(QMainWindow):
 
     def onEncoderValue(self, msg):
         if self.runMode == MachineRunModes.BiPAP:
-            print('onEncoderValue : Mode - BiPAP')
+            #print('onEncoderValue : Mode - BiPAP')
             parts = None
             value = 2
             if len(msg) <= 7:
@@ -784,10 +784,10 @@ class MainWindow(QMainWindow):
                             if self.auxMode == MachineRunModes.CMV:
                                 self.changeVTdial(value)
                         elif value == 3:
-                            if self.runMode == MachineRunModes.BiPAP:
-                                print('Mode - BiPAP')
-                            elif self.runMode == MachineRunModes.CMV:
-                                print('Mode - CMV')
+                            #if self.runMode == MachineRunModes.BiPAP:
+                            #    print('Mode - BiPAP')
+                            #elif self.runMode == MachineRunModes.CMV:
+                            #    print('Mode - CMV')
 
                             if self.workerThreadCreated:
                                 if self.worker.flagStop:
@@ -853,7 +853,7 @@ class MainWindow(QMainWindow):
                             self.show_hide_LeftPanel()
 
         elif self.runMode == MachineRunModes.CMV:
-            print('onEncoderValue : Mode - CMV')
+            #print('onEncoderValue : Mode - CMV')
             parts = None
             value = 2
             if len(msg) <= 7:
