@@ -1650,13 +1650,13 @@ class MainWindow(QMainWindow):
         self.sensorData(data_stream)
         
         if len(self.streamdata.filtered) >= self.streamdata.maxlength:
-            self.curve1.setData(self.streamdata.tfdata, self.streamdata.pressure_stream)
+            #self.curve1.setData(self.streamdata.tfdata, self.streamdata.pressure_stream)
             self.curve2.setData(self.streamdata.tfdata, self.streamdata.filtered)
-            #self.curve2.setData(self.streamdata.tfdata, self.streamdata.pressure_stream)
+            ###self.curve2.setData(self.streamdata.tfdata, self.streamdata.pressure_stream)
             self.flowcurve_filt.setData(self.streamdata.tfdata, self.streamdata.flow_filt_stream)
-            self.flowcurve.setData(self.streamdata.tfdata, self.streamdata.flow_stream)
+            #self.flowcurve.setData(self.streamdata.tfdata, self.streamdata.flow_stream)
             self.volcurve.setData(self.streamdata.tfdata, self.streamdata.volume_stream)
-            self.volcurve_filt.setData(self.streamdata.tfdata, self.streamdata.vol_filt_stream)
+            #self.volcurve_filt.setData(self.streamdata.tfdata, self.streamdata.vol_filt_stream)
 
     def LungSensorData(self, data_stream, in_vol=0.0, ex_vol=0.0, lungpressure=0.0, deltaflow=0.0, volume=0.0):
         self.PlotData(data_stream)
