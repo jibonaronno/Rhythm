@@ -636,10 +636,12 @@ class MainWindow(QMainWindow):
     def plotTimer(self):
         if self.sensorDataString != '':
             #pass
-            #self.LungSensorData(self.sensorDataString, 0.025)
             self.streamdata.push(self.sensorDataString)
         
         if len(self.streamdata.filtered) >= self.streamdata.maxlength:
+            
+            self.LungSensorData(self.sensorDataString, 0.25)
+
             if self.clk < 40:
                 self.clk += 1
             else:
@@ -1154,8 +1156,8 @@ class MainWindow(QMainWindow):
                 self.sensor = SensorThread(self.serialSensor, self.pressureque)
                 self.sensorThread = QThread()
                 self.sensorThread.started.connect(self.sensor.run)
-                ##self.sensor.signal.connect(self.sensorData)
-                self.sensor.signal.connect(self.LungSensorData)
+                self.sensor.signal.connect(self.sensorData)
+                ####MODself.sensor.signal.connect(self.LungSensorData)
                 self.sensor.moveToThread(self.sensorThread)
                 self.sensorThread.start()
                 self.sensorThreadCreated = True
