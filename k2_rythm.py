@@ -1605,6 +1605,7 @@ class MainWindow(QMainWindow):
 
         except Exception as e:
             print('Exception in sensorData : ' + str(e))
+            pprint.pprint(jobj)
 
         self.sensorDataString = dstr
 
