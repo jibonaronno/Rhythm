@@ -300,10 +300,9 @@ class MainWindow(QMainWindow):
         self.flowplotter.showGrid(x=True, y=True, alpha=None)
         #self.flowplotter.setTitle("Flow L/M")
         self.flowplotter.setLabel('left', 'Flow L/M')
-        #self.flowplotter
-        #self.flowplotter.getViewBox().enableAutoRange(axis='y', enable=False)
+        self.flowplotter.getViewBox().enableAutoRange(axis='y', enable=False)
         #self.flowplotter.getViewBox().setMinimumHeight(45)
-        #self.flowplotter.getViewBox().setYRange(-5, 5)
+        self.flowplotter.getViewBox().setYRange(-2, 5)
 
         self.dvcurve = self.flowplotter.plot(0,0,"dvcurve", pen = self.derivative_pen)
         self.flowcurve = self.flowplotter.plot(0,0,"flowcurve", pen = self.flowpen)
