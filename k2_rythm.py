@@ -1592,15 +1592,16 @@ class MainWindow(QMainWindow):
     def sensorData(self, data_stream):
         dstr = ''
         resp = ''
+        lines = data_stream.split('\n')
         try:
-            jobj = json.loads(data_stream)
-
-            #pprint.pprint(jobj)
-            if 'lung_pres_sens' in jobj:
-                dstr = str(jobj['lung_pres_sens']) +',0.0,' + str(jobj['flow_pres_comp']) + ',' + str(jobj['inhale_tmp_vol']) + ',0.0,' + str(jobj['inhale_avg_vol']) + ',' + str(jobj['exhale_avg_vol'])
-            if 'resp_param_cmv' in jobj:
-                resp = str(jobj['resp_param_cmv'])
-                print('---------------------------------' + resr + '-------------------------------')
+            for line in lines:
+                jobj = json.loads(line)
+                #pprint.pprint(jobj)
+                if 'lung_pres_sens' in jobj:
+                    dstr = str(jobj['lung_pres_sens']) +',0.0,' + str(jobj['flow_pres_comp']) + ',' + str(jobj['inhale_tmp_vol']) + ',0.0,' + str(jobj['inhale_avg_vol']) + ',' + str(jobj['exhale_avg_vol'])
+                if 'resp_param_cmv' in jobj:
+                    resp = str(jobj['resp_param_cmv'])
+                    print('---------------------------------' + resp + '-------------------------------')
 
         except Exception as e:
             print('Exception in sensorData : ' + str(e))
