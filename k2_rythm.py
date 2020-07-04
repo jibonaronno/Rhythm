@@ -1591,7 +1591,8 @@ class MainWindow(QMainWindow):
         dstr = ''
         try:
             jobj = json.loads(data_stream)
-            pprint.pprint(jobj)
+
+            #pprint.pprint(jobj)
             if 'lung_pres_sens' in jobj:
                 dstr = str(jobj['lung_pres_sens']) +',0.0,' + str(jobj['flow_pres_comp']) + ',' + str(jobj['inhale_tmp_vol']) + ',0.0,' + str(jobj['inhale_avg_vol']) + ',' + str(jobj['exhale_avg_vol'])
         except Exception as e:
@@ -1657,7 +1658,7 @@ class MainWindow(QMainWindow):
     def PlotData(self, data_stream):
         if not self.plot_run:
             return
-        self.sensorData(data_stream)
+        #self.sensorData(data_stream)
         
         if len(self.streamdata.filtered) >= self.streamdata.maxlength:
             #self.curve1.setData(self.streamdata.tfdata, self.streamdata.pressure_stream)
