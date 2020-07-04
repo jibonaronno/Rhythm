@@ -3,6 +3,7 @@ import sys
 from os.path import join, dirname, abspath
 from machinesetup import MachineSetup
 import pprint
+from jsonobject import JsonObject
 
 class GcodeGenerator(object):
     def __init__(self, vt, rr, ie, fio2, x_adj):
@@ -38,8 +39,16 @@ class GcodeGenerator(object):
         self.vol_tol = self.machinesetup.vol_tol
         print(str(self.ACC) + "," + str(self.xmax) + "," + str(self.xamb) + "," + str(self.xrect) + "," + str(self.xcon_offset) + "," + str(self.vtmax))
         self.calib_dict = {250:63.0, 300:68.0, 350:71.0, 400:73.0, 450:77.0, 500:86.0, 550:100.0}
-
         #self.calib_dict = {250:103.0, 300:108.0, 350:111.0, 400:113.0, 450:125.0, 500:126.0, 550:140.0}
+        self.jsobj = ''
+        self.loadVtTable()
+
+    def loadVtTable(self):
+        try:
+            self.jsobj = JsonObject("vttable.json")
+            pprint.pprint(self.jsobj.dict)
+        except Exception as e:
+            print('Exception at loadVtTable : ' + str(e))
 
     def getAxisdistanceFromIpap(self, pparr, ipap):
         try:

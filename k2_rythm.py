@@ -2,6 +2,15 @@
 import sys
 import enum
 from os.path import join, dirname, abspath
+import math
+import os
+import numpy as np
+import random
+import qtmodern.styles
+import qtmodern.windows
+import time
+import json
+import pprint
 import queue
 import serial
 import serial.tools.list_ports as port_list
@@ -15,16 +24,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QPushButton
-
-import math
-import os
-import numpy as np
-import random
-import qtmodern.styles
-import qtmodern.windows
-import time
-import json
-import pprint
 
 from gcodegenerator import GcodeGenerator
 from dispatchers import PrimaryThread, WorkerThread, SensorThread, BipapThread, EncoderThread, BipapInitializationThread
@@ -1589,7 +1588,13 @@ class MainWindow(QMainWindow):
     vol_changefactor = 0.0
 
     def sensorData(self, data_stream):
-        self.sensorDataString = data_stream
+        try:
+            jobj = json.loads(data_stream)
+            pprint.pprint(jobj)
+        except Exception as e:
+            print('Exception in sensorData : ' + str(e))
+
+        #self.sensorDataString = data_stream
 
     def splitSensorData(self, data_stream):
         pass
