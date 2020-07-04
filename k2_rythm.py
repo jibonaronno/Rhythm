@@ -1588,13 +1588,16 @@ class MainWindow(QMainWindow):
     vol_changefactor = 0.0
 
     def sensorData(self, data_stream):
+        dstr = ''
         try:
             jobj = json.loads(data_stream)
             pprint.pprint(jobj)
+            if 'lung_pres_sens' in jobj:
+                dstr = str(jobj['lung_pres_sens']) +',0.0,' + str(jobj['flow_pres_comp']) + ',' + str(jobj['inhale_tmp_vol']) + ',0.0,' + str(jobj['inhale_avg_vol']) + ',' + str(jobj['exhale_avg_vol'])
         except Exception as e:
             print('Exception in sensorData : ' + str(e))
 
-        #self.sensorDataString = data_stream
+        self.sensorDataString = dstr
 
     def splitSensorData(self, data_stream):
         pass
