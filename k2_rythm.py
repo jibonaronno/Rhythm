@@ -850,6 +850,9 @@ class MainWindow(QMainWindow):
                         elif value == 3:
                             self.change_set(parts[1])
                             self.change_set_bipap(parts[1])
+                            self.SaveSettings()
+                            self.strtx = 'cmv,' + str(self.vt) + ',1,' + str(self.ie) + ',' + str(self.rr) + '\n'
+                            self.flag_sensorlimit_tx = True 
                             self.ShowHideControls()
                             self.show_hide_LeftPanel()
 
@@ -1473,26 +1476,26 @@ class MainWindow(QMainWindow):
         self.vt = (self.vtdial.value() * 50) + 200
         self.vtlcd.display(self.vt)
         self.settings_dict[r"vt"] = str(self.vt)
-        self.SaveSettings()
+        #self.SaveSettings()
 
     def ieDialChanged(self):
         #self.table.setItem(0,1, QTableWidgetItem(self.settings_dict[r"ie"]))
         self.ielcd.display(self.iedial.value())
         self.ie = self.iedial.value()
         self.settings_dict[r"ie"] = str(self.ie)
-        self.SaveSettings()
+        #self.SaveSettings()
 
     def rrDialChanged(self):
         self.rrlcd.display(self.rrdial.value())
         self.rr = self.rrdial.value()
         self.settings_dict[r"rr"] = str(self.rr)
-        self.SaveSettings()
+        #self.SaveSettings()
 
     def fioDialChanged(self):
         self.fiolcd.display(self.fiodial.value())
         self.fio2 = self.fiodial.value()
         self.settings_dict[r"fio2"] = str(self.fio2)
-        self.SaveSettings()
+        #self.SaveSettings()
 
     
     def ShowGcodeTable(self):
