@@ -851,7 +851,7 @@ class MainWindow(QMainWindow):
                             self.change_set(parts[1])
                             self.change_set_bipap(parts[1])
                             self.SaveSettings()
-                            self.strtx = 'cmv,' + str(self.vt) + ',1,' + str(self.ie) + ',' + str(self.rr) + '\n'
+                            self.strtx = '<cmv,' + str(self.vt) + ',1,' + str(self.ie) + ',' + str(self.rr) + '>\n'
                             self.flag_sensorlimit_tx = True 
                             self.ShowHideControls()
                             self.show_hide_LeftPanel()
