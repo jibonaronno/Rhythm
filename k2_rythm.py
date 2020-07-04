@@ -1604,8 +1604,9 @@ class MainWindow(QMainWindow):
                     print('---------------------------------' + resp + '-------------------------------')
 
         except Exception as e:
-            print('Exception in sensorData : ' + str(e))
-            pprint.pprint(data_stream)
+            #print('Exception in sensorData : ' + str(e))
+            #pprint.pprint(data_stream)
+            pass
 
         self.sensorDataString = dstr
 
