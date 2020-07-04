@@ -1598,14 +1598,13 @@ class MainWindow(QMainWindow):
             #pprint.pprint(jobj)
             if 'lung_pres_sens' in jobj:
                 dstr = str(jobj['lung_pres_sens']) +',0.0,' + str(jobj['flow_pres_comp']) + ',' + str(jobj['inhale_tmp_vol']) + ',0.0,' + str(jobj['inhale_avg_vol']) + ',' + str(jobj['exhale_avg_vol'])
-            
             if 'resp_param_cmv' in jobj:
                 resp = str(jobj['resp_param_cmv'])
                 print('---------------------------------' + resr + '-------------------------------')
 
         except Exception as e:
             print('Exception in sensorData : ' + str(e))
-            pprint.pprint(jobj)
+            pprint.pprint(data_stream)
 
         self.sensorDataString = dstr
 
