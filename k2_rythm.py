@@ -552,6 +552,7 @@ class MainWindow(QMainWindow):
         ##self.plottingBaseTimer.start(25)
         self.timerthread.Start()
         self.readyToStartTimer = QTimer()
+        self.readyToStartTimer.timeout.connect(self.labelReadyToStart)
         self.readyToStartTimer.setSingleShot(True)
 
     def tick(self):
@@ -1596,8 +1597,8 @@ class MainWindow(QMainWindow):
         dstr = ''
         resp = ''
         lines = data_stream.split('\r\n')
-        pprint.pprint(lines)
-        print('**********************************************************************************')
+        ##pprint.pprint(lines)
+        ##print('**********************************************************************************')
         if len(lines) > 0:
             if '{' in lines[0] and '}' in lines[0]:
                 try:
@@ -1612,8 +1613,8 @@ class MainWindow(QMainWindow):
                                 print('---------------------------------' + resp + '-------------------------------')
 
                 except Exception as e:
-                    #print('Exception in sensorData : ' + str(e))
-                    #pprint.pprint(data_stream)
+                    print('*****************************************Exception in sensorData : ' + str(e))
+                    pprint.pprint(data_stream)
                     pass
             else:
                 for line in lines:
