@@ -1214,13 +1214,13 @@ class MainWindow(QMainWindow):
                 self.worker.moveToThread(self.workerThread)
                 self.workerThread.start()
                 self.workerThreadCreated = True
-                #-self.lungtimer.start(8000)
+                self.lungtimer.start(8000)
                 print("Starting Worker Thread")
 
             elif self.workerThreadCreated:
                 self.SaveSettings()
                 self.worker.Resume()
-                #-self.lungtimer.start(8000)
+                self.lungtimer.start(8000)
 
     @Slot()
     def on_btnstopcmv_clicked(self):
@@ -1589,6 +1589,8 @@ class MainWindow(QMainWindow):
         dstr = ''
         resp = ''
         lines = data_stream.split('\n')
+        pprint.pprint(lines)
+        print('**********************************************************************************')
         if len(lines) > 0:
             if '{' in lines[0] and '}' in lines[0]:
                 try:
