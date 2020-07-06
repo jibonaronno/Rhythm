@@ -550,11 +550,15 @@ class MainWindow(QMainWindow):
         self.plottingBaseTimer = QTimer()
         self.plottingBaseTimer.timeout.connect(self.plotTimer)
         ##self.plottingBaseTimer.start(25)
-
         self.timerthread.Start()
+        self.readyToStartTimer = QTimer()
+        self.readyToStartTimer.setSingleShot(True)
 
     def tick(self):
         self.plotTimer()
+
+    def labelReadyToStart(self):
+        self.lblStartStop.setText('Ready To Start')
 
     #On Mode Changed
     def labelSelectedMode(self):
@@ -795,11 +799,13 @@ class MainWindow(QMainWindow):
                                     #self.plottingBaseTimer.start(0.025)
                                     #self.pulse_state = True
                                     #self.flagStartPulse = True
+                                    self.lblStartStop.setText('Running')
                                 else:
                                     self.on_btnstopcmv_clicked()
                                     #self.plottingBaseTimer.stop()
                                     #self.pulse_state = False
                                     #self.flagStartPulse = False
+                                    self.lblStartStop.setText('Stopped')
                             else:
                                 self.modeselectwidget.hide()
                                 self.modeSelectionVisible = False
@@ -1160,6 +1166,7 @@ class MainWindow(QMainWindow):
                 self.sensorThreadCreated = True
                 self.sensorwatchtimer.start(500)
                 print("Starting Sensor Thread ...")
+                self.lblStartStop.setText('Homming Wait ...')
 
 
     def startEncoderThread(self):
@@ -1991,6 +1998,7 @@ class MainWindow(QMainWindow):
                 self.primaryThreadCreated = False
                 del self.primaryThread
                 self.runloop.setEnabled(True)
+                self.readyToStartTimer.start(5000)
         if "Endbipapinit" in data_stream:
             if self.bipap_init_threadcreated:
                 self.bipapinitThread.exit()

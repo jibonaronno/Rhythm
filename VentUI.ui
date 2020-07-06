@@ -2600,6 +2600,31 @@ background-color: rgba(255, 255, 255, 0);</string>
                <set>Qt::AlignCenter</set>
               </property>
              </widget>
+             <widget class="QLabel" name="lblStartStop">
+              <property name="geometry">
+               <rect>
+                <x>420</x>
+                <y>60</y>
+                <width>221</width>
+                <height>31</height>
+               </rect>
+              </property>
+              <property name="font">
+               <font>
+                <family>Britannic Bold</family>
+                <pointsize>20</pointsize>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(255, 250, 0);
+background-color: rgb(0, 200, 250);</string>
+              </property>
+              <property name="text">
+               <string>Press Home</string>
+              </property>
+             </widget>
              <zorder>lp_back_3</zorder>
              <zorder>lp_back_2</zorder>
              <zorder>lp_back</zorder>
@@ -2614,6 +2639,7 @@ background-color: rgba(255, 255, 255, 0);</string>
              <zorder>peak_vol</zorder>
              <zorder>lp_back_6</zorder>
              <zorder>lbl_volume</zorder>
+             <zorder>lblStartStop</zorder>
             </widget>
             <widget class="QWidget" name="page_11"/>
            </widget>
