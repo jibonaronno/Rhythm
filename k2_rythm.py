@@ -620,7 +620,7 @@ class MainWindow(QMainWindow):
                 #GPIO.cleanup() # cleanup all GPIO 
 
     def ShowHideAlarm(self):
-        if self.lowp_alarm_enable or self.breathfail_alarm_enable:
+        if self.lowp_alarm_enable or self.breathfail_alarm_enable or not self.worker.flagStop:
             if self.alarm_show:
                 self.alarm_show = False
                 self.label_alarm.hide()
