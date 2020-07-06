@@ -813,6 +813,7 @@ class MainWindow(QMainWindow):
                                 self.labelSelectedMode()
                                 if self.runloop.isEnabled():
                                     self.on_runloop_clicked()
+                                    self.lblStartStop.setText('Running')
                     if parts[0] == '2':
                         value = int(parts[1])
                         if value < 3:
@@ -1999,7 +2000,7 @@ class MainWindow(QMainWindow):
                 self.primaryThreadCreated = False
                 del self.primaryThread
                 self.runloop.setEnabled(True)
-                self.readyToStartTimer.start(5000)
+                self.readyToStartTimer.start(13000)
         if "Endbipapinit" in data_stream:
             if self.bipap_init_threadcreated:
                 self.bipapinitThread.exit()
