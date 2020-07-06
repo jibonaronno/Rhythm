@@ -621,7 +621,7 @@ class MainWindow(QMainWindow):
 
     def ShowHideAlarm(self):
         if self.workerThreadCreated:
-            if self.lowp_alarm_enable or self.breathfail_alarm_enable or not self.worker.flagStop:
+            if self.lowp_alarm_enable or self.breathfail_alarm_enable:
                 if self.alarm_show:
                     self.alarm_show = False
                     self.label_alarm.hide()
