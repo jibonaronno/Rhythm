@@ -2000,7 +2000,7 @@
               <property name="geometry">
                <rect>
                 <x>20</x>
-                <y>60</y>
+                <y>30</y>
                 <width>101</width>
                 <height>31</height>
                </rect>
@@ -2022,8 +2022,8 @@
              <widget class="QPushButton" name="btnVols">
               <property name="geometry">
                <rect>
-                <x>120</x>
-                <y>60</y>
+                <x>60</x>
+                <y>0</y>
                 <width>31</width>
                 <height>31</height>
                </rect>
@@ -2035,8 +2035,8 @@
              <widget class="QPushButton" name="btnInfo">
               <property name="geometry">
                <rect>
-                <x>120</x>
-                <y>90</y>
+                <x>90</x>
+                <y>0</y>
                 <width>31</width>
                 <height>31</height>
                </rect>
@@ -2080,7 +2080,7 @@
             <property name="minimumSize">
              <size>
               <width>330</width>
-              <height>100</height>
+              <height>120</height>
              </size>
             </property>
             <property name="maximumSize">
