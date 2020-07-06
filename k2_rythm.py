@@ -2000,7 +2000,7 @@ class MainWindow(QMainWindow):
                 self.primaryThreadCreated = False
                 del self.primaryThread
                 self.runloop.setEnabled(True)
-                self.readyToStartTimer.start(13000)
+                self.readyToStartTimer.start(22000)
         if "Endbipapinit" in data_stream:
             if self.bipap_init_threadcreated:
                 self.bipapinitThread.exit()
