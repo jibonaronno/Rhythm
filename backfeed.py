@@ -32,14 +32,14 @@ class Backfeed(QObject):
         for item in self.array:
             self.feeder.emit(item)
 
-    def Start(self, time):
+    def Start(self, time=100):
         #self.timer.start(time)
         self.timerthread.Start()
 
-    def setCallback(self, callback):
+    def setCallback(self, callback, millis=100):
         if callback:
             self.feeder.connect(callback)
-            self.timerthread = TimerThread(self.timeout, 200)
+            self.timerthread = TimerThread(self.timeout, millis)
 
     def loadFile(self, file):
         with open(file, "r") as reader:

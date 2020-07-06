@@ -17,8 +17,8 @@ class TimerThread(QObject):
         self.signal.connect(callback)
         self.thread = QThread()
         self.timer = QTimer()
-        self.timer.timeout.connect(self.timeout)
-        self.timer.start(milis)
+        #self.timer.timeout.connect(self.timeout)
+        #self.timer.start(milis)
         self.thread.started.connect(self.init)
 
     def Start(self):

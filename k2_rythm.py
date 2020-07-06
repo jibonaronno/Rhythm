@@ -110,8 +110,6 @@ class MainWindow(QMainWindow):
 
         #startdlg = StartDialog(None)
 
-        self.timerthread = TimerThread(self.tick, 25)
-
         self.lpf = LowpassFilter()
 
         self.streamdata = StreamData(0.025)
@@ -518,10 +516,6 @@ class MainWindow(QMainWindow):
         self.breathInState = False
         self.breathInMinTimer.timeout.connect(self.BreathInOver)
 
-        self.plottingBaseTimer = QTimer()
-        self.plottingBaseTimer.timeout.connect(self.plotTimer)
-        self.plottingBaseTimer.start(25)
-
         self.alarm_show = False
         self.label_alarm.hide()
         self.alarms:list = []
@@ -551,7 +545,13 @@ class MainWindow(QMainWindow):
         self.labelSelectedMode()
         self.auxMode = MachineRunModes.BiPAP
 
-        ##self.timerthread.Start()
+        self.timerthread = TimerThread(self.tick, 25)
+
+        self.plottingBaseTimer = QTimer()
+        self.plottingBaseTimer.timeout.connect(self.plotTimer)
+        ##self.plottingBaseTimer.start(25)
+
+        self.timerthread.Start()
 
     def tick(self):
         self.plotTimer()
@@ -954,13 +954,9 @@ class MainWindow(QMainWindow):
                     dial.setValue(dial_now)
 
 
-    def getStreamData(self, line):
-        #print(line)
-        self.LungSensorData(line)
-        #self.sensorData(line)
-        #elements = line.split('\t')
-        #if len(elements) > 2:
-            #print(str(elements[1]))
+    def pushStreamData(self, line):
+        self.sensorData(line)
+
 
     flagEditCmv = False
 
@@ -1078,8 +1074,8 @@ class MainWindow(QMainWindow):
     @Slot()
     def on_btnstream_clicked(self):
         self.streamer = Backfeed('log6.4.txt')
-        self.streamer.setCallback(self.getStreamData)
-        self.streamer.Start(100)
+        self.streamer.setCallback(self.pushStreamData, millis=100)
+        self.streamer.Start()
         self.lungtimer.start(8000)
         #self.plotter.addItem(self.markerPeakPressure)
 
@@ -1593,21 +1589,38 @@ class MainWindow(QMainWindow):
         dstr = ''
         resp = ''
         lines = data_stream.split('\n')
-        try:
-            for line in lines:
-                jobj = json.loads(line)
+        if len(lines) > 0:
+            if '{' in lines[0] and '}' in lines[0]:
+                try:
+                    for line in lines:
+                        jobj = json.loads(line)
+                        #pprint.pprint(jobj)
+                        if 'lung_pres_sens' in jobj:
+                            dstr = str(jobj['lung_pres_sens']) +',0.0,' + str(jobj['flow_pres_comp']) + ',' + str(jobj['inhale_tmp_vol']) + ',0.0,' + str(jobj['inhale_avg_vol']) + ',' + str(jobj['exhale_avg_vol'])
+                        if 'resp_param_cmv' in jobj:
+                            resp = str(jobj['resp_param_cmv'])
+                            print('---------------------------------' + resp + '-------------------------------')
+
+                except Exception as e:
+                    #print('Exception in sensorData : ' + str(e))
+                    #pprint.pprint(data_stream)
+                    pass
+            else:
+                for line in lines:
+                    if len(line.split(',')) > 4:
+                        dstr = line
+        else:
+            if '{' in data_stream and '}' in data_stream:
+                jobj = json.loads(data_stream)
                 #pprint.pprint(jobj)
                 if 'lung_pres_sens' in jobj:
                     dstr = str(jobj['lung_pres_sens']) +',0.0,' + str(jobj['flow_pres_comp']) + ',' + str(jobj['inhale_tmp_vol']) + ',0.0,' + str(jobj['inhale_avg_vol']) + ',' + str(jobj['exhale_avg_vol'])
                 if 'resp_param_cmv' in jobj:
                     resp = str(jobj['resp_param_cmv'])
                     print('---------------------------------' + resp + '-------------------------------')
-
-        except Exception as e:
-            #print('Exception in sensorData : ' + str(e))
-            #pprint.pprint(data_stream)
-            pass
-
+            else:
+                dstr = data_stream
+        #print(dstr)
         self.sensorDataString = dstr
 
     def splitSensorData(self, data_stream):
