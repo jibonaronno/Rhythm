@@ -634,6 +634,9 @@ class MainWindow(QMainWindow):
             else:
                 self.label_alarm.hide()
                 self.msgwindow.hide()
+        else:
+            self.label_alarm.hide()
+            self.msgwindow.hide()
 
     def BreathInOver(self):
         self.breathInState = False
@@ -1185,6 +1188,7 @@ class MainWindow(QMainWindow):
                     self.primaryThread.start()
                     self.primaryThreadCreated = True
                     print("Starting Primary Thread")
+                    self.lblStartStop.setText('Homming Wait ...')
         if self.sensorPortOpen:
             if not self.sensorThreadCreated:
                 self.sensor = SensorThread(self.serialSensor, self.pressureque)
@@ -1197,7 +1201,6 @@ class MainWindow(QMainWindow):
                 self.sensorThreadCreated = True
                 self.sensorwatchtimer.start(500)
                 print("Starting Sensor Thread ...")
-                self.lblStartStop.setText('Homming Wait ...')
 
 
     def startEncoderThread(self):
