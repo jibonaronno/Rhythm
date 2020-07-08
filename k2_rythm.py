@@ -791,8 +791,14 @@ class MainWindow(QMainWindow):
             time.sleep(3)
             self.autoConnect()
 
+    def killWorkerThread(self):
+        if self.workerThreadCreated:
+            self.worker.commandque.put('exit')
+            self.lungtimer.stop()
+
     def EmergencyStop(self):
-        self.on_btnstopcmv_clicked()
+        #self.on_btnstopcmv_clicked()
+        self.killWorkerThread()
         self.lblStartStop.setText('Stopped')
         self.ReconnectMarlin()
         

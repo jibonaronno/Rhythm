@@ -394,15 +394,16 @@ class WorkerThread(QObject):
                     if self.cycleCount == self.cycleToRun:
                         print( self.codegen.gcodestr + ' :: cycleToRun : ' + str(self.cycleToRun))
 
+            if self.commandque.qsize() > 0:
+                if self.commandque.get() == "exit":
+                    self.flagexit = True
+                    break
+
             if self.flagStop:
                 time.sleep(1)
                 if self.respondQue.qsize() <= 0:
                     self.respondQue.put("stopped")
                 continue
-            if self.commandque.qsize() > 0:
-                if self.commandque.get() == "exit":
-                    self.flagexit = True
-                    break
 
             try:
                 for line in self.codelist:
