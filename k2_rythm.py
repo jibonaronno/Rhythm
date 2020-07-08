@@ -786,7 +786,9 @@ class MainWindow(QMainWindow):
                 self.workerThread.wait()
                 self.workerThreadCreated = False
                 del self.workerThread
+            self.serialMarlin.close()
             self.marlinPortOpen = False
+            time.sleep(3)
             self.autoConnect()
 
     def EmergencyStop(self):
