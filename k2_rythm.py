@@ -172,19 +172,19 @@ class MainWindow(QMainWindow):
 
         pg.setConfigOptions(antialias=True)
 
-        self.inf1 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf2 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf3 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf4 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf5 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf6 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf7 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf8 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf9 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf10 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf11 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf12 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
-        self.inf13 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf1 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf2 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf3 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf4 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf5 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf6 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf7 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf8 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf9 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf10 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf11 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf12 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
+        self.inf13 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':0.5, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
 
     
         self.inf14 = pg.InfiniteLine(movable=True, angle=90, label='x={value:0.2f}', labelOpts={'position':12.0, 'color': (200,200,100), 'fill': (200,200,200,50), 'movable': False})
@@ -218,6 +218,7 @@ class MainWindow(QMainWindow):
         self.vlines = []
         self.fvlines = []
         self.vvlines = []
+        self.pressurepeaklines = []
 
         self.vlines.append(self.inf1)
         self.vlines.append(self.inf2)
@@ -776,6 +777,24 @@ class MainWindow(QMainWindow):
             self.left_panel_visible = True
             self.stackedWidget_2.show()
 
+    def ReconnectMarlin(self):
+        if self.marlinPortOpen:
+            if self.workerThreadCreated:
+                self.worker_cmd_que.put("exit")
+                self.worker.Stop()
+                self.workerThread.exit()
+                self.workerThread.wait()
+                self.workerThreadCreated = False
+                del self.workerThread
+            self.marlinPortOpen = False
+            self.autoConnect()
+
+    def EmergencyStop(self):
+        self.on_btnstopcmv_clicked()
+        self.lblStartStop.setText('Stopped')
+        self.ReconnectMarlin()
+        
+
     def onEncoderValue(self, msg):
         if self.runMode == MachineRunModes.BiPAP:
             #print('onEncoderValue : Mode - BiPAP')
@@ -831,6 +850,7 @@ class MainWindow(QMainWindow):
                         elif value == 3:
                             if self.plot_run:
                                 self.plot_run = False
+                                self.EmergencyStop()
                             else:
                                 self.plot_run = True
                             #self.emulateSpace()
