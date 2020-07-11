@@ -383,7 +383,6 @@ class WorkerThread(QObject):
         itm:str = ''
         in_waiting:int = 0
         while 1:
-
             if self.cycleToRun > 0:
                 #print( self.codegen.gcodestr + ' :: cycleToRun : ' + str(self.cycleToRun))
                 if (self.cycleCount >= self.cycleToRun):

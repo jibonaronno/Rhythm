@@ -25,7 +25,7 @@ from PyQt5.QtGui import *
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QPushButton
 
-from gcodegenerator import GcodeGenerator
+from gcodegenerator import GcodeGenerator, GcodeOptions
 from dispatchers import PrimaryThread, WorkerThread, SensorThread, BipapThread, EncoderThread, BipapInitializationThread
 from kalmanlib import kalman
 from flowprocess import FlowProcess
@@ -545,7 +545,6 @@ class MainWindow(QMainWindow):
 
         self.labelSelectedMode()
         self.auxMode = MachineRunModes.BiPAP
-
         self.timerthread = TimerThread(self.tick, 25)
 
         self.plottingBaseTimer = QTimer()
@@ -800,7 +799,6 @@ class MainWindow(QMainWindow):
             self.lungtimer.stop()
 
     def EmergencyStop(self):
-        #self.on_btnstopcmv_clicked()
         self.killWorkerThread()
         self.lblStartStop.setText('Stopped')
         self.ReconnectMarlin()
@@ -1355,7 +1353,7 @@ class MainWindow(QMainWindow):
         #self.wave.changeVolume(1000)
         #self.wave.play()
 
-    def SaveSettings(self):
+    def SaveSettings(self, option=GcodeOptions.NORMAL):
         ###self.json = JsonSettings("settings.json")
         ###self.settings_dict = self.json.dict
         self.json.dict[r'vt'] = str(self.vt)
@@ -1363,7 +1361,7 @@ class MainWindow(QMainWindow):
         self.json.dict[r'rr'] = str(self.rr)
         self.json.dict[r'fio2'] = str(self.fio2)
         self.generator = GcodeGenerator(self.vt, self.rr, self.ie, self.fio2, self.vt_adjust)
-        self.generator.GenerateCMV()
+        self.generator.GenerateCMV(option=option)
         if self.workerThreadCreated:
             self.worker.updateGcode(self.generator)
         pprint.pprint(self.generator.gcodestr)

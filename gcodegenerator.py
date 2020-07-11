@@ -5,6 +5,10 @@ from machinesetup import MachineSetup
 import pprint
 from jsonobject import JsonObject
 
+class GcodeOptions(enum.Enum):
+    NORMAL = 1
+    CLOSE_LOOP = 2
+
 class GcodeGenerator(object):
     def __init__(self, vt, rr, ie, fio2, x_adj):
         self.vtfactor = 1.0
@@ -267,7 +271,7 @@ class GcodeGenerator(object):
         self.Vh = self.VhAvg
 
 
-    def GenerateCMV(self):
+    def GenerateCMV(self, option=GcodeOptions.NORMAL):
         self.ComputeCMV2()
         self.gcodeinit = "G21\r\nG80\r\nG90\r\nM92 X" + str(self.presmm) +" Y"+ str(self.presmm) +"\r\nG28 X0Y0 F500\r\nM92 X" + str(self.postsmm) + " Y" + str(self.postsmm) + "\r\nM906 X"+ str(self.motor_i_min) + " Y" + str(self.motor_i_min) +"\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC)
         self.gcodeprimary = "G21\r\nG80\r\nG90\r\nM92 X"+ str(self.presmm) +" Y"+ str(self.presmm) + "\r\nM914 X" + str(self.home_sense) + " Y" + str(self.home_sense) +"\r\nG28 X0Y0 F500\r\nM92 X"+ str(self.postsmm) +" Y"+ str(self.postsmm) + "\r\nM201 X"+str(self.ACC)+" Y"+str(self.ACC) + "\r\nM906 X"+ str(self.motor_i_min) + " Y" + str(self.motor_i_min) + "\r\nG01 X" + str(int(self.Dp)) + " Y" + str(int(self.Dp)) + " F500\r\n" + "G01 X" + str(int(self.Dt))+" Y"+str(int(self.Dt))+" F500\r\n"
@@ -275,7 +279,11 @@ class GcodeGenerator(object):
         
         #MOD self.gcodestr =  "M107\r\nG01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+"\r\nM106 S255\r\nG04 P"+ str(self.TDMS) +"\r\n" +"G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
 
-        self.gcodestr =  "G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+" \r\nG01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n"
+        if(option==GcodeOptions.NORMAL):
+
+            self.gcodestr =  "G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+" \r\nG01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n"
+        elif(option==GcodeOptions.CLOSE_LOOP):
+            self.gcodestr =  "M107\r\nG01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+"\r\nM106 S255\r\nG04 P"+ str(self.TDMS) +"\r\n" +"G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
         
         #self.gcodestr =  "G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+"\r\n" +"G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n"
 
