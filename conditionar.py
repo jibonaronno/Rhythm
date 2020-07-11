@@ -84,7 +84,7 @@ class StreamData(object):
         if not self.plot_run:
             return
         self.lines = data_stream.split('\n')
-        pprint.pprint(self.lines)
+        pprint.pprint(data_stream)
         if len(self.lines) > 0:
             for line in self.lines:
                 self.lst = line.split(',')
