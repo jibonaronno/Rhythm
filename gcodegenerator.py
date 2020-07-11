@@ -286,7 +286,7 @@ class GcodeGenerator(object):
 
         if(option==GcodeOptions.NORMAL):
 
-            self.gcodestr =  "G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+" \r\nG01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n" + "M400\r\n"
+            self.gcodestr =  "G01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+ "M400\r\n" + " \r\nG01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n"
         elif(option==GcodeOptions.CLOSE_LOOP):
             self.gcodestr =  "M107\r\nG01 X" + str(int(self.Dp))+" Y"+str(int(self.Dp))+" F"+str(int(self.ViAvg))+"\r\nM106 S255\r\nG04 P"+ str(self.TDMS) +"\r\n" +"G01 X"+str(int(self.Dt))+" Y"+str(int(self.Dt))+" F"+str(int(self.VhAvg))+"\r\n" #+"G04 P"+str(self.TDMS)+"\r\n"
         
