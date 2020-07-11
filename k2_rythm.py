@@ -1628,7 +1628,7 @@ class MainWindow(QMainWindow):
         dstr = ''
         resp = ''
         lines = data_stream.split('\r\n')
-        ##pprint.pprint(lines)
+        pprint.pprint(lines)
         ##print('**********************************************************************************')
         if len(lines) > 0:
             if '{' in lines[0] and '}' in lines[0]:
