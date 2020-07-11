@@ -4,6 +4,7 @@ from os.path import join, dirname, abspath
 from machinesetup import MachineSetup
 import pprint
 from jsonobject import JsonObject
+import enum
 
 class GcodeOptions(enum.Enum):
     NORMAL = 1
