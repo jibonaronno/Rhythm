@@ -19,6 +19,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGr
 
 import math
 import os
+import scipy
 import numpy as np
 import random
 import qtmodern.styles
@@ -75,6 +76,8 @@ class StreamData(object):
         self.volume = 0.0
         self.involume = 0.0
         self.exvolume = 0.0
+        self.peaks = []
+        self.props = []
 
     def push(self, data_stream):
         
@@ -101,6 +104,8 @@ class StreamData(object):
                             self.flow_filt_stream = self.lpf.butter_lowpass_filter(self.flow_stream, cutoff=10, fs=40, order=1)
 
                             self.filtered = self.lpf.butter_lowpass_filter(self.pressure_stream, cutoff=79, fs=20, order=1)
+                            ##self.peaks, self.props = scipy.signal.find_peaks(prominence=1, width=1.0)
+
                             self.volume_stream.popleft()
                             self.vol_filt_stream = self.lpf.butter_lowpass_filter(self.volume_stream, cutoff=79, fs=20, order=1)
 
