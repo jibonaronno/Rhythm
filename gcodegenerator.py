@@ -205,7 +205,10 @@ class GcodeGenerator(object):
 
     def ComputeCMV2(self):
         self.xavv = self.x_adj
-        self.Dt = self.xmax - self.xrect
+        
+        #MOD self.Dt = self.xmax - self.xrect #
+        self.Dt = self.xcon_offset
+
         initial_x = self.calib_dict[str(self.vt)] #self.calib_dict[450]
         #self.xav = self.calib_dict[self.vt]
         #self.xav = self.xrect * (self.vt / self.vtmax) * self.vtfactor
