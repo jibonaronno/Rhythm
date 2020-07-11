@@ -2022,7 +2022,7 @@ class MainWindow(QMainWindow):
         #self.txrxtable.scrollToBottom()
         #self.txrxtable.resizeColumnsToContents()
         #self.txrxtable.resizeRowsToContents()
-        #print(data_stream)
+        print(data_stream)
         if data_stream == "StoppedOK":
             if self.primaryThreadCreated:
                 self.primaryThread.exit()
