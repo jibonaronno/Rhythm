@@ -1053,8 +1053,8 @@
               </property>
               <property name="geometry">
                <rect>
-                <x>50</x>
-                <y>40</y>
+                <x>80</x>
+                <y>0</y>
                 <width>41</width>
                 <height>30</height>
                </rect>
@@ -1087,6 +1087,26 @@
                <number>250</number>
               </property>
              </widget>
+             <widget class="QLabel" name="vtrange">
+              <property name="geometry">
+               <rect>
+                <x>26</x>
+                <y>29</y>
+                <width>71</width>
+                <height>31</height>
+               </rect>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>11</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Range-1</string>
+              </property>
+             </widget>
              <zorder>peakdial</zorder>
              <zorder>iedial</zorder>
              <zorder>ilcd</zorder>
@@ -1105,6 +1125,7 @@
              <zorder>lblVt</zorder>
              <zorder>vtdial</zorder>
              <zorder>vtlcd</zorder>
+             <zorder>vtrange</zorder>
             </widget>
             <widget class="QWidget" name="page_2">
              <widget class="QLabel" name="label_11">

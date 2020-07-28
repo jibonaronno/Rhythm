@@ -1511,6 +1511,13 @@ class MainWindow(QMainWindow):
         self.vt = (self.vtdial.value() * 50) + 200
         self.vtlcd.display(self.vt)
         self.settings_dict[r"vt"] = str(self.vt)
+
+        if self.vt == 250:  
+            self.vtrange.setText('Range-1')
+        elif self.vt == 300:
+            self.vtrange.setText('Range-2')
+        elif self.vt == 350:
+            self.vtrange.setText('Range-3')
         #self.SaveSettings()
 
     def ieDialChanged(self):
