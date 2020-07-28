@@ -966,7 +966,7 @@ class MainWindow(QMainWindow):
         if self.iedial.isEnabled():
             self.changedial(incr, self.iedial)
 
-    def changeRRdial(self, incr=1):
+    def changeRRdial(self, incr=2):
         if self.rrdial.isEnabled():
             self.changedial(incr, self.rrdial)
 
@@ -1528,8 +1528,8 @@ class MainWindow(QMainWindow):
         #self.SaveSettings()
 
     def rrDialChanged(self):
-        self.rrlcd.display(self.rrdial.value())
-        self.rr = self.rrdial.value()
+        self.rrlcd.display(self.rrdial.value() * 2)
+        self.rr = self.rrdial.value() * 2
         self.settings_dict[r"rr"] = str(self.rr)
         #self.SaveSettings()
 
