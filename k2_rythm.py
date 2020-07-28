@@ -1510,15 +1510,15 @@ class MainWindow(QMainWindow):
 
 
     def vtDialChanged(self):
-        self.vt = (self.vtdial.value() * 50) + 200
+        self.vt = (self.vtdial.value() * 100) + 200
         self.vtlcd.display(self.vt)
         self.settings_dict[r"vt"] = str(self.vt)
 
-        if self.vt == 250:  
+        if self.vt == 300:  
             self.vtrange.setText('Range-1')
-        elif self.vt == 300:
+        elif self.vt == 400:
             self.vtrange.setText('Range-2')
-        elif self.vt == 350:
+        elif self.vt == 500:
             self.vtrange.setText('Range-3')
 
         print(str(self.vt))
