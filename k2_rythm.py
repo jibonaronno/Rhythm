@@ -556,6 +556,8 @@ class MainWindow(QMainWindow):
         self.readyToStartTimer.timeout.connect(self.labelReadyToStart)
         self.readyToStartTimer.setSingleShot(True)
 
+        self.rrDialChanged()
+
     def tick(self):
         self.plotTimer()
 
@@ -1528,8 +1530,8 @@ class MainWindow(QMainWindow):
         #self.SaveSettings()
 
     def rrDialChanged(self):
-        self.rrlcd.display(self.rrdial.value() * 2)
-        self.rr = self.rrdial.value() * 2
+        self.rrlcd.display((self.rrdial.value() * 2) + 12)
+        self.rr = (self.rrdial.value() * 2) + 12
         self.settings_dict[r"rr"] = str(self.rr)
         #self.SaveSettings()
 
