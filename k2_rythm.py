@@ -331,6 +331,7 @@ class MainWindow(QMainWindow):
         #self.plotter.hide()
         #self.flowplotter.hide()
         #self.volplotter.hide()
+        self.vtlcd.hide()
 
         self.show_hide_LeftPanel()
         #self.infoStack.hide()
@@ -579,14 +580,14 @@ class MainWindow(QMainWindow):
     def show_hide_vtdial(self, sh):
         if sh:
             self.vtdial.show()
-            self.vtlcd.show()
+            ##self.vtlcd.show()
             self.lblVt.show()
             self.labelipap.hide()
             self.ipapdial.hide()
             self.ipaplcd.hide()
         else:
             self.vtdial.hide()
-            self.vtlcd.hide()
+            ##self.vtlcd.hide()
             self.lblVt.hide()
             self.labelipap.show()
             self.ipapdial.show()
