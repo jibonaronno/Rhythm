@@ -1520,6 +1520,8 @@ class MainWindow(QMainWindow):
             self.vtrange.setText('Range-2')
         elif self.vt == 350:
             self.vtrange.setText('Range-3')
+
+        print(str(self.vt))
         #self.SaveSettings()
 
     def ieDialChanged(self):
