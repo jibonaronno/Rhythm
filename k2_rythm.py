@@ -140,7 +140,7 @@ class MainWindow(QMainWindow):
         self.bipapLookup = BipapLookup()
         self.lst = []
 
-        self.vt = (self.vtdial.value() * 50) + 200
+        self.vt = (self.vtdial.value() * 100) + 200
         self.ie = self.iedial.value()
         self.rr = self.rrdial.value()
         self.fio2 = self.fiodial.value()
