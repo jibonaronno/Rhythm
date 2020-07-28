@@ -558,6 +558,13 @@ class MainWindow(QMainWindow):
 
         self.rrDialChanged()
 
+        self.lp_back_3.hide()
+        self.lp_back_6.hide()
+        self.peak_vol.hide()
+        self.label_7.hide()
+        self.lp_back_6.hide()
+
+
     def tick(self):
         self.plotTimer()
 
@@ -1847,7 +1854,7 @@ class MainWindow(QMainWindow):
 
         rising_edge_detection = False
 
-        try:                
+        try:
             if self.flow_offseted > 0.3:
                 if not self.breathInState:
                     self.breath_in_min_time = ((60 / (self.rr * 1.2)) / (1 + self.ie)) * 1000
