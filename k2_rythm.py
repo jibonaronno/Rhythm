@@ -1845,7 +1845,7 @@ class MainWindow(QMainWindow):
         
         try:
             #self.peak_flow.setText('{:03.2f}'.format(self.flow_detector.peak_value) + 'L/Min')
-            self.peak_flow.setText('{:03.2f}'.format(self.epap) + 'mb')
+            self.peak_flow.setText('{:03.2f}'.format(self.epap - 1.5) + 'mb')
         except:
             pass
 
