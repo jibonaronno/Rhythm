@@ -713,7 +713,7 @@
                <number>1</number>
               </property>
               <property name="maximum">
-               <number>4</number>
+               <number>5</number>
               </property>
               <property name="singleStep">
                <number>1</number>
@@ -784,8 +784,11 @@
               <property name="segmentStyle">
                <enum>QLCDNumber::Flat</enum>
               </property>
+              <property name="value" stdset="0">
+               <double>12.000000000000000</double>
+              </property>
               <property name="intValue" stdset="0">
-               <number>14</number>
+               <number>12</number>
               </property>
              </widget>
              <widget class="QPushButton" name="btnchangeset">

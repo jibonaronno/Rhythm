@@ -1539,8 +1539,8 @@ class MainWindow(QMainWindow):
         #self.SaveSettings()
 
     def rrDialChanged(self):
-        self.rrlcd.display((self.rrdial.value() * 2) + 12)
-        self.rr = (self.rrdial.value() * 2) + 12
+        self.rrlcd.display((self.rrdial.value() * 2) + 10)
+        self.rr = (self.rrdial.value() * 2) + 10
         self.settings_dict[r"rr"] = str(self.rr)
         #self.SaveSettings()
 
