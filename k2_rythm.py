@@ -934,12 +934,14 @@ class MainWindow(QMainWindow):
         else:
             self.changeCmvParams()
 
+    #when Stream button pressed.
     @Slot()
     def on_btnstream_clicked(self):
         self.streamer = Backfeed('log4.txt')
         self.streamer.setCallback(self.getStreamData)
         self.streamer.Start(100)
-        self.lungtimer.start(8000)
+        #following lungtimer is commented for test.
+        #self.lungtimer.start(8000) #The timer that alarms if lung peak is not detected within time period
         #self.plotter.addItem(self.markerPeakPressure)
 
     @Slot()
