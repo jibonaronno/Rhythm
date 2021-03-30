@@ -9,4 +9,4 @@ In k2_rythm.py at
         self.streamer.setCallback(self.getStreamData)
         self.streamer.Start(100)
 ```
-see that ```python self.getStreamData``` is registered to the callback, hence ```python getStreamData``` eventually calls to ```python self.LungSensorData(line)``` which is the main graph displaying and other dicision makin function.
+see that ```self.getStreamData``` is registered to the callback, hence ```getStreamData``` eventually calls to ```self.LungSensorData(line)``` which is the main graph displaying and other dicision makin function.
