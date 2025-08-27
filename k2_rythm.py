@@ -14,7 +14,7 @@ from collections import deque
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QPushButton
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QPushButton, QTableWidget
 
 import math
 import os
