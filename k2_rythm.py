@@ -634,7 +634,7 @@ class MainWindow(QMainWindow):
     #     self.buttonstack.setCurrentIndex(1)
     #     pass
 
-    left_panel_visible = True
+    left_panel_visible = False
 
     def show_hide_LeftPanel(self):
         if self.left_panel_visible:
